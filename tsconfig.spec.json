@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "module": "commonjs",
+    "allowJs": true,
+    "types": [
+      "jest",
+      "node"
+    ],
+    "composite": true,
+    "declaration": false
+  },
+  "include": [
+    "jest.config.ts",
+    "tests/**/*.ts",
+    "src/**/*.ts",
+    "src/**/*.js",
+    "src/fixtures/**/*.ts"
+  ]
+}
