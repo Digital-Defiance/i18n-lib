@@ -1,17 +1,39 @@
+// Legacy exports (for backwards compatibility)
 export * from './active-context';
+export * from './component-definition';
+export * from './component-registration';
+export * from './component-registry';
 export * from './context';
 export * from './context-manager';
 export * from './currency';
 export * from './currency-code';
 export * from './currency-format';
-export * from './enum-registry';
 export * from './default-config';
+export * from './enum-registry';
+export * from './i18n-context';
 export * from './i18n-engine';
+export * from './language-definition';
 export * from './template';
 export * from './timezone';
 export * from './typed-error';
 export * from './types';
 export * from './utils';
+export * from './validation-config';
+export * from './validation-result';
+
+export * from './core-i18n';
+export * from './core-language';
+export * from './core-string-key';
+export * from './language-registry';
+export * from './plugin-i18n-engine';
+export * from './registry-config';
+export * from './registry-context';
+export * from './registry-error';
+export * from './registry-error-type';
+export * from './translation-request';
+export * from './translation-response';
 
 // Re-export for convenience
+export { createCoreI18nEngine as createCoreI18n } from './core-i18n';
 export { I18nEngine as I18n } from './i18n-engine';
+export { PluginI18nEngine as PluginI18n } from './plugin-i18n-engine';

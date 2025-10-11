@@ -1,5 +1,6 @@
-import { CurrencyCode } from './currency-code';
-import { Timezone } from './timezone';
+import { ComponentDefinition } from './component-definition';
+import { ComponentRegistration } from './component-registration';
+import { LanguageDefinition } from './language-definition';
 
 /**
  * Standard language contexts
@@ -52,42 +53,38 @@ export type EnumTranslationMap<
 > = Partial<Record<TLanguage, Partial<Record<TEnum, string>>>>;
 
 /**
- * I18n configuration interface
+ * String collection for a specific language and component
  */
-export interface I18nConfig<
-  TStringKey extends string,
-  TLanguage extends string,
-  TConstants extends Record<string, any> = Record<string, any>,
-  TTranslationContext extends string = LanguageContext,
-> {
-  stringNames: TStringKey[];
-  strings: MasterStringsCollection<TStringKey, TLanguage>;
-  defaultLanguage: TLanguage;
-  defaultTranslationContext: TTranslationContext;
-  defaultCurrencyCode: CurrencyCode;
-  languageCodes: LanguageCodeCollection<TLanguage>;
-  languages: TLanguage[];
-  constants?: TConstants;
-  enumName?: string;
-  enumObj?: Record<string, TStringKey>;
-  timezone: Timezone;
-  adminTimezone: Timezone;
-}
+export type ComponentStrings<TStringKeys extends string> = {
+  [K in TStringKeys]: string;
+};
 
 /**
- * I18n context interface
+ * Partial string collection (used during registration before validation)
  */
-export interface I18nContext<
-  TLanguage extends string,
-  TTranslationContext extends string = LanguageContext,
-> {
-  language: TLanguage;
-  adminLanguage: TLanguage;
-  currencyCode: CurrencyCode;
-  currentContext: TTranslationContext;
-  timezone: Timezone;
-  adminTimezone: Timezone;
-}
+export type PartialComponentStrings<TStringKeys extends string> = {
+  [K in TStringKeys]?: string;
+};
+
+/**
+ * Language strings for a component across all registered languages
+ */
+export type ComponentLanguageStrings<
+  TStringKeys extends string,
+  TLanguages extends string,
+> = {
+  [L in TLanguages]: ComponentStrings<TStringKeys>;
+};
+
+/**
+ * Partial language strings (used during registration before validation)
+ */
+export type PartialComponentLanguageStrings<
+  TStringKeys extends string,
+  TLanguages extends string,
+> = {
+  [L in TLanguages]?: PartialComponentStrings<TStringKeys>;
+};
 
 /**
  * Generic translation type for any enumeration
@@ -105,6 +102,36 @@ export type EnumLanguageTranslation<
 > = Partial<{
   [L in TLanguage]: EnumTranslation<T>;
 }>;
+
+/**
+ * Type utility to extract string keys from a component definition
+ */
+export type ExtractStringKeys<T> = T extends ComponentDefinition<infer K>
+  ? K
+  : never;
+
+/**
+ * Type utility to extract languages from registry
+ */
+export type ExtractLanguages<T> = T extends LanguageDefinition
+  ? T['id']
+  : never;
+
+/**
+ * Type utility to create a strongly typed component registration
+ */
+export type CreateComponentRegistration<
+  TComponent extends ComponentDefinition<any>,
+  TLanguages extends string,
+> = ComponentRegistration<ExtractStringKeys<TComponent>, TLanguages>;
+
+/**
+ * Utility type to ensure all string keys are provided for all languages
+ */
+export type CompleteComponentStrings<
+  TStringKeys extends string,
+  TLanguages extends string,
+> = ComponentLanguageStrings<TStringKeys, TLanguages>;
 
 /**
  * Helper function to create typed translations for an enumeration

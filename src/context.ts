@@ -1,6 +1,7 @@
 import { CurrencyCode } from './currency-code';
+import { I18nContext } from './i18n-context';
 import { Timezone } from './timezone';
-import { I18nContext, LanguageContext } from './types';
+import { LanguageContext } from './types';
 
 /**
  * Creates a new I18n context with default values.

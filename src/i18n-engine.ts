@@ -1,7 +1,9 @@
 import { createContext } from './context';
 import { EnumTranslationRegistry } from './enum-registry';
+import { I18nConfig } from './i18n-config';
+import { I18nContext } from './i18n-context';
 import { createTemplateProcessor } from './template';
-import { EnumLanguageTranslation, I18nConfig, I18nContext } from './types';
+import { EnumLanguageTranslation } from './types';
 import { isTemplate, replaceVariables } from './utils';
 
 /**

@@ -1,4 +1,5 @@
-import { CurrencyCode, I18nConfig, I18nEngine, Timezone } from '../src';
+import { CurrencyCode, I18nEngine, Timezone } from '../src';
+import { I18nConfig } from '../src/i18n-config';
 
 enum TestStrings {
   Simple = 'simple',
@@ -110,12 +111,14 @@ describe('I18nEngine', () => {
     it('should convert non-string translation results to strings', () => {
       // Mock a scenario where getString might return a non-string
       const originalGetString = (i18n as any).getString;
-      (i18n as any).getString = jest.fn().mockReturnValue({ toString: () => 'MockedString' });
-      
+      (i18n as any).getString = jest
+        .fn()
+        .mockReturnValue({ toString: () => 'MockedString' });
+
       const result = i18n.translate(TestStrings.Simple);
       expect(typeof result).toBe('string');
       expect(result).toBe('MockedString');
-      
+
       // Restore original method
       (i18n as any).getString = originalGetString;
     });
@@ -123,12 +126,14 @@ describe('I18nEngine', () => {
     it('should handle objects without custom toString as [object Object]', () => {
       // Mock a scenario where getString returns a plain object
       const originalGetString = (i18n as any).getString;
-      (i18n as any).getString = jest.fn().mockReturnValue({ someProperty: 'value' });
-      
+      (i18n as any).getString = jest
+        .fn()
+        .mockReturnValue({ someProperty: 'value' });
+
       const result = i18n.translate(TestStrings.Simple);
       expect(typeof result).toBe('string');
       expect(result).toBe('[object Object]');
-      
+
       // Restore original method
       (i18n as any).getString = originalGetString;
     });
@@ -137,7 +142,7 @@ describe('I18nEngine', () => {
       const result = i18n.translate(TestStrings.Template, {
         complexVar: { nested: { value: 'test' } } as any,
       });
-      
+
       expect(typeof result).toBe('string');
       expect(result).not.toBe('[object Object]');
       expect(result).toContain('Hello');
@@ -178,7 +183,11 @@ describe('I18nEngine', () => {
       };
 
       expect(() => {
-        i18n.registerEnum(invalidEnum, invalidTranslations as any, 'InvalidEnum');
+        i18n.registerEnum(
+          invalidEnum,
+          invalidTranslations as any,
+          'InvalidEnum',
+        );
       }).toThrow('Error_EnumLanguageNotAvailableTemplate');
     });
   });
@@ -195,7 +204,10 @@ describe('I18nEngine', () => {
       I18nEngine.clearInstances();
       const configWithEnumErrors = {
         ...testConfig,
-        stringNames: [...Object.values(TestStrings), 'Error_EnumNotFoundTemplate'] as any,
+        stringNames: [
+          ...Object.values(TestStrings),
+          'Error_EnumNotFoundTemplate',
+        ] as any,
         strings: {
           [TestLanguages.English]: {
             ...testConfig.strings[TestLanguages.English],
@@ -203,7 +215,8 @@ describe('I18nEngine', () => {
           },
           [TestLanguages.Spanish]: {
             ...testConfig.strings[TestLanguages.Spanish],
-            Error_EnumNotFoundTemplate: 'Error de enum personalizado: {enumName}',
+            Error_EnumNotFoundTemplate:
+              'Error de enum personalizado: {enumName}',
           },
           [TestLanguages.French]: {
             ...testConfig.strings[TestLanguages.French],
@@ -211,11 +224,15 @@ describe('I18nEngine', () => {
           },
         },
       };
-      
+
       const engineWithErrors = new I18nEngine(configWithEnumErrors);
-      
+
       expect(() => {
-        engineWithErrors.enumRegistry.translate({ Unknown: 'unknown' }, 'unknown' as any, TestLanguages.English);
+        engineWithErrors.enumRegistry.translate(
+          { Unknown: 'unknown' },
+          'unknown' as any,
+          TestLanguages.English,
+        );
       }).toThrow('Custom enum error: UnknownEnum');
     });
   });
@@ -252,7 +269,7 @@ describe('I18nEngine', () => {
       };
       I18nEngine.clearInstances();
       const engine = new I18nEngine(configWithoutCodes);
-      
+
       const result = engine.getLanguageCode(TestLanguages.English);
       expect(result).toBe(TestLanguages.English);
     });
@@ -271,7 +288,7 @@ describe('I18nEngine', () => {
         language: TestLanguages.Spanish,
         currentContext: 'user',
       };
-      
+
       expect(i18n.context.language).toBe(TestLanguages.Spanish);
       expect(i18n.context.currentContext).toBe('user');
       expect(i18n.context.adminLanguage).toBe(TestLanguages.English);
@@ -308,12 +325,18 @@ describe('I18nEngine', () => {
     });
 
     it('should process enum patterns with variables', () => {
-      const result = i18n.t('{{TestStrings.Template}}', TestLanguages.English, { name: 'John' });
+      const result = i18n.t('{{TestStrings.Template}}', TestLanguages.English, {
+        name: 'John',
+      });
       expect(result).toBe('Hello, John!');
     });
 
     it('should process multiple enum patterns', () => {
-      const result = i18n.t('{{TestStrings.Simple}} {{TestStrings.Template}}', TestLanguages.English, { name: 'World' });
+      const result = i18n.t(
+        '{{TestStrings.Simple}} {{TestStrings.Template}}',
+        TestLanguages.English,
+        { name: 'World' },
+      );
       expect(result).toBe('Hello Hello, World!');
     });
 
@@ -359,13 +382,13 @@ describe('I18nEngine', () => {
           [TestLanguages.French]: testConfig.strings[TestLanguages.French],
         },
       };
-      
+
       expect(() => {
         new I18nEngine(invalidConfig);
-      }).toThrow("Missing translation for key 'template' in language 'English'");
+      }).toThrow(
+        "Missing translation for key 'template' in language 'English'",
+      );
     });
-
-
 
     it('should throw error for missing default language collection', () => {
       const invalidConfig = {
@@ -375,7 +398,7 @@ describe('I18nEngine', () => {
           // Missing English (default) strings
         },
       };
-      
+
       expect(() => {
         new I18nEngine(invalidConfig);
       }).toThrow("Default language 'English' has no string collection");
@@ -384,7 +407,10 @@ describe('I18nEngine', () => {
     it('should use localized error messages when available', () => {
       const configWithErrorMessages = {
         ...testConfig,
-        stringNames: [...Object.values(TestStrings), 'Error_DefaultLanguageNoCollectionTemplate'] as any,
+        stringNames: [
+          ...Object.values(TestStrings),
+          'Error_DefaultLanguageNoCollectionTemplate',
+        ] as any,
         strings: {
           [TestLanguages.Spanish]: testConfig.strings[TestLanguages.Spanish],
           [TestLanguages.French]: testConfig.strings[TestLanguages.French],
@@ -392,7 +418,7 @@ describe('I18nEngine', () => {
         },
         defaultLanguage: TestLanguages.English,
       };
-      
+
       expect(() => {
         new I18nEngine(configWithErrorMessages);
       }).toThrow("Default language 'English' has no string collection");
