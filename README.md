@@ -231,6 +231,37 @@ const userNotFound = getUserTranslation(
 
 ### Advanced Plugin Usage
 
+#### Compile-Time Completeness Enforcement (Strict Mode)
+
+By default the plugin engine performs runtime validation and provides fallbacks. If you want **compile-time** enforcement that every language mapping contains every string key, use the helper in `strict-types`:
+
+```typescript
+import { createCompleteComponentStrings } from '@digitaldefiance/i18n-lib';
+
+enum MyStrings {
+  Welcome = 'welcome',
+  Farewell = 'farewell'
+}
+
+type AppLang = 'en' | 'fr';
+
+// This will only compile if BOTH languages contain BOTH keys.
+const myStrictStrings = createCompleteComponentStrings<MyStrings, AppLang>({
+  en: {
+    [MyStrings.Welcome]: 'Welcome',
+    [MyStrings.Farewell]: 'Goodbye'
+  },
+  fr: {
+    [MyStrings.Welcome]: 'Bienvenue',
+    [MyStrings.Farewell]: 'Au revoir'
+  }
+});
+
+// If any key is missing, TypeScript reports an error before runtime.
+```
+
+The core library itself uses this helper for the core component (`createCoreComponentStrings`) to guarantee internal completeness. For partial / iterative authoring you can still start with normal objects and later switch to the strict helper when translations stabilize.
+
 #### Adding New Languages
 
 ```typescript
@@ -858,6 +889,12 @@ MIT
 Part of the DigitalBurnbag project - a secure file sharing and automated protocol system.
 
 ## ChangeLog
+
+### Version 1.1.1
+
+- Sat Oct 11 2025 17:47:00 GMT-0700 (Pacific Daylight Time)
+  - Improved type checking for completeness of component translations during registration
+  - Updated README/Migration guide for clarity.
 
 ### Version 1.1.0
 

@@ -464,6 +464,36 @@ console.log(result3.isValid); // false - missing German
 
 ### Strict Validation Mode
 
+### Compile-Time Strict Completeness (Optional)
+
+If you want the compiler to refuse builds when any translation is missing for a component, use the `createCompleteComponentStrings` helper:
+
+```typescript
+import { createCompleteComponentStrings } from '@digitaldefiance/i18n-lib';
+
+enum ProfileStrings {
+  Header = 'header',
+  SaveSuccess = 'saveSuccess'
+}
+
+type AppLang = CoreLanguage.EnglishUS | CoreLanguage.French;
+
+const profileStrings = createCompleteComponentStrings<ProfileStrings, AppLang>({
+  [CoreLanguage.EnglishUS]: {
+    [ProfileStrings.Header]: 'Profile',
+    [ProfileStrings.SaveSuccess]: 'Profile saved'
+  },
+  [CoreLanguage.French]: {
+    [ProfileStrings.Header]: 'Profil',
+    [ProfileStrings.SaveSuccess]: 'Profil enregistré'
+  }
+});
+
+// Any omission (e.g. forgetting SaveSuccess in FR) triggers a TypeScript error immediately.
+```
+
+Adopt this after an initial migration to lock in completeness guarantees at compile time.
+
 For production applications requiring complete translations:
 
 ```typescript

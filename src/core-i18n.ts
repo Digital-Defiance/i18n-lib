@@ -9,6 +9,7 @@ import { CoreStringKey } from './core-string-key';
 import { LanguageDefinition } from './language-definition';
 import { createLanguageDefinitions } from './language-registry';
 import { PluginI18nEngine } from './plugin-i18n-engine';
+import { createCompleteComponentStrings } from './strict-types';
 
 /**
  * Create default language definitions
@@ -72,7 +73,7 @@ export const CoreComponentDefinition: ComponentDefinition<CoreStringKey> = {
  * Core component strings for all default languages
  */
 export function createCoreComponentStrings() {
-  return {
+  return createCompleteComponentStrings<CoreStringKey, CoreLanguage>({
     [CoreLanguage.EnglishUS]: {
       // Common/General
       [CoreStringKey.Common_Yes]: 'Yes',
@@ -486,7 +487,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_OperationComplete]: 'Операція успішно завершена',
       [CoreStringKey.System_NoDataAvailable]: 'Дані недоступні',
     },
-  };
+  });
 }
 
 /**

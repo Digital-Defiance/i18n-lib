@@ -143,7 +143,9 @@ export class PluginI18nEngine<TLanguages extends string> {
 
     // Update component registry with new language
     const newLanguages = this.languageRegistry.getLanguageIds();
-    this.componentRegistry.updateRegisteredLanguages(newLanguages as TLanguages[]);
+    this.componentRegistry.updateRegisteredLanguages(
+      newLanguages as TLanguages[],
+    );
   }
 
   /**
