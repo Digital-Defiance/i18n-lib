@@ -84,6 +84,15 @@ export class PluginI18nEngine<TLanguages extends string> {
       timezone: this.config.timezone,
       adminTimezone: this.config.adminTimezone,
     };
+
+    // Auto-register as default instance if none exists
+    if (!PluginI18nEngine._defaultKey) {
+      PluginI18nEngine._instances.set(
+        PluginI18nEngine.DefaultInstanceKey,
+        this,
+      );
+      PluginI18nEngine._defaultKey = PluginI18nEngine.DefaultInstanceKey;
+    }
   }
 
   /**
@@ -392,5 +401,56 @@ export class PluginI18nEngine<TLanguages extends string> {
     }
 
     return { isValid, errors, warnings };
+  }
+
+  /**
+   * Clear all component registrations for this instance (useful for testing)
+   */
+  public clearAllComponents(): void {
+    this.componentRegistry.clearAllComponents();
+  }
+
+  /**
+   * Clear all named instances (useful for testing)
+   */
+  public static clearAllInstances(): void {
+    PluginI18nEngine._instances.clear();
+    PluginI18nEngine._defaultKey = null;
+  }
+
+  /**
+   * Remove a specific named instance
+   */
+  public static removeInstance(key?: string): boolean {
+    const instanceKey = key || PluginI18nEngine.DefaultInstanceKey;
+    const removed = PluginI18nEngine._instances.delete(instanceKey);
+
+    // If we removed the default instance, clear the default key
+    if (removed && PluginI18nEngine._defaultKey === instanceKey) {
+      PluginI18nEngine._defaultKey = null;
+    }
+
+    return removed;
+  }
+
+  /**
+   * Check if an instance exists
+   */
+  public static hasInstance(key?: string): boolean {
+    const instanceKey = key || PluginI18nEngine.DefaultInstanceKey;
+    return PluginI18nEngine._instances.has(instanceKey);
+  }
+
+  /**
+   * Reset all plugin engines and clear component registrations
+   * Useful for test cleanup
+   */
+  public static resetAll(): void {
+    for (const [key, engine] of PluginI18nEngine._instances) {
+      // Clear component registrations for each engine
+      engine.clearAllComponents();
+    }
+    PluginI18nEngine._instances.clear();
+    PluginI18nEngine._defaultKey = null;
   }
 }

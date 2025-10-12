@@ -721,6 +721,52 @@ yarn test enum-registry.spec.ts
 yarn test i18n-engine.spec.ts
 ```
 
+### Test Cleanup and Instance Management
+
+For proper test isolation when using the plugin-based architecture, use the cleanup utilities:
+
+```typescript
+import { PluginI18nEngine, resetAllI18nEngines } from '@digitaldefiance/i18n-lib';
+
+describe('My tests', () => {
+  beforeEach(() => {
+    // Clean up any existing instances before each test
+    PluginI18nEngine.clearAllInstances();
+  });
+
+  afterEach(() => {
+    // Or use the convenience function
+    resetAllI18nEngines();
+  });
+
+  // Or use specific cleanup methods
+  it('should manage instances', () => {
+    const engine1 = PluginI18nEngine.createInstance('app1', [englishLang]);
+    const engine2 = PluginI18nEngine.createInstance('app2', [frenchLang]);
+
+    // Check if instances exist
+    expect(PluginI18nEngine.hasInstance('app1')).toBe(true);
+    expect(PluginI18nEngine.hasInstance('app2')).toBe(true);
+
+    // Remove specific instance
+    PluginI18nEngine.removeInstance('app1');
+    expect(PluginI18nEngine.hasInstance('app1')).toBe(false);
+
+    // Clear all instances and component registrations
+    PluginI18nEngine.resetAll();
+    expect(PluginI18nEngine.hasInstance('app2')).toBe(false);
+  });
+});
+```
+
+#### Available Cleanup Methods
+
+- `PluginI18nEngine.clearAllInstances()` - Remove all engine instances
+- `PluginI18nEngine.removeInstance(key?)` - Remove specific instance by key
+- `PluginI18nEngine.hasInstance(key?)` - Check if instance exists  
+- `PluginI18nEngine.resetAll()` - Clear instances and component registrations
+- `resetAllI18nEngines()` - Convenience function that calls `resetAll()`
+
 ## Extensible Configuration
 
 The library supports layered extension across multiple libraries using TypeScript module augmentation:
@@ -889,6 +935,11 @@ MIT
 Part of the DigitalBurnbag project - a secure file sharing and automated protocol system.
 
 ## ChangeLog
+
+### Version 1.1.2
+
+- Sat Oct 11 2025 19:25:00 GMT-0700 (Pacific Daylight Time)
+  - Added cleanup mechanisms for other modules to deregister, etc.
 
 ### Version 1.1.1
 

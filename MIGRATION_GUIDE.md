@@ -566,6 +566,100 @@ if (!componentValidation.isValid) {
 - [ ] Validate all components are complete
 - [ ] Remove old I18nEngine code
 
+## Testing with the New Architecture
+
+The new plugin-based architecture introduces instance management that requires proper cleanup for test isolation.
+
+### Key Differences in Testing
+
+**Legacy System:**
+
+```typescript
+// Old way - simple per-test cleanup
+beforeEach(() => {
+  I18nEngine.clearInstances(); // Simple static cleanup
+});
+```
+
+**New Plugin System:**
+
+```typescript
+// New way - comprehensive cleanup including component registrations
+import { PluginI18nEngine, resetAllI18nEngines } from '@digitaldefiance/i18n-lib';
+
+beforeEach(() => {
+  // Clear instances and component registrations
+  PluginI18nEngine.clearAllInstances();
+});
+
+afterEach(() => {
+  // Or use the convenience function
+  resetAllI18nEngines();
+});
+```
+
+### Test Isolation Best Practices
+
+```typescript
+describe('My App Tests', () => {
+  beforeEach(() => {
+    // Essential: Clear all instances before each test
+    PluginI18nEngine.clearAllInstances();
+  });
+
+  afterEach(() => {
+    // Optional: Additional cleanup after each test
+    resetAllI18nEngines();
+  });
+
+  it('should handle translations correctly', () => {
+    // Each test starts with a clean slate
+    const i18n = createCoreI18nEngine('test-app');
+    // ... test logic
+  });
+});
+```
+
+### Available Cleanup Methods
+
+- `PluginI18nEngine.clearAllInstances()` - Remove all engine instances
+- `PluginI18nEngine.removeInstance(key?)` - Remove specific instance
+- `PluginI18nEngine.hasInstance(key?)` - Check if instance exists
+- `PluginI18nEngine.resetAll()` - Clear instances and component registrations
+- `resetAllI18nEngines()` - Convenience function for complete cleanup
+
+### Migration Testing Strategy
+
+1. **Gradual Testing**: Run both systems in parallel during migration
+2. **Instance Isolation**: Always clean up between tests
+3. **Component Validation**: Test that components register successfully
+4. **Translation Verification**: Verify all translations work correctly
+
+```typescript
+// Example migration test setup
+describe('Migration Tests', () => {
+  beforeEach(() => {
+    I18nEngine.clearInstances();           // Clean legacy system
+    PluginI18nEngine.clearAllInstances();  // Clean new system
+  });
+
+  it('should produce same translations in both systems', () => {
+    // Set up legacy system
+    const legacy = new I18nEngine(legacyConfig);
+    
+    // Set up new system
+    const modern = createCoreI18nEngine('test');
+    modern.registerComponent(modernComponent);
+    
+    // Compare outputs
+    const legacyText = legacy.translate(OldStrings.Welcome);
+    const modernText = modern.translate('component', NewStrings.Welcome);
+    
+    expect(modernText).toBe(legacyText);
+  });
+});
+```
+
 ## Troubleshooting
 
 ### Issue: Missing Translations

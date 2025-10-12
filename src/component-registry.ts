@@ -381,4 +381,12 @@ export class ComponentRegistry<TLanguages extends string> {
 
     return result;
   }
+
+  /**
+   * Clear all components and their strings (useful for testing)
+   */
+  public clearAllComponents(): void {
+    this.components.clear();
+    this.componentStrings.clear();
+  }
 }

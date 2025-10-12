@@ -416,4 +416,187 @@ describe('Component Registration Validation', () => {
       }).toThrow(RegistryError);
     });
   });
+
+  describe('Instance Management and Cleanup', () => {
+    beforeEach(() => {
+      // Clean up instances before each test for proper isolation
+      PluginI18nEngine.clearAllInstances();
+    });
+
+    afterEach(() => {
+      // Clean up instances after each test for proper isolation
+      PluginI18nEngine.clearAllInstances();
+    });
+
+    describe('Instance creation and retrieval', () => {
+      it('should create and retrieve default instance', () => {
+        const engine1 = new PluginI18nEngine([englishLang]);
+        const engine2 = PluginI18nEngine.getInstance();
+
+        expect(engine2).toBe(engine1);
+      });
+
+      it('should create and retrieve named instances', () => {
+        const adminEngine = PluginI18nEngine.createInstance('admin', [
+          englishLang,
+        ]);
+        const userEngine = PluginI18nEngine.createInstance('user', [
+          englishLang,
+          frenchLang,
+        ]);
+
+        expect(PluginI18nEngine.getInstance('admin')).toBe(adminEngine);
+        expect(PluginI18nEngine.getInstance('user')).toBe(userEngine);
+        expect(adminEngine).not.toBe(userEngine);
+      });
+
+      it('should check if instance exists', () => {
+        expect(PluginI18nEngine.hasInstance()).toBe(false);
+        expect(PluginI18nEngine.hasInstance('custom')).toBe(false);
+
+        new PluginI18nEngine([englishLang]);
+        expect(PluginI18nEngine.hasInstance()).toBe(true);
+        expect(PluginI18nEngine.hasInstance('custom')).toBe(false);
+
+        PluginI18nEngine.createInstance('custom', [englishLang]);
+        expect(PluginI18nEngine.hasInstance('custom')).toBe(true);
+      });
+
+      it('should throw error for non-existent instance', () => {
+        expect(() => {
+          PluginI18nEngine.getInstance('nonexistent');
+        }).toThrow("I18n instance with key 'nonexistent' not found");
+      });
+    });
+
+    describe('Instance cleanup methods', () => {
+      beforeEach(() => {
+        // Set up some test instances and components
+        const engine1 = new PluginI18nEngine([englishLang, frenchLang]);
+        const engine2 = PluginI18nEngine.createInstance('test', [englishLang]);
+
+        // Register some components
+        const component: ComponentDefinition<ComponentAStrings> = {
+          id: 'test-component',
+          name: 'Test Component',
+          stringKeys: Object.values(ComponentAStrings),
+        };
+
+        const registration: ComponentRegistration<
+          ComponentAStrings,
+          'en' | 'fr'
+        > = {
+          component,
+          strings: {
+            en: {
+              [ComponentAStrings.Welcome]: 'Welcome',
+              [ComponentAStrings.Goodbye]: 'Goodbye',
+            },
+            fr: {
+              [ComponentAStrings.Welcome]: 'Bienvenue',
+              [ComponentAStrings.Goodbye]: 'Au revoir',
+            },
+          },
+        };
+
+        engine1.registerComponent(registration);
+        engine2.registerComponent(registration);
+      });
+
+      it('should clear all instances', () => {
+        expect(PluginI18nEngine.hasInstance()).toBe(true);
+        expect(PluginI18nEngine.hasInstance('test')).toBe(true);
+
+        PluginI18nEngine.clearAllInstances();
+
+        expect(PluginI18nEngine.hasInstance()).toBe(false);
+        expect(PluginI18nEngine.hasInstance('test')).toBe(false);
+
+        // Should throw when trying to get non-existent instances
+        expect(() => PluginI18nEngine.getInstance()).toThrow();
+        expect(() => PluginI18nEngine.getInstance('test')).toThrow();
+      });
+
+      it('should remove specific instance', () => {
+        expect(PluginI18nEngine.hasInstance()).toBe(true);
+        expect(PluginI18nEngine.hasInstance('test')).toBe(true);
+
+        const removed = PluginI18nEngine.removeInstance('test');
+        expect(removed).toBe(true);
+
+        expect(PluginI18nEngine.hasInstance()).toBe(true);
+        expect(PluginI18nEngine.hasInstance('test')).toBe(false);
+
+        // Should be able to remove default instance too
+        const removedDefault = PluginI18nEngine.removeInstance();
+        expect(removedDefault).toBe(true);
+        expect(PluginI18nEngine.hasInstance()).toBe(false);
+      });
+
+      it('should return false when removing non-existent instance', () => {
+        const removed = PluginI18nEngine.removeInstance('nonexistent');
+        expect(removed).toBe(false);
+      });
+
+      it('should reset all instances and clear component registrations', () => {
+        // Verify instances and components exist
+        const engine1 = PluginI18nEngine.getInstance();
+        const engine2 = PluginI18nEngine.getInstance('test');
+
+        expect(engine1.hasComponent('test-component')).toBe(true);
+        expect(engine2.hasComponent('test-component')).toBe(true);
+
+        // Reset all
+        PluginI18nEngine.resetAll();
+
+        // Instances should be cleared
+        expect(PluginI18nEngine.hasInstance()).toBe(false);
+        expect(PluginI18nEngine.hasInstance('test')).toBe(false);
+
+        // Should throw when trying to get instances
+        expect(() => PluginI18nEngine.getInstance()).toThrow();
+        expect(() => PluginI18nEngine.getInstance('test')).toThrow();
+      });
+
+      it('should handle resetAll when no instances exist', () => {
+        PluginI18nEngine.clearAllInstances();
+
+        // Should not throw
+        expect(() => {
+          PluginI18nEngine.resetAll();
+        }).not.toThrow();
+      });
+    });
+
+    describe('Component cleanup integration', () => {
+      it('should clear component registrations when clearing instances', () => {
+        const engine = new PluginI18nEngine([englishLang]);
+
+        const component: ComponentDefinition<ComponentAStrings> = {
+          id: 'cleanup-test',
+          name: 'Cleanup Test',
+          stringKeys: Object.values(ComponentAStrings),
+        };
+
+        const registration: ComponentRegistration<ComponentAStrings, 'en'> = {
+          component,
+          strings: {
+            en: {
+              [ComponentAStrings.Welcome]: 'Welcome',
+              [ComponentAStrings.Goodbye]: 'Goodbye',
+            },
+          },
+        };
+
+        engine.registerComponent(registration);
+        expect(engine.hasComponent('cleanup-test')).toBe(true);
+
+        // Clear instances should allow new engines to start fresh
+        PluginI18nEngine.clearAllInstances();
+
+        const newEngine = new PluginI18nEngine([englishLang]);
+        expect(newEngine.hasComponent('cleanup-test')).toBe(false);
+      });
+    });
+  });
 });

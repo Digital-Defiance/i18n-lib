@@ -1,6 +1,6 @@
 {
   "name": "@digitaldefiance/i18n-lib",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Generic i18n library with enum translation support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

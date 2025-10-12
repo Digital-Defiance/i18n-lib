@@ -37,3 +37,14 @@ export * from './translation-response';
 export { createCoreI18nEngine as createCoreI18n } from './core-i18n';
 export { I18nEngine as I18n } from './i18n-engine';
 export { PluginI18nEngine as PluginI18n } from './plugin-i18n-engine';
+
+// Testing utilities
+import { PluginI18nEngine } from './plugin-i18n-engine';
+
+/**
+ * Reset all I18n engines and clear component registrations
+ * Useful for test cleanup
+ */
+export function resetAllI18nEngines(): void {
+  PluginI18nEngine.resetAll();
+}
