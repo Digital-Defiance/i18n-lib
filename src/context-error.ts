@@ -1,21 +1,16 @@
 import { ContextErrorType } from './context-error-type';
-import { CoreLanguage } from './core-language';
-import { CoreStringKey } from './core-string-key';
-import { PluginI18nEngine } from './plugin-i18n-engine';
-import { CoreTypedError } from './typed-error';
 
-export class ContextError extends CoreTypedError<typeof ContextErrorType> {
+export class ContextError extends Error {
+  public readonly type: ContextErrorType;
+  public readonly contextKey?: string;
+
   constructor(type: ContextErrorType, contextKey?: string) {
-    const engine = PluginI18nEngine.getInstance<CoreLanguage>();
-    super(
-      engine,
-      type,
-      {
-        [ContextErrorType.InvalidContext]:
-          CoreStringKey.Error_InvalidContextTemplate,
-      },
-      undefined,
-      { ...(contextKey && { contextKey }) },
-    );
+    const message = contextKey 
+      ? `Invalid context: ${contextKey}`
+      : 'Invalid context';
+    super(message);
+    this.name = 'ContextError';
+    this.type = type;
+    this.contextKey = contextKey;
   }
 }

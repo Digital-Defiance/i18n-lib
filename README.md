@@ -564,7 +564,7 @@ I18nEngine.removeInstance('main');
 
 - `new PluginI18nEngine<TLanguages>(languages, config?)` - Create new plugin engine
 - `PluginI18nEngine.createInstance<TLanguages>(key, languages, config?)` - Create named instance
-- `PluginI18nEngine.getInstance<TLanguages>(key?)` - Get existing instance
+- `PluginI18nEngine.getInstance<TLanguages>(key?)` - Get existing instance (throws error if not found)
 
 **Component Management**
 
@@ -762,8 +762,9 @@ describe('My tests', () => {
 #### Available Cleanup Methods
 
 - `PluginI18nEngine.clearAllInstances()` - Remove all engine instances
-- `PluginI18nEngine.removeInstance(key?)` - Remove specific instance by key
-- `PluginI18nEngine.hasInstance(key?)` - Check if instance exists  
+- `PluginI18nEngine.removeInstance(key?)` - Remove specific instance by key (returns boolean)
+- `PluginI18nEngine.hasInstance(key?)` - Check if instance exists (returns boolean)
+- `PluginI18nEngine.getInstance(key?)` - Get existing instance (throws RegistryError if not found)
 - `PluginI18nEngine.resetAll()` - Clear instances and component registrations
 - `resetAllI18nEngines()` - Convenience function that calls `resetAll()`
 
@@ -935,6 +936,14 @@ MIT
 Part of the DigitalBurnbag project - a secure file sharing and automated protocol system.
 
 ## ChangeLog
+
+### Version 1.1.5
+
+- Tue Oct 14 2025 14:48:00 GMT-0700 (Pacific Daylight Time)
+  - [Current] HotFix for GlobalActiveContext
+    - Fixed getInstance method to throw RegistryError when instance not found instead of auto-creating instances
+  - Improved test reliability and proper error handling for non-existent instances
+  - Updated API documentation to reflect error-throwing behavior
 
 ### Version 1.1.4
 

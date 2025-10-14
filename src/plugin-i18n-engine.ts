@@ -18,6 +18,7 @@ import { Timezone } from './timezone';
 import { TranslationRequest } from './translation-request';
 import { TranslationResponse } from './translation-response';
 import { EnumLanguageTranslation } from './types';
+import { DefaultLanguage, DefaultLanguageCodes } from './default-config';
 
 /**
  * Plugin-based I18n Engine with registration capabilities
