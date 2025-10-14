@@ -31,7 +31,7 @@ export * from './core-string-key';
 export * from './language-registry';
 export * from './plugin-i18n-engine';
 export * from './registry-config';
-export * from './registry-context';
+
 export * from './registry-error';
 export * from './registry-error-type';
 export * from './translation-request';

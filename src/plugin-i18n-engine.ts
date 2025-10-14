@@ -7,10 +7,11 @@ import { ComponentRegistration } from './component-registration';
 import { ComponentRegistry } from './component-registry';
 import { CurrencyCode } from './currency-code';
 import { EnumTranslationRegistry } from './enum-registry';
+import { GlobalActiveContext } from './global-active-context';
+import { IActiveContext } from './active-context';
 import { LanguageDefinition } from './language-definition';
 import { LanguageRegistry } from './language-registry';
 import { RegistryConfig } from './registry-config';
-import { RegistryContext } from './registry-context';
 import { RegistryError } from './registry-error';
 import { RegistryErrorType } from './registry-error-type';
 import { Timezone } from './timezone';
@@ -26,7 +27,7 @@ export class PluginI18nEngine<TLanguages extends string> {
   private readonly componentRegistry: ComponentRegistry<TLanguages>;
   private readonly enumRegistry: EnumTranslationRegistry<string, TLanguages>;
   private readonly config: RegistryConfig<TLanguages>;
-  private context: RegistryContext<TLanguages>;
+  private contextKey: string;
 
   /**
    * Static instances for semi-singleton pattern
@@ -76,14 +77,21 @@ export class PluginI18nEngine<TLanguages extends string> {
     // Register initial languages
     this.languageRegistry.registerLanguages(initialLanguages);
 
-    // Initialize context
-    this.context = {
-      currentLanguage: this.config.defaultLanguage,
-      fallbackLanguage: this.config.fallbackLanguage,
-      currencyCode: this.config.defaultCurrencyCode,
-      timezone: this.config.timezone,
-      adminTimezone: this.config.adminTimezone,
-    };
+    // Initialize context key for this engine instance
+    this.contextKey = PluginI18nEngine.DefaultInstanceKey;
+    
+    // Create or get the global context for this engine
+    const globalContext = GlobalActiveContext.getInstance<TLanguages, IActiveContext<TLanguages>>();
+    
+    // Always create/update the context for this engine
+    globalContext.createContext(
+      this.config.defaultLanguage,
+      this.config.defaultLanguage,
+      this.contextKey
+    );
+    globalContext.setCurrencyCode(this.config.defaultCurrencyCode, this.contextKey);
+    globalContext.setUserTimezone(this.config.timezone, this.contextKey);
+    globalContext.setAdminTimezone(this.config.adminTimezone, this.contextKey);
 
     // Auto-register as default instance if none exists
     if (!PluginI18nEngine._defaultKey) {
@@ -112,6 +120,19 @@ export class PluginI18nEngine<TLanguages extends string> {
     }
 
     const instance = new PluginI18nEngine<TLangs>(initialLanguages, config);
+    instance.contextKey = key;
+    
+    // Create context for this specific instance
+    const globalContext = GlobalActiveContext.getInstance();
+    globalContext.createContext(
+      instance.config.defaultLanguage,
+      instance.config.defaultLanguage,
+      key
+    );
+    globalContext.setCurrencyCode(instance.config.defaultCurrencyCode, key);
+    globalContext.setUserTimezone(instance.config.timezone, key);
+    globalContext.setAdminTimezone(instance.config.adminTimezone, key);
+    
     PluginI18nEngine._instances.set(key, instance);
 
     if (!PluginI18nEngine._defaultKey) {
@@ -210,7 +231,7 @@ export class PluginI18nEngine<TLanguages extends string> {
     const request: TranslationRequest<TStringKeys, TLanguages> = {
       componentId,
       stringKey,
-      language: language || this.context.currentLanguage,
+      language: language || this.getCurrentLanguage(),
       variables,
     };
 
@@ -246,7 +267,7 @@ export class PluginI18nEngine<TLanguages extends string> {
     return this.enumRegistry.translate(
       enumObj,
       value,
-      language || this.context.currentLanguage,
+      language || this.getCurrentLanguage(),
     );
   }
 
@@ -262,7 +283,7 @@ export class PluginI18nEngine<TLanguages extends string> {
     const request: TranslationRequest<TStringKeys, TLanguages> = {
       componentId,
       stringKey,
-      language: language || this.context.currentLanguage,
+      language: language || this.getCurrentLanguage(),
       variables,
     };
 
@@ -272,15 +293,31 @@ export class PluginI18nEngine<TLanguages extends string> {
   /**
    * Get current context
    */
-  public getContext(): RegistryContext<TLanguages> {
-    return { ...this.context };
+  public getContext(): IActiveContext<TLanguages> {
+    const globalContext = GlobalActiveContext.getInstance<TLanguages, IActiveContext<TLanguages>>();
+    return globalContext.getContext(this.contextKey);
   }
 
   /**
    * Update context
    */
-  public updateContext(updates: Partial<RegistryContext<TLanguages>>): void {
-    this.context = { ...this.context, ...updates };
+  public updateContext(updates: Partial<IActiveContext<TLanguages>>): void {
+    const globalContext = GlobalActiveContext.getInstance<TLanguages, IActiveContext<TLanguages>>();
+    
+    if (updates.language) globalContext.setUserLanguage(updates.language, this.contextKey);
+    if (updates.adminLanguage) globalContext.setAdminLanguage(updates.adminLanguage, this.contextKey);
+    if (updates.currencyCode) globalContext.setCurrencyCode(updates.currencyCode, this.contextKey);
+    if (updates.currentContext) globalContext.setLanguageContextSpace(updates.currentContext, this.contextKey);
+    if (updates.timezone) globalContext.setUserTimezone(updates.timezone, this.contextKey);
+    if (updates.adminTimezone) globalContext.setAdminTimezone(updates.adminTimezone, this.contextKey);
+  }
+
+  /**
+   * Get current language from global context
+   */
+  private getCurrentLanguage(): TLanguages {
+    const globalContext = GlobalActiveContext.getInstance<TLanguages, IActiveContext<TLanguages>>();
+    return globalContext.getContext(this.contextKey).language;
   }
 
   /**
@@ -294,7 +331,8 @@ export class PluginI18nEngine<TLanguages extends string> {
         { language },
       );
     }
-    this.context.currentLanguage = language;
+    const globalContext = GlobalActiveContext.getInstance<TLanguages, IActiveContext<TLanguages>>();
+    globalContext.setUserLanguage(language, this.contextKey);
   }
 
   /**
