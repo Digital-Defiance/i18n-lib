@@ -6,7 +6,7 @@ import { Timezone } from './timezone';
 import {
   DefaultCurrencyCode,
   LanguageCodeCollection,
-  LanguageContext,
+  LanguageContextSpace,
 } from './types';
 
 // Default enum types that can be augmented by consumers
@@ -66,7 +66,7 @@ export const getI18nEngine = (): Engine => I18nEngine.getInstance() as Engine;
 
 const getConfig = <
   TConstants extends Record<string, any>,
-  TTranslationContext extends string = LanguageContext,
+  TTranslationContext extends string = LanguageContextSpace,
 >(
   constants: TConstants,
   timezone?: Timezone,

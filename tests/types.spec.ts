@@ -1,4 +1,8 @@
-import { createTranslations, EnumLanguageTranslation, EnumTranslation } from '../src/types';
+import {
+  createTranslations,
+  EnumLanguageTranslation,
+  EnumTranslation,
+} from '../src/types';
 
 enum TestStatus {
   Active = 'active',
@@ -35,7 +39,7 @@ describe('types utilities', () => {
       };
 
       const result = createTranslations(translations);
-      
+
       expect(result).toEqual(translations);
       expect(result[TestLanguages.English]?.[TestStatus.Active]).toBe('Active');
       expect(result[TestLanguages.Spanish]?.[TestStatus.Active]).toBe('Activo');
@@ -56,7 +60,7 @@ describe('types utilities', () => {
       };
 
       const result = createTranslations(translations);
-      
+
       expect(result).toEqual(translations);
       expect(result[TestLanguages.English]?.[NumericEnum.First]).toBe('First');
       expect(result[TestLanguages.French]?.[NumericEnum.First]).toBe('Premier');
@@ -70,11 +74,18 @@ describe('types utilities', () => {
         },
       };
 
-      const result = createTranslations(partialTranslations as EnumLanguageTranslation<TestStatus, TestLanguages>);
-      
+      const result = createTranslations(
+        partialTranslations as EnumLanguageTranslation<
+          TestStatus,
+          TestLanguages
+        >,
+      );
+
       expect(result).toEqual(partialTranslations);
       expect(result[TestLanguages.English]?.[TestStatus.Active]).toBe('Active');
-      expect(result[TestLanguages.English]?.[TestStatus.Inactive]).toBeUndefined();
+      expect(
+        result[TestLanguages.English]?.[TestStatus.Inactive],
+      ).toBeUndefined();
     });
 
     it('should handle empty translations', () => {
@@ -82,8 +93,10 @@ describe('types utilities', () => {
         [TestLanguages.English]: {},
       };
 
-      const result = createTranslations(emptyTranslations as EnumLanguageTranslation<TestStatus, TestLanguages>);
-      
+      const result = createTranslations(
+        emptyTranslations as EnumLanguageTranslation<TestStatus, TestLanguages>,
+      );
+
       expect(result).toEqual(emptyTranslations);
       expect(Object.keys(result[TestLanguages.English] || {})).toHaveLength(0);
     });
@@ -98,11 +111,13 @@ describe('types utilities', () => {
       };
 
       const result = createTranslations(translations);
-      
+
       // Type checking - these should compile without errors
-      const activeTranslation: string | undefined = result[TestLanguages.English]?.[TestStatus.Active];
-      const englishTranslations: EnumTranslation<TestStatus> | undefined = result[TestLanguages.English];
-      
+      const activeTranslation: string | undefined =
+        result[TestLanguages.English]?.[TestStatus.Active];
+      const englishTranslations: EnumTranslation<TestStatus> | undefined =
+        result[TestLanguages.English];
+
       expect(activeTranslation).toBe('Active');
       expect(englishTranslations?.[TestStatus.Active]).toBe('Active');
     });
@@ -122,9 +137,13 @@ describe('types utilities', () => {
       };
 
       const result = createTranslations(translations);
-      
-      expect(result[TestLanguages.English]?.[MixedEnum.StringValue]).toBe('String Value');
-      expect(result[TestLanguages.English]?.[MixedEnum.NumericValue]).toBe('Numeric Value');
+
+      expect(result[TestLanguages.English]?.[MixedEnum.StringValue]).toBe(
+        'String Value',
+      );
+      expect(result[TestLanguages.English]?.[MixedEnum.NumericValue]).toBe(
+        'Numeric Value',
+      );
     });
   });
 
@@ -148,13 +167,17 @@ describe('types utilities', () => {
       };
 
       expect(partialTranslations[TestStatus.Active]).toBe('Active');
-      expect(partialTranslations[TestStatus.Inactive as keyof typeof partialTranslations]).toBeUndefined();
+      expect(
+        partialTranslations[
+          TestStatus.Inactive as keyof typeof partialTranslations
+        ],
+      ).toBeUndefined();
     });
 
     it('should support numeric enum translations', () => {
       const numericTranslations: EnumTranslation<number> = {
         [NumericEnum.First]: 'First',
-        [NumericEnum.Second]: 'Second', 
+        [NumericEnum.Second]: 'Second',
         [NumericEnum.Third]: 'Third',
       };
 
@@ -164,8 +187,11 @@ describe('types utilities', () => {
 
     it('should support custom language types', () => {
       type CustomLanguages = 'German' | 'Italian' | 'Portuguese';
-      
-      const customTranslations: EnumLanguageTranslation<TestStatus, CustomLanguages> = {
+
+      const customTranslations: EnumLanguageTranslation<
+        TestStatus,
+        CustomLanguages
+      > = {
         German: {
           [TestStatus.Active]: 'Aktiv',
           [TestStatus.Inactive]: 'Inaktiv',
@@ -179,7 +205,7 @@ describe('types utilities', () => {
       };
 
       const result = createTranslations(customTranslations);
-      
+
       expect(result.German?.[TestStatus.Active]).toBe('Aktiv');
       expect(result.Italian?.[TestStatus.Active]).toBe('Attivo');
     });

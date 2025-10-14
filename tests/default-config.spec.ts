@@ -1,4 +1,12 @@
-import { DefaultStringKey, DefaultLanguage, DefaultLanguageCodes, StringKey, Language, getI18nEngine, getDefaultI18nEngine } from '../src/default-config';
+import {
+  DefaultLanguage,
+  DefaultLanguageCodes,
+  DefaultStringKey,
+  Language,
+  StringKey,
+  getDefaultI18nEngine,
+  getI18nEngine,
+} from '../src/default-config';
 import { I18nEngine } from '../src/i18n-engine';
 
 describe('DefaultConfig', () => {

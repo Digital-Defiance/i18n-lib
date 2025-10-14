@@ -3,14 +3,19 @@ import { ComponentRegistration } from './component-registration';
 import { LanguageDefinition } from './language-definition';
 
 /**
- * Standard language contexts
+ * Standard language context spaces
  */
-export type LanguageContext = 'admin' | 'user' | 'system' | 'api';
+export type LanguageContextSpace = 'admin' | 'user' | 'system' | 'api';
 
 /**
  * Default currency code
  */
 export const DefaultCurrencyCode: string = 'USD';
+
+/**
+ * Default timezone
+ */
+export const DefaultTimezone: string = 'UTC';
 
 /**
  * Currency position type
@@ -20,7 +25,7 @@ export type CurrencyPosition = 'prefix' | 'postfix' | 'infix';
 /**
  * Custom language context type
  */
-export type CustomLanguageContext<T extends string = LanguageContext> = T;
+export type CustomLanguageContext<T extends string = LanguageContextSpace> = T;
 
 /**
  * Collection of localized strings for a specific language

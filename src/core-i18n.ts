@@ -99,6 +99,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: 'Internal server error',
       [CoreStringKey.Error_ValidationFailed]: 'Validation failed',
       [CoreStringKey.Error_RequiredField]: 'This field is required',
+      [CoreStringKey.Error_InvalidContextTemplate]: 'Invalid context: {contextKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -151,6 +152,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: 'Internal server error',
       [CoreStringKey.Error_ValidationFailed]: 'Validation failed',
       [CoreStringKey.Error_RequiredField]: 'This field is required',
+      [CoreStringKey.Error_InvalidContextTemplate]: 'Invalid context: {contextKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -203,6 +205,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: 'Erreur interne du serveur',
       [CoreStringKey.Error_ValidationFailed]: 'Échec de la validation',
       [CoreStringKey.Error_RequiredField]: 'Ce champ est obligatoire',
+      [CoreStringKey.Error_InvalidContextTemplate]: 'Contexte invalide : {contextKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -256,6 +259,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: 'Error interno del servidor',
       [CoreStringKey.Error_ValidationFailed]: 'Error de validación',
       [CoreStringKey.Error_RequiredField]: 'Este campo es obligatorio',
+      [CoreStringKey.Error_InvalidContextTemplate]: 'Contexte invalide : {contextKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -308,6 +312,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: 'Interner Serverfehler',
       [CoreStringKey.Error_ValidationFailed]: 'Validierung fehlgeschlagen',
       [CoreStringKey.Error_RequiredField]: 'Dieses Feld ist erforderlich',
+      [CoreStringKey.Error_InvalidContextTemplate]: 'Ungültiger Kontext: {contextKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -361,6 +366,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: '内部服务器错误',
       [CoreStringKey.Error_ValidationFailed]: '验证失败',
       [CoreStringKey.Error_RequiredField]: '此字段为必填项',
+      [CoreStringKey.Error_InvalidContextTemplate]: '无效的上下文：{contextKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -411,6 +417,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: '内部サーバーエラー',
       [CoreStringKey.Error_ValidationFailed]: '検証に失敗しました',
       [CoreStringKey.Error_RequiredField]: 'このフィールドは必須です',
+      [CoreStringKey.Error_InvalidContextTemplate]: '無効なコンテキスト：{contextKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -462,6 +469,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: 'Внутрішня помилка сервера',
       [CoreStringKey.Error_ValidationFailed]: 'Перевірка не вдалася',
       [CoreStringKey.Error_RequiredField]: "Це поле є обов'язковим",
+      [CoreStringKey.Error_InvalidContextTemplate]: 'Неправильний контекст: {contextKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:

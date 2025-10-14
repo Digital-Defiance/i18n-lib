@@ -16,7 +16,7 @@ export function replaceVariables(
   if (typeof str !== 'string') {
     str = String(str);
   }
-  
+
   const variables = str.match(/\{(.+?)\}/g);
   if (!variables) return str;
 
@@ -51,7 +51,7 @@ export function isTemplate(key: string): boolean {
 /**
  * Checks if a given timezone string is valid.
  * @param timezone - The timezone string to validate
- * @returns 
+ * @returns
  */
 export function isValidTimezone(timezone: string): boolean {
   return moment.tz.zone(timezone) !== null;
@@ -62,7 +62,9 @@ export function isValidTimezone(timezone: string): boolean {
  * @param parts - The parts to join
  * @returns The joined string key
  */
-export function toStringKey<TStringKey extends string>(...parts: (string)[]): TStringKey {
+export function toStringKey<TStringKey extends string>(
+  ...parts: string[]
+): TStringKey {
   return parts.join('_') as TStringKey;
 }
 
@@ -72,7 +74,10 @@ export function toStringKey<TStringKey extends string>(...parts: (string)[]): TS
  * @param parts - Additional parts to join
  * @returns The constructed string key
  */
-export function toStringKeyFromEnum<TStringKey extends string>(value: string, ...parts: string[]): TStringKey {
+export function toStringKeyFromEnum<TStringKey extends string>(
+  value: string,
+  ...parts: string[]
+): TStringKey {
   const allParts = [...parts, value];
   return allParts.join('_') as TStringKey;
 }
@@ -83,7 +88,7 @@ export function toStringKeyFromEnum<TStringKey extends string>(value: string, ..
 type BuildStringKey<
   TEnumValue extends string,
   TPrefixes extends readonly string[],
-  TIsTemplate extends boolean = false
+  TIsTemplate extends boolean = false,
 > = TPrefixes extends readonly []
   ? `${TEnumValue}${TIsTemplate extends true ? 'Template' : ''}`
   : TPrefixes extends readonly [infer First, ...infer Rest]
@@ -101,7 +106,7 @@ type ReasonMapFromEnum<
   TEnum extends Record<string, string>,
   TStringKey extends string,
   TPrefixes extends readonly string[] = [],
-  TTemplateKeys extends Set<TEnum[keyof TEnum]> = never
+  TTemplateKeys extends Set<TEnum[keyof TEnum]> = never,
 > = {
   [K in TEnum[keyof TEnum]]: BuildStringKey<
     K,
@@ -119,19 +124,24 @@ type ReasonMapFromEnum<
  * @param templateKeys - Optional set of enum values that should have 'Template' suffix for template processing
  * @returns The constructed reason map
  */
-export function buildReasonMap<TEnum extends Record<string, string>, TStringKey extends string>(
+export function buildReasonMap<
+  TEnum extends Record<string, string>,
+  TStringKey extends string,
+>(
   enumObj: TEnum,
   prefixes: string[] = [],
-  templateKeys?: Set<TEnum[keyof TEnum]>
+  templateKeys?: Set<TEnum[keyof TEnum]>,
 ): Record<TEnum[keyof TEnum], TStringKey> {
   const map = {} as Record<TEnum[keyof TEnum], TStringKey>;
-  
-  Object.values(enumObj).forEach(value => {
+
+  Object.values(enumObj).forEach((value) => {
     const baseKey = [...prefixes, value].join('_');
-    const finalKey = templateKeys?.has(value as TEnum[keyof TEnum]) ? baseKey + 'Template' : baseKey;
+    const finalKey = templateKeys?.has(value as TEnum[keyof TEnum])
+      ? baseKey + 'Template'
+      : baseKey;
     map[value as TEnum[keyof TEnum]] = finalKey as TStringKey;
   });
-  
+
   return map;
 }
 
@@ -142,32 +152,39 @@ export function buildTypeSafeReasonMap<
   TEnum extends Record<string, string>,
   TStringKey extends string,
   TPrefixes extends readonly string[] = [],
-  TTemplateKeys extends Set<TEnum[keyof TEnum]> = never
+  TTemplateKeys extends Set<TEnum[keyof TEnum]> = never,
 >(
   enumObj: TEnum,
   prefixes: TPrefixes,
-  templateKeys?: TTemplateKeys
+  templateKeys?: TTemplateKeys,
 ): ReasonMapFromEnum<TEnum, TStringKey, TPrefixes, TTemplateKeys> {
   const map = {} as any;
-  
-  Object.values(enumObj).forEach(value => {
+
+  Object.values(enumObj).forEach((value) => {
     const baseKey = [...prefixes, value].join('_');
-    const finalKey = templateKeys?.has(value as TEnum[keyof TEnum]) ? baseKey + 'Template' : baseKey;
+    const finalKey = templateKeys?.has(value as TEnum[keyof TEnum])
+      ? baseKey + 'Template'
+      : baseKey;
     map[value as TEnum[keyof TEnum]] = finalKey;
   });
-  
+
   return map;
 }
 
 /**
  * Validates that a reason map has entries for all enum values
  */
-export function validateReasonMap<TEnum extends Record<string, string>, TStringKey extends string>(
+export function validateReasonMap<
+  TEnum extends Record<string, string>,
+  TStringKey extends string,
+>(
   enumObj: TEnum,
-  reasonMap: Partial<Record<TEnum[keyof TEnum], TStringKey>>
+  reasonMap: Partial<Record<TEnum[keyof TEnum], TStringKey>>,
 ): reasonMap is Record<TEnum[keyof TEnum], TStringKey> {
-  return Object.values(enumObj).every(value => 
-    value in reasonMap && reasonMap[value as TEnum[keyof TEnum]] !== undefined
+  return Object.values(enumObj).every(
+    (value) =>
+      value in reasonMap &&
+      reasonMap[value as TEnum[keyof TEnum]] !== undefined,
   );
 }
 
@@ -176,18 +193,21 @@ export function validateReasonMap<TEnum extends Record<string, string>, TStringK
  */
 export function createCompleteReasonMap<
   TEnum extends Record<string, string>,
-  TStringKey extends string
+  TStringKey extends string,
 >(
   enumObj: TEnum,
   prefixes: readonly string[] = [],
-  templateKeys?: Set<TEnum[keyof TEnum]>
+  templateKeys?: Set<TEnum[keyof TEnum]>,
 ): Record<TEnum[keyof TEnum], TStringKey> {
-  const map = buildReasonMap(enumObj, [...prefixes], templateKeys) as Record<TEnum[keyof TEnum], TStringKey>;
-  
+  const map = buildReasonMap(enumObj, [...prefixes], templateKeys) as Record<
+    TEnum[keyof TEnum],
+    TStringKey
+  >;
+
   if (!validateReasonMap(enumObj, map)) {
-    const missing = Object.values(enumObj).filter(value => !(value in map));
+    const missing = Object.values(enumObj).filter((value) => !(value in map));
     throw new Error(`Missing reason map entries for: ${missing.join(', ')}`);
   }
-  
+
   return map;
 }

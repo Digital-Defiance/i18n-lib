@@ -1,4 +1,10 @@
-import { buildReasonMap, isTemplate, replaceVariables, toStringKey, toStringKeyFromEnum } from '../src/utils';
+import {
+  buildReasonMap,
+  isTemplate,
+  replaceVariables,
+  toStringKey,
+  toStringKeyFromEnum,
+} from '../src/utils';
 
 describe('utils', () => {
   describe('replaceVariables', () => {
@@ -92,7 +98,9 @@ describe('utils', () => {
     });
 
     it('should handle boolean values', () => {
-      const result = replaceVariables('Status: {active}', { active: true as any });
+      const result = replaceVariables('Status: {active}', {
+        active: true as any,
+      });
       expect(result).toBe('Status: true');
     });
 
@@ -100,13 +108,15 @@ describe('utils', () => {
       const result = replaceVariables(
         'Hello {name}!',
         { name: 'John' },
-        { name: 'Jane' }
+        { name: 'Jane' },
       );
       expect(result).toBe('Hello John!');
     });
 
     it('should handle malformed variable syntax', () => {
-      const result = replaceVariables('Hello {name} and {incomplete', { name: 'John' });
+      const result = replaceVariables('Hello {name} and {incomplete', {
+        name: 'John',
+      });
       expect(result).toBe('Hello John and {incomplete');
     });
 
@@ -116,12 +126,16 @@ describe('utils', () => {
     });
 
     it('should handle special characters in variable names', () => {
-      const result = replaceVariables('Hello {user_name}!', { user_name: 'John' });
+      const result = replaceVariables('Hello {user_name}!', {
+        user_name: 'John',
+      });
       expect(result).toBe('Hello John!');
     });
 
     it('should handle multiple occurrences of same variable', () => {
-      const result = replaceVariables('Hello {name}, goodbye {name}!', { name: 'John' });
+      const result = replaceVariables('Hello {name}, goodbye {name}!', {
+        name: 'John',
+      });
       expect(result).toBe('Hello John, goodbye John!');
     });
 
@@ -129,18 +143,21 @@ describe('utils', () => {
       const constants = {
         SITE: 'MyApp',
         VERSION: '1.0.0',
-        nested: { value: 'test' }
+        nested: { value: 'test' },
       };
       const result = replaceVariables(
         'Welcome to {SITE} v{VERSION}',
         undefined,
-        constants
+        constants,
       );
       expect(result).toBe('Welcome to MyApp v1.0.0');
     });
 
     it('should convert non-string input to string', () => {
-      const result = replaceVariables({ toString: () => 'Hello {name}!' } as any, { name: 'John' });
+      const result = replaceVariables(
+        { toString: () => 'Hello {name}!' } as any,
+        { name: 'John' },
+      );
       expect(typeof result).toBe('string');
       expect(result).toBe('Hello John!');
     });
@@ -153,28 +170,36 @@ describe('utils', () => {
 
     it('should handle object variables by converting to string', () => {
       const objectVar = { toString: () => 'CustomObject' };
-      const result = replaceVariables('Hello {obj}!', { obj: objectVar as any });
+      const result = replaceVariables('Hello {obj}!', {
+        obj: objectVar as any,
+      });
       expect(typeof result).toBe('string');
       expect(result).toBe('Hello CustomObject!');
     });
 
     it('should handle object variables without custom toString', () => {
       const objectVar = { prop: 'value' };
-      const result = replaceVariables('Hello {obj}!', { obj: objectVar as any });
+      const result = replaceVariables('Hello {obj}!', {
+        obj: objectVar as any,
+      });
       expect(typeof result).toBe('string');
       expect(result).toBe('Hello [object Object]!');
     });
 
     it('should handle array variables', () => {
       const arrayVar = ['item1', 'item2'];
-      const result = replaceVariables('Items: {items}', { items: arrayVar as any });
+      const result = replaceVariables('Items: {items}', {
+        items: arrayVar as any,
+      });
       expect(typeof result).toBe('string');
       expect(result).toBe('Items: item1,item2');
     });
 
     it('should handle function variables', () => {
       const funcVar = () => 'function result';
-      const result = replaceVariables('Result: {func}', { func: funcVar as any });
+      const result = replaceVariables('Result: {func}', {
+        func: funcVar as any,
+      });
       expect(typeof result).toBe('string');
       expect(result).toContain('function');
     });
@@ -188,16 +213,16 @@ describe('utils', () => {
         undefined as any,
         {} as any,
         [] as any,
-        (() => {}) as any
+        (() => {}) as any,
       ];
-      
-      inputs.forEach(input => {
+
+      inputs.forEach((input) => {
         const result = replaceVariables(input, { name: 'test' });
         expect(typeof result).toBe('string');
       });
     });
   });
-    
+
   describe('toStringKey', () => {
     it('should join single part', () => {
       expect(toStringKey('test')).toBe('test');
@@ -215,22 +240,23 @@ describe('utils', () => {
   describe('toStringKeyFromEnum', () => {
     enum TestEnum {
       VALUE1 = 'val1',
-      VALUE2 = 'val2'
+      VALUE2 = 'val2',
     }
 
     it('should create key from enum value with parts', () => {
-      expect(toStringKeyFromEnum(TestEnum.VALUE1, 'prefix', 'suffix'))
-        .toBe('prefix_suffix_val1');
+      expect(toStringKeyFromEnum(TestEnum.VALUE1, 'prefix', 'suffix')).toBe(
+        'prefix_suffix_val1',
+      );
     });
 
     it('should create key from enum value without parts', () => {
-      expect(toStringKeyFromEnum(TestEnum.VALUE2))
-        .toBe('val2');
+      expect(toStringKeyFromEnum(TestEnum.VALUE2)).toBe('val2');
     });
 
     it('should handle empty parts', () => {
-      expect(toStringKeyFromEnum(TestEnum.VALUE1, '', 'test'))
-        .toBe('_test_val1');
+      expect(toStringKeyFromEnum(TestEnum.VALUE1, '', 'test')).toBe(
+        '_test_val1',
+      );
     });
   });
 
@@ -238,7 +264,7 @@ describe('utils', () => {
     enum TestEnum {
       REASON1 = 'reason1',
       REASON2 = 'reason2',
-      REASON3 = 'reason3'
+      REASON3 = 'reason3',
     }
 
     it('should build reason map with prefixes', () => {
@@ -246,7 +272,7 @@ describe('utils', () => {
       expect(result).toEqual({
         reason1: 'error_message_reason1',
         reason2: 'error_message_reason2',
-        reason3: 'error_message_reason3'
+        reason3: 'error_message_reason3',
       });
     });
 
@@ -255,7 +281,7 @@ describe('utils', () => {
       expect(result).toEqual({
         reason1: 'reason1',
         reason2: 'reason2',
-        reason3: 'reason3'
+        reason3: 'reason3',
       });
     });
 
@@ -264,7 +290,7 @@ describe('utils', () => {
       expect(result).toEqual({
         reason1: 'prefix_reason1',
         reason2: 'prefix_reason2',
-        reason3: 'prefix_reason3'
+        reason3: 'prefix_reason3',
       });
     });
 
@@ -280,7 +306,7 @@ describe('utils', () => {
       expect(result).toEqual({
         reason1: 'Error_Test_reason1',
         reason2: 'Error_Test_reason2Template',
-        reason3: 'Error_Test_reason3'
+        reason3: 'Error_Test_reason3',
       });
     });
 
@@ -290,7 +316,7 @@ describe('utils', () => {
       expect(result).toEqual({
         reason1: 'Prefix_reason1Template',
         reason2: 'Prefix_reason2',
-        reason3: 'Prefix_reason3Template'
+        reason3: 'Prefix_reason3Template',
       });
     });
   });

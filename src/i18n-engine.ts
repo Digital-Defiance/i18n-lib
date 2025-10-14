@@ -82,7 +82,8 @@ export class I18nEngine<
     this.config = config;
     this._enumRegistry = new EnumTranslationRegistry<TStringKey, TLanguage>(
       Object.keys(config.strings) as TLanguage[],
-      (key: string, vars?: Record<string, any>) => this.safeTranslate(key as TStringKey, vars)
+      (key: string, vars?: Record<string, any>) =>
+        this.safeTranslate(key as TStringKey, vars),
     );
     this._context = newContext();
 
@@ -227,7 +228,7 @@ export class I18nEngine<
       let result = isTemplate(key)
         ? replaceVariables(stringValue, vars, this.config.constants)
         : stringValue;
-      
+
       // Ensure result is always a string
       if (typeof result !== 'string') {
         result = String(result);
@@ -240,7 +241,7 @@ export class I18nEngine<
           let result = isTemplate(key)
             ? replaceVariables(stringValue, vars, this.config.constants)
             : stringValue;
-          
+
           // Ensure result is always a string
           if (typeof result !== 'string') {
             result = String(result);
@@ -307,7 +308,7 @@ export class I18nEngine<
       let result = isTemplate(key)
         ? replaceVariables(stringValue, vars, this.config.constants)
         : stringValue;
-      
+
       // Ensure result is always a string
       if (typeof result !== 'string') {
         result = String(result);
@@ -421,9 +422,12 @@ export class I18nEngine<
    * Static error message templates for validation
    */
   private static readonly ErrorTemplates = {
-    MissingStringCollection: 'Missing string collection for language: {language}',
-    MissingTranslation: 'Missing translation for key \'{key}\' in language \'{language}\'',
-    DefaultLanguageNoCollection: 'Default language \'{language}\' has no string collection'
+    MissingStringCollection:
+      'Missing string collection for language: {language}',
+    MissingTranslation:
+      "Missing translation for key '{key}' in language '{language}'",
+    DefaultLanguageNoCollection:
+      "Default language '{language}' has no string collection",
   };
 
   /**
@@ -432,18 +436,32 @@ export class I18nEngine<
    * @param config The configuration to validate
    * @throws Error if validation fails
    */
-  private validateConfig(config: I18nConfig<TStringKey, TLanguage, TConstants, TTranslationContext>): void {
+  private validateConfig(
+    config: I18nConfig<TStringKey, TLanguage, TConstants, TTranslationContext>,
+  ): void {
     // Check that default language exists
     if (!config.strings[config.defaultLanguage]) {
-      throw new Error(this.getValidationError('Error_DefaultLanguageNoCollectionTemplate' as any, { language: config.defaultLanguage }, config));
+      throw new Error(
+        this.getValidationError(
+          'Error_DefaultLanguageNoCollectionTemplate' as any,
+          { language: config.defaultLanguage },
+          config,
+        ),
+      );
     }
-    
+
     // Check that all string keys are provided for each language that has strings
     for (const language of Object.keys(config.strings) as TLanguage[]) {
       const strings = config.strings[language]!;
       for (const stringKey of config.stringNames) {
         if (!strings[stringKey]) {
-          throw new Error(this.getValidationError('Error_MissingTranslationTemplate' as any, { key: stringKey, language }, config));
+          throw new Error(
+            this.getValidationError(
+              'Error_MissingTranslationTemplate' as any,
+              { key: stringKey, language },
+              config,
+            ),
+          );
         }
       }
     }
@@ -452,20 +470,25 @@ export class I18nEngine<
   /**
    * Gets validation error message, trying translation first, falling back to template
    */
-  private getValidationError(key: TStringKey, vars: Record<string, any>, config: I18nConfig<TStringKey, TLanguage, TConstants, TTranslationContext>): string {
+  private getValidationError(
+    key: TStringKey,
+    vars: Record<string, any>,
+    config: I18nConfig<TStringKey, TLanguage, TConstants, TTranslationContext>,
+  ): string {
     try {
       const strings = config.strings[config.defaultLanguage];
       if (strings?.[key]) {
         return replaceVariables(strings[key], vars, config.constants);
       }
     } catch {}
-    
+
     // Fallback to static templates
-    const template = key.includes('MissingStringCollection') ? I18nEngine.ErrorTemplates.MissingStringCollection :
-                    key.includes('MissingTranslation') ? I18nEngine.ErrorTemplates.MissingTranslation :
-                    I18nEngine.ErrorTemplates.DefaultLanguageNoCollection;
-    
+    const template = key.includes('MissingStringCollection')
+      ? I18nEngine.ErrorTemplates.MissingStringCollection
+      : key.includes('MissingTranslation')
+      ? I18nEngine.ErrorTemplates.MissingTranslation
+      : I18nEngine.ErrorTemplates.DefaultLanguageNoCollection;
+
     return replaceVariables(template, vars);
   }
-
 }

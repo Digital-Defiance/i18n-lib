@@ -1,7 +1,7 @@
 import { CurrencyCode } from './currency-code';
 import { I18nContext } from './i18n-context';
 import { Timezone } from './timezone';
-import { LanguageContext } from './types';
+import { LanguageContextSpace } from './types';
 
 /**
  * Creates a new I18n context with default values.
@@ -14,7 +14,7 @@ import { LanguageContext } from './types';
  */
 export function createContext<
   TLanguage extends string,
-  TTranslationContext extends string = LanguageContext,
+  TTranslationContext extends string = LanguageContextSpace,
   TContext extends I18nContext<TLanguage, TTranslationContext> = I18nContext<
     TLanguage,
     TTranslationContext
@@ -43,7 +43,7 @@ export function createContext<
  */
 export function setLanguage<
   TLanguage extends string,
-  TContext extends string = LanguageContext,
+  TContext extends string = LanguageContextSpace,
 >(context: I18nContext<TLanguage, TContext>, language: TLanguage): void {
   context.language = language;
 }
@@ -55,7 +55,7 @@ export function setLanguage<
  */
 export function setAdminLanguage<
   TLanguage extends string,
-  TContext extends string = LanguageContext,
+  TContext extends string = LanguageContextSpace,
 >(context: I18nContext<TLanguage, TContext>, language: TLanguage): void {
   context.adminLanguage = language;
 }
@@ -67,7 +67,7 @@ export function setAdminLanguage<
  */
 export function setContext<
   TLanguage extends string,
-  TContext extends string = LanguageContext,
+  TContext extends string = LanguageContextSpace,
 >(context: I18nContext<TLanguage, TContext>, languageContext: TContext): void {
   context.currentContext = languageContext;
 }
@@ -79,7 +79,7 @@ export function setContext<
  */
 export function setTimezone<
   TLanguage extends string,
-  TContext extends string = LanguageContext,
+  TContext extends string = LanguageContextSpace,
 >(context: I18nContext<TLanguage, TContext>, timezone: Timezone): void {
   context.timezone = timezone;
 }
@@ -91,7 +91,7 @@ export function setTimezone<
  */
 export function setAdminTimezone<
   TLanguage extends string,
-  TContext extends string = LanguageContext,
+  TContext extends string = LanguageContextSpace,
 >(context: I18nContext<TLanguage, TContext>, timezone: Timezone): void {
   context.adminTimezone = timezone;
 }

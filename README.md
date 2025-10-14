@@ -936,6 +936,11 @@ Part of the DigitalBurnbag project - a secure file sharing and automated protoco
 
 ## ChangeLog
 
+### Version 1.1.3
+
+- Tuesday Oct 14 2025 14:00:00 GMT-0700 (Pacific Daylight Time)
+  - Added GlobalActiveContext class instead of plain object
+
 ### Version 1.1.2
 
 - Sat Oct 11 2025 19:25:00 GMT-0700 (Pacific Daylight Time)

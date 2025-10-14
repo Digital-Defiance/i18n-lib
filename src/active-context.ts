@@ -1,6 +1,6 @@
-import { LanguageContext } from './types';
-import { Timezone } from './timezone';
 import { CurrencyCode } from './currency-code';
+import { Timezone } from './timezone';
+import { LanguageContextSpace } from './types';
 
 export interface IActiveContext<TLanguage extends string> {
   /**
@@ -18,7 +18,7 @@ export interface IActiveContext<TLanguage extends string> {
   /**
    * The default language context for the current context
    */
-  currentContext: LanguageContext;
+  currentContext: LanguageContextSpace;
   /**
    * The default timezone for the user facing application
    */

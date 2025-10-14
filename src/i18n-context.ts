@@ -1,13 +1,13 @@
 import { CurrencyCode } from './currency-code';
 import { Timezone } from './timezone';
-import { LanguageContext } from './types';
+import { LanguageContextSpace } from './types';
 
 /**
  * I18n context interface
  */
 export interface I18nContext<
   TLanguage extends string,
-  TTranslationContext extends string = LanguageContext,
+  TTranslationContext extends string = LanguageContextSpace,
 > {
   language: TLanguage;
   adminLanguage: TLanguage;

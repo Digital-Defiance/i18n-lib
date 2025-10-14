@@ -26,6 +26,7 @@ export enum CoreStringKey {
   Error_InternalServer = 'error_internalServer',
   Error_ValidationFailed = 'error_validationFailed',
   Error_RequiredField = 'error_requiredField',
+  Error_InvalidContextTemplate = 'error_invalidContextTemplate',
 
   // Registry Errors (templates support variables)
   Error_ComponentNotFoundTemplate = 'error_componentNotFoundTemplate',

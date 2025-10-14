@@ -2,7 +2,7 @@ import { CurrencyCode } from './currency-code';
 import { Timezone } from './timezone';
 import {
   LanguageCodeCollection,
-  LanguageContext,
+  LanguageContextSpace,
   MasterStringsCollection,
 } from './types';
 
@@ -13,7 +13,7 @@ export interface I18nConfig<
   TStringKey extends string,
   TLanguage extends string,
   TConstants extends Record<string, any> = Record<string, any>,
-  TTranslationContext extends string = LanguageContext,
+  TTranslationContext extends string = LanguageContextSpace,
 > {
   stringNames: TStringKey[];
   strings: MasterStringsCollection<TStringKey, TLanguage>;

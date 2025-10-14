@@ -81,7 +81,7 @@ describe('getCurrencyFormat', () => {
   it('should handle currencies with no decimal places correctly', () => {
     const jpyFormat = getCurrencyFormat('ja-JP', 'JPY');
     const krwFormat = getCurrencyFormat('ko-KR', 'KRW');
-    
+
     expect(jpyFormat.symbol).toBe('￥');
     expect(krwFormat.symbol).toBe('₩');
   });
@@ -90,7 +90,7 @@ describe('getCurrencyFormat', () => {
     expect(() => {
       getCurrencyFormat('', 'USD');
     }).toThrow();
-    
+
     // Some invalid locales may not throw in all environments
     const result = getCurrencyFormat('invalid-locale', 'USD');
     expect(result).toHaveProperty('symbol');
@@ -101,7 +101,7 @@ describe('getCurrencyFormat', () => {
     expect(() => {
       getCurrencyFormat('en-US', '');
     }).toThrow();
-    
+
     expect(() => {
       getCurrencyFormat('en-US', 'INVALID');
     }).toThrow();
@@ -109,12 +109,12 @@ describe('getCurrencyFormat', () => {
 
   it('should return valid CurrencyFormat structure', () => {
     const format = getCurrencyFormat('en-US', 'USD');
-    
+
     expect(format).toHaveProperty('symbol');
     expect(format).toHaveProperty('position');
     expect(format).toHaveProperty('groupSeparator');
     expect(format).toHaveProperty('decimalSeparator');
-    
+
     expect(typeof format.symbol).toBe('string');
     expect(typeof format.position).toBe('string');
     expect(typeof format.groupSeparator).toBe('string');
@@ -127,8 +127,8 @@ describe('getCurrencyFormat', () => {
       getCurrencyFormat('it-IT', 'EUR'),
       getCurrencyFormat('es-ES', 'EUR'),
     ];
-    
-    formats.forEach(format => {
+
+    formats.forEach((format) => {
       expect(format.symbol).toBe('€');
       expect(['prefix', 'postfix', 'infix']).toContain(format.position);
     });

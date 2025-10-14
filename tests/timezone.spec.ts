@@ -12,7 +12,9 @@ describe('Timezone', () => {
   });
 
   it('should throw error for invalid timezone', () => {
-    expect(() => new Timezone('Invalid/Timezone')).toThrow('Invalid timezone: Invalid/Timezone');
+    expect(() => new Timezone('Invalid/Timezone')).toThrow(
+      'Invalid timezone: Invalid/Timezone',
+    );
   });
 
   it('should throw error for empty string', () => {
@@ -20,6 +22,8 @@ describe('Timezone', () => {
   });
 
   it('should throw error for non-existent timezone', () => {
-    expect(() => new Timezone('NotATimezone')).toThrow('Invalid timezone: NotATimezone');
+    expect(() => new Timezone('NotATimezone')).toThrow(
+      'Invalid timezone: NotATimezone',
+    );
   });
 });

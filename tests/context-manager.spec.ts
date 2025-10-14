@@ -1,4 +1,4 @@
-import { ContextManager, ContextChangeListener } from '../src/context-manager';
+import { ContextChangeListener, ContextManager } from '../src/context-manager';
 
 interface TestContext {
   language: string;
@@ -18,10 +18,10 @@ describe('ContextManager', () => {
   describe('addListener', () => {
     it('should add a listener', () => {
       manager.addListener(mockListener);
-      
+
       const context: TestContext = { language: 'en', theme: 'dark', userId: 1 };
       manager.notifyChange('language', 'en', 'es');
-      
+
       expect(mockListener).toHaveBeenCalledWith('language', 'en', 'es');
     });
 
@@ -29,9 +29,9 @@ describe('ContextManager', () => {
       const listener2 = jest.fn();
       manager.addListener(mockListener);
       manager.addListener(listener2);
-      
+
       manager.notifyChange('theme', 'dark', 'light');
-      
+
       expect(mockListener).toHaveBeenCalledWith('theme', 'dark', 'light');
       expect(listener2).toHaveBeenCalledWith('theme', 'dark', 'light');
     });
@@ -41,9 +41,9 @@ describe('ContextManager', () => {
     it('should remove a listener', () => {
       manager.addListener(mockListener);
       manager.removeListener(mockListener);
-      
+
       manager.notifyChange('language', 'en', 'es');
-      
+
       expect(mockListener).not.toHaveBeenCalled();
     });
 
@@ -55,10 +55,10 @@ describe('ContextManager', () => {
       const listener2 = jest.fn();
       manager.addListener(mockListener);
       manager.addListener(listener2);
-      
+
       manager.removeListener(mockListener);
       manager.notifyChange('theme', 'dark', 'light');
-      
+
       expect(mockListener).not.toHaveBeenCalled();
       expect(listener2).toHaveBeenCalledWith('theme', 'dark', 'light');
     });
@@ -69,9 +69,9 @@ describe('ContextManager', () => {
       const listener2 = jest.fn();
       manager.addListener(mockListener);
       manager.addListener(listener2);
-      
+
       manager.notifyChange('userId', 1, 2);
-      
+
       expect(mockListener).toHaveBeenCalledWith('userId', 1, 2);
       expect(listener2).toHaveBeenCalledWith('userId', 1, 2);
     });
@@ -81,15 +81,18 @@ describe('ContextManager', () => {
         throw new Error('Listener error');
       });
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-      
+
       manager.addListener(errorListener);
       manager.addListener(mockListener);
-      
+
       manager.notifyChange('language', 'en', 'es');
-      
-      expect(consoleErrorSpy).toHaveBeenCalledWith('Error in context change listener:', expect.any(Error));
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Error in context change listener:',
+        expect.any(Error),
+      );
       expect(mockListener).toHaveBeenCalledWith('language', 'en', 'es');
-      
+
       consoleErrorSpy.mockRestore();
     });
   });
@@ -99,9 +102,9 @@ describe('ContextManager', () => {
       manager.addListener(mockListener);
       const context: TestContext = { language: 'en', theme: 'dark', userId: 1 };
       const proxy = manager.createProxy(context);
-      
+
       proxy.language = 'es';
-      
+
       expect(mockListener).toHaveBeenCalledWith('language', 'en', 'es');
       expect(proxy.language).toBe('es');
     });
@@ -110,11 +113,11 @@ describe('ContextManager', () => {
       manager.addListener(mockListener);
       const context: TestContext = { language: 'en', theme: 'dark', userId: 1 };
       const proxy = manager.createProxy(context);
-      
+
       proxy.language = 'es';
       proxy.theme = 'light';
       proxy.userId = 2;
-      
+
       expect(mockListener).toHaveBeenCalledTimes(3);
       expect(mockListener).toHaveBeenNthCalledWith(1, 'language', 'en', 'es');
       expect(mockListener).toHaveBeenNthCalledWith(2, 'theme', 'dark', 'light');
@@ -124,11 +127,11 @@ describe('ContextManager', () => {
     it('should work with no listeners', () => {
       const context: TestContext = { language: 'en', theme: 'dark', userId: 1 };
       const proxy = manager.createProxy(context);
-      
+
       expect(() => {
         proxy.language = 'es';
       }).not.toThrow();
-      
+
       expect(proxy.language).toBe('es');
     });
   });

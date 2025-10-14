@@ -24,9 +24,10 @@ describe('EnumTranslationRegistry', () => {
   let registry: EnumTranslationRegistry<DefaultStringKey, TestLanguages>;
 
   beforeEach(() => {
-    registry = new EnumTranslationRegistry<DefaultStringKey, TestLanguages>(
-      [TestLanguages.English, TestLanguages.Spanish]
-    );
+    registry = new EnumTranslationRegistry<DefaultStringKey, TestLanguages>([
+      TestLanguages.English,
+      TestLanguages.Spanish,
+    ]);
   });
 
   describe('register', () => {
@@ -63,7 +64,9 @@ describe('EnumTranslationRegistry', () => {
 
       expect(() => {
         registry.register(TestStatus, invalidTranslations as any, 'TestStatus');
-      }).toThrow("Language 'French' in enum 'TestStatus' is not available in this engine instance");
+      }).toThrow(
+        "Language 'French' in enum 'TestStatus' is not available in this engine instance",
+      );
     });
 
     it('should register numeric enum translations', () => {
@@ -81,10 +84,16 @@ describe('EnumTranslationRegistry', () => {
       };
 
       expect(() => {
-        registry.register(NumericEnum as unknown as Record<string, number>, translations, 'NumericEnum');
+        registry.register(
+          NumericEnum as unknown as Record<string, number>,
+          translations,
+          'NumericEnum',
+        );
       }).not.toThrow();
 
-      expect(registry.has(NumericEnum as unknown as Record<string, number>)).toBe(true);
+      expect(
+        registry.has(NumericEnum as unknown as Record<string, number>),
+      ).toBe(true);
     });
   });
 
@@ -106,73 +115,136 @@ describe('EnumTranslationRegistry', () => {
     });
 
     it('should translate enum values', () => {
-      const result = registry.translate(TestStatus, TestStatus.Active, TestLanguages.English);
+      const result = registry.translate(
+        TestStatus,
+        TestStatus.Active,
+        TestLanguages.English,
+      );
       expect(result).toBe('Active');
     });
 
     it('should translate to different languages', () => {
-      const englishResult = registry.translate(TestStatus, TestStatus.Active, TestLanguages.English);
-      const spanishResult = registry.translate(TestStatus, TestStatus.Active, TestLanguages.Spanish);
-      
+      const englishResult = registry.translate(
+        TestStatus,
+        TestStatus.Active,
+        TestLanguages.English,
+      );
+      const spanishResult = registry.translate(
+        TestStatus,
+        TestStatus.Active,
+        TestLanguages.Spanish,
+      );
+
       expect(englishResult).toBe('Active');
       expect(spanishResult).toBe('Activo');
     });
 
     it('should translate all enum values', () => {
-      expect(registry.translate(TestStatus, TestStatus.Active, TestLanguages.English)).toBe('Active');
-      expect(registry.translate(TestStatus, TestStatus.Inactive, TestLanguages.English)).toBe('Inactive');
-      expect(registry.translate(TestStatus, TestStatus.Pending, TestLanguages.English)).toBe('Pending');
+      expect(
+        registry.translate(
+          TestStatus,
+          TestStatus.Active,
+          TestLanguages.English,
+        ),
+      ).toBe('Active');
+      expect(
+        registry.translate(
+          TestStatus,
+          TestStatus.Inactive,
+          TestLanguages.English,
+        ),
+      ).toBe('Inactive');
+      expect(
+        registry.translate(
+          TestStatus,
+          TestStatus.Pending,
+          TestLanguages.English,
+        ),
+      ).toBe('Pending');
     });
 
     it('should handle numeric enums', () => {
-      const numericTranslations: EnumLanguageTranslation<number, TestLanguages> = {
+      const numericTranslations: EnumLanguageTranslation<
+        number,
+        TestLanguages
+      > = {
         [TestLanguages.English]: {
           [NumericEnum.First]: 'First',
           [NumericEnum.Second]: 'Second',
           [NumericEnum.Third]: 'Third',
         },
       };
-      registry.register(NumericEnum as unknown as Record<string, number>, numericTranslations, 'NumericEnum');
+      registry.register(
+        NumericEnum as unknown as Record<string, number>,
+        numericTranslations,
+        'NumericEnum',
+      );
 
-      const result = registry.translate(NumericEnum as unknown as Record<string, number>, NumericEnum.First, TestLanguages.English);
+      const result = registry.translate(
+        NumericEnum as unknown as Record<string, number>,
+        NumericEnum.First,
+        TestLanguages.English,
+      );
       expect(result).toBe('First');
     });
 
     it('should use translation function for error messages when provided', () => {
       const mockTranslateFn = jest.fn((key: string) => `Translated: ${key}`);
-      const registryWithTranslation = new EnumTranslationRegistry<DefaultStringKey, TestLanguages>(
-        [TestLanguages.English],
-        mockTranslateFn
-      );
+      const registryWithTranslation = new EnumTranslationRegistry<
+        DefaultStringKey,
+        TestLanguages
+      >([TestLanguages.English], mockTranslateFn);
 
       expect(() => {
-        registryWithTranslation.translate({ Unknown: 'unknown' }, 'unknown' as any, TestLanguages.English);
+        registryWithTranslation.translate(
+          { Unknown: 'unknown' },
+          'unknown' as any,
+          TestLanguages.English,
+        );
       }).toThrow('Translated: Error_EnumNotFoundTemplate');
 
-      expect(mockTranslateFn).toHaveBeenCalledWith('Error_EnumNotFoundTemplate', { enumName: 'UnknownEnum' });
+      expect(mockTranslateFn).toHaveBeenCalledWith(
+        'Error_EnumNotFoundTemplate',
+        { enumName: 'UnknownEnum' },
+      );
     });
 
     it('should handle numeric enum values by finding string keys', () => {
-      const numericTranslations: EnumLanguageTranslation<string, TestLanguages> = {
+      const numericTranslations: EnumLanguageTranslation<
+        string,
+        TestLanguages
+      > = {
         [TestLanguages.English]: {
-          'First': 'First Item',
-          'Second': 'Second Item',
-          'Third': 'Third Item',
+          First: 'First Item',
+          Second: 'Second Item',
+          Third: 'Third Item',
         },
       };
       const enumRef = NumericEnum as unknown as Record<string, number>;
-      registry.register(enumRef, numericTranslations as EnumLanguageTranslation<number, TestLanguages>, 'NumericEnum');
+      registry.register(
+        enumRef,
+        numericTranslations as EnumLanguageTranslation<number, TestLanguages>,
+        'NumericEnum',
+      );
 
       // Test with the actual numeric value - the registry should find the string key 'First' for value 1
-      const result = registry.translate(enumRef, 1 as number, TestLanguages.English);
+      const result = registry.translate(
+        enumRef,
+        1 as number,
+        TestLanguages.English,
+      );
       expect(result).toBe('First Item');
     });
 
     it('should throw error for unregistered enum', () => {
       const unregisteredEnum = { Test: 'test' };
-      
+
       expect(() => {
-        registry.translate(unregisteredEnum, 'test' as any, TestLanguages.English);
+        registry.translate(
+          unregisteredEnum,
+          'test' as any,
+          TestLanguages.English,
+        );
       }).toThrow('No translations found for enum: UnknownEnum');
     });
 
@@ -189,21 +261,40 @@ describe('EnumTranslationRegistry', () => {
           // Missing Inactive and Pending - this will be a runtime error
         },
       };
-      registry.register(TestStatus, incompleteTranslations as EnumLanguageTranslation<TestStatus, TestLanguages>, 'IncompleteStatus');
+      registry.register(
+        TestStatus,
+        incompleteTranslations as EnumLanguageTranslation<
+          TestStatus,
+          TestLanguages
+        >,
+        'IncompleteStatus',
+      );
 
       expect(() => {
-        registry.translate(TestStatus, TestStatus.Inactive, TestLanguages.English);
+        registry.translate(
+          TestStatus,
+          TestStatus.Inactive,
+          TestLanguages.English,
+        );
       }).toThrow('No translation found for value: inactive');
     });
 
     it('should use enum name in error messages', () => {
       const customEnum = { Custom: 'custom' };
-      registry.register(customEnum, {
-        [TestLanguages.English]: { Custom: 'Custom Value' }
-      } as EnumLanguageTranslation<string, TestLanguages>, 'CustomEnum');
+      registry.register(
+        customEnum,
+        {
+          [TestLanguages.English]: { Custom: 'Custom Value' },
+        } as EnumLanguageTranslation<string, TestLanguages>,
+        'CustomEnum',
+      );
 
       expect(() => {
-        registry.translate(customEnum, 'nonexistent' as any, TestLanguages.English);
+        registry.translate(
+          customEnum,
+          'nonexistent' as any,
+          TestLanguages.English,
+        );
       }).toThrow('No translation found for value: nonexistent');
     });
   });
@@ -215,7 +306,11 @@ describe('EnumTranslationRegistry', () => {
           [TestStatus.Active]: 'Active',
         },
       };
-      registry.register(TestStatus, translations as EnumLanguageTranslation<TestStatus, TestLanguages>, 'TestStatus');
+      registry.register(
+        TestStatus,
+        translations as EnumLanguageTranslation<TestStatus, TestLanguages>,
+        'TestStatus',
+      );
 
       expect(registry.has(TestStatus)).toBe(true);
     });
@@ -233,11 +328,21 @@ describe('EnumTranslationRegistry', () => {
         [TestLanguages.English]: { [NumericEnum.First]: 'First' },
       };
 
-      registry.register(TestStatus, translations1 as EnumLanguageTranslation<TestStatus, TestLanguages>, 'TestStatus');
-      registry.register(NumericEnum as unknown as Record<string, number>, translations2 as EnumLanguageTranslation<number, TestLanguages>, 'NumericEnum');
+      registry.register(
+        TestStatus,
+        translations1 as EnumLanguageTranslation<TestStatus, TestLanguages>,
+        'TestStatus',
+      );
+      registry.register(
+        NumericEnum as unknown as Record<string, number>,
+        translations2 as EnumLanguageTranslation<number, TestLanguages>,
+        'NumericEnum',
+      );
 
       expect(registry.has(TestStatus)).toBe(true);
-      expect(registry.has(NumericEnum as unknown as Record<string, number>)).toBe(true);
+      expect(
+        registry.has(NumericEnum as unknown as Record<string, number>),
+      ).toBe(true);
     });
   });
 
@@ -246,13 +351,24 @@ describe('EnumTranslationRegistry', () => {
       const emptyTranslations = {
         [TestLanguages.English]: {},
       };
-      
+
       expect(() => {
-        registry.register(TestStatus, emptyTranslations as EnumLanguageTranslation<TestStatus, TestLanguages>, 'EmptyStatus');
+        registry.register(
+          TestStatus,
+          emptyTranslations as EnumLanguageTranslation<
+            TestStatus,
+            TestLanguages
+          >,
+          'EmptyStatus',
+        );
       }).not.toThrow();
 
       expect(() => {
-        registry.translate(TestStatus, TestStatus.Active, TestLanguages.English);
+        registry.translate(
+          TestStatus,
+          TestStatus.Active,
+          TestLanguages.English,
+        );
       }).toThrow('No translation found for value: active');
     });
 
@@ -264,11 +380,28 @@ describe('EnumTranslationRegistry', () => {
         },
         // Missing Spanish translations
       };
-      registry.register(TestStatus, partialTranslations as EnumLanguageTranslation<TestStatus, TestLanguages>, 'PartialStatus');
+      registry.register(
+        TestStatus,
+        partialTranslations as EnumLanguageTranslation<
+          TestStatus,
+          TestLanguages
+        >,
+        'PartialStatus',
+      );
 
-      expect(registry.translate(TestStatus, TestStatus.Active, TestLanguages.English)).toBe('Active');
+      expect(
+        registry.translate(
+          TestStatus,
+          TestStatus.Active,
+          TestLanguages.English,
+        ),
+      ).toBe('Active');
       expect(() => {
-        registry.translate(TestStatus, TestStatus.Active, TestLanguages.Spanish);
+        registry.translate(
+          TestStatus,
+          TestStatus.Active,
+          TestLanguages.Spanish,
+        );
       }).toThrow('No translations found for language: Spanish');
     });
   });
