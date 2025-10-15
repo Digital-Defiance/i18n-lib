@@ -423,6 +423,95 @@ For complete documentation on the plugin architecture, see [PLUGIN_ARCHITECTURE.
 
 ## Advanced Features
 
+### Translatable Errors
+
+The `TranslatableGenericError` class provides a simple way to create errors with translated messages that work across any component:
+
+```typescript
+import { TranslatableGenericError, CoreStringKey, CoreLanguage } from '@digitaldefiance/i18n-lib';
+
+// Define your error string keys
+enum UserErrorKey {
+  UserNotFound = 'userNotFound',
+  InvalidCredentials = 'invalidCredentials',
+  AccountLocked = 'accountLocked',
+}
+
+// Register your component with translations
+const userErrorComponent = {
+  id: 'user-errors',
+  name: 'User Errors',
+  stringKeys: Object.values(UserErrorKey)
+};
+
+const registration = {
+  component: userErrorComponent,
+  strings: {
+    en: {
+      [UserErrorKey.UserNotFound]: 'User "{username}" not found',
+      [UserErrorKey.InvalidCredentials]: 'Invalid credentials provided',
+      [UserErrorKey.AccountLocked]: 'Account locked until {unlockTime}'
+    },
+    fr: {
+      [UserErrorKey.UserNotFound]: 'Utilisateur "{username}" introuvable',
+      [UserErrorKey.InvalidCredentials]: 'Identifiants invalides fournis',
+      [UserErrorKey.AccountLocked]: 'Compte verrouillé jusqu\'à {unlockTime}'
+    }
+  }
+};
+
+i18n.registerComponent(registration);
+
+// Throw translatable errors
+throw new TranslatableGenericError(
+  'user-errors',
+  UserErrorKey.UserNotFound,
+  { username: 'john_doe' },
+  'en',
+  { userId: 123 }, // metadata
+  'myapp' // engine instance key
+);
+
+// Use with explicit engine instance
+const error = TranslatableGenericError.withEngine(
+  i18n,
+  'user-errors',
+  UserErrorKey.InvalidCredentials,
+  undefined,
+  'fr'
+);
+
+// Retranslate errors dynamically
+try {
+  // ... code that throws TranslatableGenericError
+} catch (error) {
+  if (error instanceof TranslatableGenericError) {
+    const localizedMessage = error.retranslate(userLanguage, 'myapp');
+    sendToUser(localizedMessage);
+  }
+}
+
+// Use with core strings
+throw new TranslatableGenericError(
+  'core',
+  CoreStringKey.Error_AccessDenied,
+  undefined,
+  CoreLanguage.EnglishUS,
+  { requestId: '12345' },
+  'myapp'
+);
+```
+
+**Key Features:**
+- Works with any registered component and string keys
+- Uses `safeTranslate` for consistent fallback behavior (`[componentId.stringKey]`)
+- Stores error context: stringKey, componentId, language, variables, metadata
+- Supports dynamic retranslation with `retranslate()` method
+- Never throws during construction - always returns a valid error
+- Compatible with both constructor and static factory methods
+
+For complete documentation, see [TRANSLATABLE_ERROR_GUIDE.md](./TRANSLATABLE_ERROR_GUIDE.md).
+
 ### Enum Translation Registry
 
 ```typescript
@@ -936,6 +1025,28 @@ MIT
 Part of the DigitalBurnbag project - a secure file sharing and automated protocol system.
 
 ## ChangeLog
+
+### Version 1.1.7
+
+- Wed Oct 15 2025 16:13:00 GMT-0700 (Pacific Daylight Time)
+  **Fixed:**
+  - Corrected safeCoreTranslation fallback format to use 
+    ```plaintext
+    [CoreStringKey.${stringKey}]
+    ```
+  - Fixed import issues with DefaultInstanceKey
+  **Added:**
+    - New TranslatableGenericError class for generic translatable errors across any component
+    - CoreI18nComponentId constant export
+    - 130+ new tests for comprehensive coverage
+    - Complete usage documentation
+  **Changed:**
+    - Standardized all fallback formats to use square brackets 
+    ```plaintext
+    [componentId.stringKey]
+    ```
+    - Refactored to use CoreI18nComponentId constant
+  All tests pass and backward compatibility is maintained.
 
 ### Version 1.1.6
 

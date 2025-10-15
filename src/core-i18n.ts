@@ -11,6 +11,8 @@ import { createLanguageDefinitions } from './language-registry';
 import { PluginI18nEngine } from './plugin-i18n-engine';
 import { createCompleteComponentStrings } from './strict-types';
 
+const DefaultInstanceKey = 'default';
+
 /**
  * Create default language definitions
  */
@@ -60,11 +62,13 @@ export function createDefaultLanguages(): LanguageDefinition[] {
   ]);
 }
 
+export const CoreI18nComponentId = 'core';
+
 /**
  * Core component definition
  */
 export const CoreComponentDefinition: ComponentDefinition<CoreStringKey> = {
-  id: 'core',
+  id: CoreI18nComponentId,
   name: 'Core I18n System',
   stringKeys: Object.values(CoreStringKey),
 };
@@ -515,7 +519,7 @@ export function createCoreComponentRegistration(): ComponentRegistration<
  * Create a pre-configured I18n engine with core components
  */
 export function createCoreI18nEngine(
-  instanceKey: string = 'default',
+  instanceKey: string = DefaultInstanceKey,
 ): PluginI18nEngine<CoreLanguage> {
   const languages = createDefaultLanguages();
   const engine = PluginI18nEngine.createInstance<CoreLanguage>(
@@ -541,7 +545,7 @@ export function getCoreTranslation(
   instanceKey?: string,
 ): string {
   const engine = PluginI18nEngine.getInstance<CoreLanguage>(instanceKey);
-  return engine.translate('core', stringKey, variables, language);
+  return engine.translate(CoreI18nComponentId, stringKey, variables, language);
 }
 
 /**
@@ -556,6 +560,6 @@ export function safeCoreTranslation(
   try {
     return getCoreTranslation(stringKey, variables, language, instanceKey);
   } catch {
-    return `[core.${stringKey}]`;
+    return `[CoreStringKey.${stringKey}]`;
   }
 }

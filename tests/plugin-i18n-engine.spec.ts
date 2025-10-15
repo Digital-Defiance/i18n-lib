@@ -646,4 +646,133 @@ describe('PluginI18nEngine', () => {
       expect(PluginI18nEngine.hasInstance('reset2')).toBe(false);
     });
   });
+
+  describe('safeTranslate bracket formatting', () => {
+    it('should return square bracket format for missing translations', () => {
+      const result = engine.safeTranslate('nonexistent-component', 'missing-key');
+      expect(result).toBe('[nonexistent-component.missing-key]');
+    });
+
+    it('should use square brackets not curly braces', () => {
+      const result = engine.safeTranslate('invalid', 'key');
+      expect(result).not.toContain('{{');
+      expect(result).not.toContain('}}');
+      expect(result).toMatch(/^\[.*\]$/);
+    });
+
+    it('should format as [componentId.stringKey]', () => {
+      const componentId = 'test-component';
+      const stringKey = 'test-key';
+      const result = engine.safeTranslate(componentId, stringKey);
+      expect(result).toBe(`[${componentId}.${stringKey}]`);
+    });
+
+    it('should handle various component and key combinations', () => {
+      const testCases = [
+        { component: 'comp1', key: 'key1', expected: '[comp1.key1]' },
+        { component: 'my-component', key: 'my-key', expected: '[my-component.my-key]' },
+        { component: 'core', key: 'error', expected: '[core.error]' },
+      ];
+
+      testCases.forEach(({ component, key, expected }) => {
+        const result = engine.safeTranslate(component, key);
+        expect(result).toBe(expected);
+      });
+    });
+
+    it('should not throw errors for any input', () => {
+      expect(() => engine.safeTranslate('', '')).not.toThrow();
+      expect(() => engine.safeTranslate('a', 'b')).not.toThrow();
+      expect(() => engine.safeTranslate('test', 'key', { var: 'value' })).not.toThrow();
+    });
+
+    it('should return actual translation when component exists', () => {
+      const component: ComponentDefinition<'testKey'> = {
+        id: 'safe-test',
+        name: 'Safe Test',
+        stringKeys: ['testKey'],
+      };
+
+      const registration: ComponentRegistration<'testKey', 'en'> = {
+        component,
+        strings: {
+          en: {
+            testKey: 'Test Value',
+          },
+        },
+      };
+
+      engine.registerComponent(registration);
+
+      const result = engine.safeTranslate('safe-test', 'testKey');
+      expect(result).toBe('Test Value');
+      expect(result).not.toContain('[');
+      expect(result).not.toContain(']');
+    });
+
+    it('should handle variables in safe translate', () => {
+      const component: ComponentDefinition<'template'> = {
+        id: 'var-test',
+        name: 'Variable Test',
+        stringKeys: ['template'],
+      };
+
+      const registration: ComponentRegistration<'template', 'en'> = {
+        component,
+        strings: {
+          en: {
+            template: 'Hello, {name}!',
+          },
+        },
+      };
+
+      engine.registerComponent(registration);
+
+      const result = engine.safeTranslate('var-test', 'template', { name: 'World' });
+      expect(result).toBe('Hello, World!');
+    });
+
+    it('should return bracket format when translation throws', () => {
+      // Try to translate with unregistered component
+      const result = engine.safeTranslate('unregistered', 'key');
+      expect(result).toBe('[unregistered.key]');
+    });
+
+    it('should be consistent with t function fallback format', () => {
+      // When t function encounters a missing component.key, it should use safeTranslate
+      const tResult = engine.t('{{missing.key}}');
+      const safeResult = engine.safeTranslate('missing', 'key');
+      
+      expect(tResult).toBe(safeResult);
+      expect(tResult).toBe('[missing.key]');
+    });
+  });
+
+  describe('bracket format edge cases', () => {
+    it('should handle empty component id', () => {
+      const result = engine.safeTranslate('', 'key');
+      expect(result).toBe('[.key]');
+    });
+
+    it('should handle empty string key', () => {
+      const result = engine.safeTranslate('component', '');
+      expect(result).toBe('[component.]');
+    });
+
+    it('should handle special characters in component id', () => {
+      const result = engine.safeTranslate('my-component_v2', 'test-key');
+      expect(result).toBe('[my-component_v2.test-key]');
+    });
+
+    it('should handle special characters in string key', () => {
+      const result = engine.safeTranslate('component', 'Error_NotFound');
+      expect(result).toBe('[component.Error_NotFound]');
+    });
+
+    it('should preserve exact format without extra spaces', () => {
+      const result = engine.safeTranslate('comp', 'key');
+      expect(result).not.toContain(' ');
+      expect(result).toBe('[comp.key]');
+    });
+  });
 });

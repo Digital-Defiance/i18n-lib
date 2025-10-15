@@ -19,6 +19,7 @@ export * from './i18n-engine';
 export * from './language-definition';
 export * from './template';
 export * from './timezone';
+export * from './translatable-generic-error';
 export * from './typed-error';
 export * from './types';
 export * from './utils';
