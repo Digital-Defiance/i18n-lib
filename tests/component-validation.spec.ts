@@ -417,6 +417,96 @@ describe('Component Registration Validation', () => {
     });
   });
 
+  describe('Template Processing (t function)', () => {
+    beforeEach(() => {
+      // Register a core component for t function testing
+      const coreComponent: ComponentDefinition<'error' | 'success'> = {
+        id: 'core',
+        name: 'Core Component',
+        stringKeys: ['error', 'success'],
+      };
+
+      const coreRegistration: ComponentRegistration<'error' | 'success', 'en' | 'fr' | 'es'> = {
+        component: coreComponent,
+        strings: {
+          en: {
+            error: 'Error occurred',
+            success: 'Operation successful',
+          },
+          fr: {
+            error: 'Erreur survenue',
+            success: 'Opération réussie',
+          },
+          es: {
+            error: 'Error ocurrido',
+            success: 'Operación exitosa',
+          },
+        },
+      };
+
+      engine.registerComponent(coreRegistration);
+    });
+
+    it('should have t function available', () => {
+      expect(engine.t).toBeDefined();
+      expect(typeof engine.t).toBe('function');
+    });
+
+    it('should process plain text without patterns', () => {
+      const result = engine.t('Plain text message');
+      expect(result).toBe('Plain text message');
+    });
+
+    it('should process component-based template patterns', () => {
+      const result = engine.t('{{core.error}}');
+      expect(result).toBe('Error occurred');
+    });
+
+    it('should process template patterns with specified language', () => {
+      const result = engine.t('{{core.success}}', 'fr');
+      expect(result).toBe('Opération réussie');
+    });
+
+    it('should handle non-existent patterns gracefully', () => {
+      const result = engine.t('{{core.nonexistent}}');
+      expect(result).toBe('[core.nonexistent]');
+    });
+
+    it('should process multiple template patterns', () => {
+      const result = engine.t('{{core.error}} - {{core.success}}');
+      expect(result).toBe('Error occurred - Operation successful');
+    });
+
+    it('should merge multiple variable objects', () => {
+      // Register a component with template variables
+      const templateComponent: ComponentDefinition<'greeting'> = {
+        id: 'template-vars',
+        name: 'Template Variables',
+        stringKeys: ['greeting'],
+      };
+
+      const templateRegistration: ComponentRegistration<'greeting', 'en'> = {
+        component: templateComponent,
+        strings: {
+          en: {
+            greeting: '{salutation}, {name}! Today is {day}.',
+          },
+        },
+      };
+
+      engine.registerComponent(templateRegistration);
+
+      const result = engine.t(
+        '{{template-vars.greeting}}',
+        'en',
+        { salutation: 'Hello' },
+        { name: 'John' },
+        { day: 'Monday' }
+      );
+      expect(result).toBe('Hello, John! Today is Monday.');
+    });
+  });
+
   describe('Instance Management and Cleanup', () => {
     beforeEach(() => {
       // Clean up instances before each test for proper isolation

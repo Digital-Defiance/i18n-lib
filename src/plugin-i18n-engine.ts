@@ -18,7 +18,6 @@ import { Timezone } from './timezone';
 import { TranslationRequest } from './translation-request';
 import { TranslationResponse } from './translation-response';
 import { EnumLanguageTranslation } from './types';
-import { DefaultLanguage, DefaultLanguageCodes } from './default-config';
 
 /**
  * Plugin-based I18n Engine with registration capabilities
@@ -29,6 +28,15 @@ export class PluginI18nEngine<TLanguages extends string> {
   private readonly enumRegistry: EnumTranslationRegistry<string, TLanguages>;
   private readonly config: RegistryConfig<TLanguages>;
   private contextKey: string;
+
+  /**
+   * Default template processor instance
+   */
+  public readonly t: (
+    str: string,
+    language?: TLanguages,
+    ...otherVars: Record<string, string | number>[]
+  ) => string;
 
   /**
    * Static instances for semi-singleton pattern
@@ -93,6 +101,30 @@ export class PluginI18nEngine<TLanguages extends string> {
     globalContext.setCurrencyCode(this.config.defaultCurrencyCode, this.contextKey);
     globalContext.setUserTimezone(this.config.timezone, this.contextKey);
     globalContext.setAdminTimezone(this.config.adminTimezone, this.contextKey);
+
+    // Initialize the default template processor for component-based patterns
+    this.t = (str: string, language?: TLanguages, ...otherVars: Record<string, string | number>[]) => {
+      // Step 1: Replace component-based patterns like {{componentId.stringKey}}
+      let result = str.replace(/\{\{([^}]+)\}\}/g, (match, pattern) => {
+        const parts = pattern.split('.');
+        if (parts.length === 2) {
+          const [componentId, stringKey] = parts;
+          // For template strings, use the first variable object if available
+          const isTemplate = stringKey.toLowerCase().endsWith('template');
+          const vars = isTemplate && otherVars.length > 0 ? otherVars[0] : {};
+          return this.safeTranslate(componentId.trim(), stringKey.trim(), vars, language);
+        }
+        return match; // Return original if pattern doesn't match expected format
+      });
+      
+      // Step 2: Replace remaining variable patterns like {varName} with merged variables
+      const allVars = otherVars.reduce((acc, vars) => ({ ...acc, ...vars }), {});
+      result = result.replace(/\{(\w+)\}/g, (match, varName) => {
+        return allVars[varName] !== undefined ? String(allVars[varName]) : match;
+      });
+      
+      return result;
+    };
 
     // Auto-register as default instance if none exists
     if (!PluginI18nEngine._defaultKey) {

@@ -937,6 +937,11 @@ Part of the DigitalBurnbag project - a secure file sharing and automated protoco
 
 ## ChangeLog
 
+### Version 1.1.6
+
+- Tue Oct 14 2025 17:04:00 GMT-0700 (Pacific Daylight Time)
+  - Added missing T function to i18n plugin engine
+
 ### Version 1.1.5
 
 - Tue Oct 14 2025 14:48:00 GMT-0700 (Pacific Daylight Time)

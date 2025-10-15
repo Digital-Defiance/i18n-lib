@@ -202,9 +202,9 @@ export class ComponentRegistry<TLanguages extends string> {
       );
     }
 
-    // Process variables if the string is a template
+    // Process variables if the string key indicates it's a template
     let processedTranslation: string = translation;
-    if (variables && isTemplate(translation)) {
+    if (variables && isTemplate(stringKey)) {
       processedTranslation = replaceVariables(translation, variables);
     }
 
