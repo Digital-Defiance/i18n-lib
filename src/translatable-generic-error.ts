@@ -53,7 +53,8 @@ export class TranslatableGenericError<
     this.variables = variables;
     this.metadata = metadata;
 
-    Object.setPrototypeOf(this, TranslatableGenericError.prototype);
+    // Ensure proper prototype chain for instanceof checks across transpiled targets
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 
   /**

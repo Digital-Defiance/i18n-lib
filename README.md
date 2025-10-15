@@ -1026,6 +1026,11 @@ Part of the DigitalBurnbag project - a secure file sharing and automated protoco
 
 ## ChangeLog
 
+### Version 1.1.8
+
+- Wed Oct 15 2025 16:43:00 GMT-0700 (Pacific Daylight Time)
+  - Fix to translatable prototype inheritance
+
 ### Version 1.1.7
 
 - Wed Oct 15 2025 16:13:00 GMT-0700 (Pacific Daylight Time)
