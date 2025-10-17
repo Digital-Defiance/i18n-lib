@@ -1026,6 +1026,11 @@ Part of the DigitalBurnbag project - a secure file sharing and automated protoco
 
 ## ChangeLog
 
+### Version 1.1.9
+
+- Fri Oct 17 2025 14:44:00 GMT-0700 (Pacific Daylight Time)
+  - Add String
+
 ### Version 1.1.8
 
 - Wed Oct 15 2025 16:43:00 GMT-0700 (Pacific Daylight Time)

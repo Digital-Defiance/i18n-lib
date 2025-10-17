@@ -104,6 +104,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_ValidationFailed]: 'Validation failed',
       [CoreStringKey.Error_RequiredField]: 'This field is required',
       [CoreStringKey.Error_InvalidContextTemplate]: 'Invalid context: {contextKey}',
+      [CoreStringKey.Error_MissingTranslationKeyTemplate]: 'Missing translation key: {stringKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -157,6 +158,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_ValidationFailed]: 'Validation failed',
       [CoreStringKey.Error_RequiredField]: 'This field is required',
       [CoreStringKey.Error_InvalidContextTemplate]: 'Invalid context: {contextKey}',
+      [CoreStringKey.Error_MissingTranslationKeyTemplate]: 'Missing translation key: {stringKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -210,6 +212,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_ValidationFailed]: 'Échec de la validation',
       [CoreStringKey.Error_RequiredField]: 'Ce champ est obligatoire',
       [CoreStringKey.Error_InvalidContextTemplate]: 'Contexte invalide : {contextKey}',
+      [CoreStringKey.Error_MissingTranslationKeyTemplate]: 'Clé de traduction manquante : {stringKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -264,6 +267,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_ValidationFailed]: 'Error de validación',
       [CoreStringKey.Error_RequiredField]: 'Este campo es obligatorio',
       [CoreStringKey.Error_InvalidContextTemplate]: 'Contexte invalide : {contextKey}',
+      [CoreStringKey.Error_MissingTranslationKeyTemplate]: 'Clave de traducción faltante: {stringKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -317,6 +321,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_ValidationFailed]: 'Validierung fehlgeschlagen',
       [CoreStringKey.Error_RequiredField]: 'Dieses Feld ist erforderlich',
       [CoreStringKey.Error_InvalidContextTemplate]: 'Ungültiger Kontext: {contextKey}',
+      [CoreStringKey.Error_MissingTranslationKeyTemplate]: 'Fehlender Übersetzungsschlüssel: {stringKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -371,6 +376,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_ValidationFailed]: '验证失败',
       [CoreStringKey.Error_RequiredField]: '此字段为必填项',
       [CoreStringKey.Error_InvalidContextTemplate]: '无效的上下文：{contextKey}',
+      [CoreStringKey.Error_MissingTranslationKeyTemplate]: '缺少翻译键：{stringKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -422,6 +428,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_ValidationFailed]: '検証に失敗しました',
       [CoreStringKey.Error_RequiredField]: 'このフィールドは必須です',
       [CoreStringKey.Error_InvalidContextTemplate]: '無効なコンテキスト：{contextKey}',
+      [CoreStringKey.Error_MissingTranslationKeyTemplate]: '翻訳キーが見つかりません：{stringKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -474,6 +481,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_ValidationFailed]: 'Перевірка не вдалася',
       [CoreStringKey.Error_RequiredField]: "Це поле є обов'язковим",
       [CoreStringKey.Error_InvalidContextTemplate]: 'Неправильний контекст: {contextKey}',
+      [CoreStringKey.Error_MissingTranslationKeyTemplate]: 'Відсутній ключ перекладу: {stringKey}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:

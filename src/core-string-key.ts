@@ -36,6 +36,7 @@ export enum CoreStringKey {
   Error_DuplicateComponentTemplate = 'error_duplicateComponentTemplate',
   Error_DuplicateLanguageTemplate = 'error_duplicateLanguageTemplate',
   Error_ValidationFailedTemplate = 'error_validationFailedTemplate',
+  Error_MissingTranslationKeyTemplate = 'error_missingTranslationKeyTemplate',
 
   // System Messages
   System_Welcome = 'system_welcome',
