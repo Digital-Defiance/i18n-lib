@@ -94,7 +94,8 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Success]: 'Success',
       [CoreStringKey.Common_Warning]: 'Warning',
       [CoreStringKey.Common_Info]: 'Information',
-
+      [CoreStringKey.Common_Disposed]: 'Object has been disposed',
+      
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: 'Invalid input provided',
       [CoreStringKey.Error_NetworkError]: 'Network connection error',
@@ -148,6 +149,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Success]: 'Success',
       [CoreStringKey.Common_Warning]: 'Warning',
       [CoreStringKey.Common_Info]: 'Information',
+      [CoreStringKey.Common_Disposed]: 'Object has been disposed',
 
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: 'Invalid input provided',
@@ -202,6 +204,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Success]: 'Succès',
       [CoreStringKey.Common_Warning]: 'Avertissement',
       [CoreStringKey.Common_Info]: 'Information',
+      [CoreStringKey.Common_Disposed]: 'L\'objet a été disposé',
 
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: 'Entrée invalide fournie',
@@ -257,6 +260,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Success]: 'Éxito',
       [CoreStringKey.Common_Warning]: 'Advertencia',
       [CoreStringKey.Common_Info]: 'Información',
+      [CoreStringKey.Common_Disposed]: 'El objeto ha sido eliminado',
 
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: 'Entrada inválida proporcionada',
@@ -311,6 +315,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Success]: 'Erfolg',
       [CoreStringKey.Common_Warning]: 'Warnung',
       [CoreStringKey.Common_Info]: 'Information',
+      [CoreStringKey.Common_Disposed]: 'Objekt wurde freigegeben',
 
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: 'Ungültige Eingabe bereitgestellt',
@@ -366,6 +371,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Success]: '成功',
       [CoreStringKey.Common_Warning]: '警告',
       [CoreStringKey.Common_Info]: '信息',
+      [CoreStringKey.Common_Disposed]: '对象已被释放',
 
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: '提供的输入无效',
@@ -418,6 +424,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Success]: '成功',
       [CoreStringKey.Common_Warning]: '警告',
       [CoreStringKey.Common_Info]: '情報',
+      [CoreStringKey.Common_Disposed]: 'オブジェクトは破棄されました',
 
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: '無効な入力が提供されました',
@@ -471,6 +478,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Success]: 'Успіх',
       [CoreStringKey.Common_Warning]: 'Попередження',
       [CoreStringKey.Common_Info]: 'Інформація',
+      [CoreStringKey.Common_Disposed]: 'Об\'єкт було звільнено',
 
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: 'Надано неправильний ввід',
