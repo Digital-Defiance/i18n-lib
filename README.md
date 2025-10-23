@@ -217,23 +217,44 @@ const saveText = i18n.translate('core', CoreStringKey.Common_Save);
 const errorMsg = i18n.translate('core', CoreStringKey.Error_ValidationFailed);
 ```
 
-#### User System Component (Example)
+#### Custom Component Example
 
-Demonstrates user management strings:
+Create your own component with translations:
 
 ```typescript
 import { 
-  registerUserSystemComponent, 
-  getUserTranslation, 
-  UserStringKey 
+  ComponentDefinition,
+  ComponentRegistration,
+  LanguageCodes
 } from '@digitaldefiance/i18n-lib';
 
-// Register user system with existing engine
-registerUserSystemComponent(i18n);
+enum UserStringKey {
+  Auth_Login = 'auth_login',
+  Error_UserNotFoundTemplate = 'error_user_not_found_template'
+}
 
-// Use user system translations
-const loginText = getUserTranslation(UserStringKey.Auth_Login);
-const userNotFound = getUserTranslation(
+const userComponent: ComponentDefinition<UserStringKey> = {
+  id: 'user-system',
+  name: 'User System',
+  stringKeys: Object.values(UserStringKey)
+};
+
+const registration: ComponentRegistration<UserStringKey, CoreLanguageCode> = {
+  component: userComponent,
+  strings: {
+    [LanguageCodes.EN_US]: {
+      [UserStringKey.Auth_Login]: 'Login',
+      [UserStringKey.Error_UserNotFoundTemplate]: 'User "{username}" not found'
+    }
+  }
+};
+
+i18n.registerComponent(registration);
+
+// Use translations
+const loginText = i18n.translate('user-system', UserStringKey.Auth_Login);
+const userNotFound = i18n.translate(
+  'user-system',
   UserStringKey.Error_UserNotFoundTemplate, 
   { username: 'john_doe' }
 );
@@ -309,18 +330,18 @@ const myComponent: ComponentDefinition<MyStrings> = {
 };
 
 // System has EN, FR, ES languages - component must provide translations for all three
-const registration: ComponentRegistration<MyStrings, CoreLanguage> = {
+const registration: ComponentRegistration<MyStrings, CoreLanguageCode> = {
   component: myComponent,
   strings: {
-    [CoreLanguage.EnglishUS]: {
+    [LanguageCodes.EN_US]: {
       [MyStrings.Welcome]: 'Welcome',
       [MyStrings.Goodbye]: 'Goodbye'
     },
-    [CoreLanguage.French]: {
+    [LanguageCodes.FR]: {
       [MyStrings.Welcome]: 'Bienvenue',
       [MyStrings.Goodbye]: 'Au revoir'
     },
-    [CoreLanguage.Spanish]: {
+    [LanguageCodes.ES]: {
       [MyStrings.Welcome]: 'Bienvenido', 
       [MyStrings.Goodbye]: 'Adiós'
     }
@@ -343,9 +364,9 @@ Components can support different subsets of system languages:
 const componentA = {
   component: { id: 'comp-a', name: 'Component A', stringKeys: ['hello'] },
   strings: {
-    en: { hello: 'Hello' },
-    fr: { hello: 'Bonjour' },
-    es: { hello: 'Hola' }
+    'en-US': { hello: 'Hello' },
+    'fr': { hello: 'Bonjour' },
+    'es': { hello: 'Hola' }
   }
 };
 
@@ -353,8 +374,8 @@ const componentA = {
 const componentB = {
   component: { id: 'comp-b', name: 'Component B', stringKeys: ['save'] },
   strings: {
-    en: { save: 'Save' },
-    de: { save: 'Speichern' }
+    'en-US': { save: 'Save' },
+    'de': { save: 'Speichern' }
   }
 };
 
@@ -363,23 +384,25 @@ i18n.registerComponent(componentA); // ✓ Complete
 i18n.registerComponent(componentB); // ⚠ Missing FR, ES - uses fallback
 
 // Usage automatically handles fallbacks
-i18n.translate('comp-b', 'save', {}, 'fr'); // Returns 'Save' (EN fallback)
+i18n.translate('comp-b', 'save', {}, 'fr'); // Returns 'Save' (en-US fallback)
 ```
 
 #### Dynamic Language Addition
 
 ```typescript
+import { createLanguageDefinition } from '@digitaldefiance/i18n-lib';
+
 // Add new language to system
-const germanLang = { id: 'de', name: 'German', code: 'de' };
+const germanLang = createLanguageDefinition('de', 'Deutsch', 'de');
 i18n.registerLanguage(germanLang);
 
 // New component registrations now require German translations
 const newRegistration = {
   component: { id: 'new-comp', name: 'New Component', stringKeys: ['test'] },
   strings: {
-    en: { test: 'Test' },
-    fr: { test: 'Test' },
-    es: { test: 'Prueba' }
+    'en-US': { test: 'Test' },
+    'fr': { test: 'Test' },
+    'es': { test: 'Prueba' }
     // Missing 'de' - validation will flag this
   }
 };
@@ -412,7 +435,7 @@ const strictEngine = new PluginI18nEngine(languages, {
   validation: {
     requireCompleteStrings: true,
     allowPartialRegistration: false,
-    fallbackLanguageId: 'en'
+    fallbackLanguageId: 'en-US'
   }
 });
 ```
@@ -438,7 +461,7 @@ For complete documentation on the plugin architecture, see [PLUGIN_ARCHITECTURE.
 The `TranslatableGenericError` class provides a simple way to create errors with translated messages that work across any component:
 
 ```typescript
-import { TranslatableGenericError, CoreStringKey, CoreLanguage } from '@digitaldefiance/i18n-lib';
+import { TranslatableGenericError, CoreStringKey, LanguageCodes } from '@digitaldefiance/i18n-lib';
 
 // Define your error string keys
 enum UserErrorKey {
@@ -457,12 +480,12 @@ const userErrorComponent = {
 const registration = {
   component: userErrorComponent,
   strings: {
-    en: {
+    'en-US': {
       [UserErrorKey.UserNotFound]: 'User "{username}" not found',
       [UserErrorKey.InvalidCredentials]: 'Invalid credentials provided',
       [UserErrorKey.AccountLocked]: 'Account locked until {unlockTime}'
     },
-    fr: {
+    'fr': {
       [UserErrorKey.UserNotFound]: 'Utilisateur "{username}" introuvable',
       [UserErrorKey.InvalidCredentials]: 'Identifiants invalides fournis',
       [UserErrorKey.AccountLocked]: 'Compte verrouillé jusqu\'à {unlockTime}'
@@ -477,7 +500,7 @@ throw new TranslatableGenericError(
   'user-errors',
   UserErrorKey.UserNotFound,
   { username: 'john_doe' },
-  'en',
+  'en-US',
   { userId: 123 }, // metadata
   'myapp' // engine instance key
 );
@@ -506,7 +529,7 @@ throw new TranslatableGenericError(
   'core',
   CoreStringKey.Error_AccessDenied,
   undefined,
-  CoreLanguage.EnglishUS,
+  LanguageCodes.EN_US,
   { requestId: '12345' },
   'myapp'
 );
@@ -1036,6 +1059,11 @@ Part of the DigitalBurnbag project - a secure file sharing and automated protoco
 
 ## ChangeLog
 
+### Version 1.2.1
+
+- Thu Oct 23 2025 15:10:00 GMT-0700 (Pacific Daylight Time)
+  - Update README
+
 ### Version 1.2.0
 
 - Thu Oct 23 2025 14:13:00 GMT-0700 (Pacific Daylight Time)
@@ -1063,7 +1091,7 @@ Part of the DigitalBurnbag project - a secure file sharing and automated protoco
 
 #### Migration Guide
 ```typescript
-// Before
+// Before (v1.1.x)
 import { CoreLanguage } from '@digitaldefiance/i18n-lib';
 i18n.setLanguage(CoreLanguage.French);
 
