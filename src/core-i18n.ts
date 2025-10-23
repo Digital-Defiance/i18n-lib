@@ -4,12 +4,23 @@
 
 import { ComponentDefinition } from './component-definition';
 import { ComponentRegistration } from './component-registration';
-import { CoreLanguage } from './core-language';
 import { CoreStringKey } from './core-string-key';
+import { LanguageCodes } from './language-codes';
 import { LanguageDefinition } from './language-definition';
 import { createLanguageDefinitions } from './language-registry';
 import { PluginI18nEngine } from './plugin-i18n-engine';
 import { createCompleteComponentStrings } from './strict-types';
+
+// Core language codes type
+export type CoreLanguageCode = 
+  | typeof LanguageCodes.EN_US
+  | typeof LanguageCodes.EN_GB
+  | typeof LanguageCodes.FR
+  | typeof LanguageCodes.ES
+  | typeof LanguageCodes.DE
+  | typeof LanguageCodes.ZH_CN
+  | typeof LanguageCodes.JA
+  | typeof LanguageCodes.UK;
 
 const DefaultInstanceKey = 'default';
 
@@ -19,43 +30,43 @@ const DefaultInstanceKey = 'default';
 export function createDefaultLanguages(): LanguageDefinition[] {
   return createLanguageDefinitions([
     {
-      id: CoreLanguage.EnglishUS,
+      id: LanguageCodes.EN_US,
       name: 'English (US)',
       code: 'en-US',
       isDefault: true,
     },
     {
-      id: CoreLanguage.EnglishUK,
+      id: LanguageCodes.EN_GB,
       name: 'English (UK)',
       code: 'en-GB',
     },
     {
-      id: CoreLanguage.French,
+      id: LanguageCodes.FR,
       name: 'Français',
       code: 'fr',
     },
     {
-      id: CoreLanguage.Spanish,
+      id: LanguageCodes.ES,
       name: 'Español',
       code: 'es',
     },
     {
-      id: CoreLanguage.German,
+      id: LanguageCodes.DE,
       name: 'Deutsch',
       code: 'de',
     },
     {
-      id: CoreLanguage.MandarinChinese,
+      id: LanguageCodes.ZH_CN,
       name: '中文 (简体)',
       code: 'zh-CN',
     },
     {
-      id: CoreLanguage.Japanese,
+      id: LanguageCodes.JA,
       name: '日本語',
       code: 'ja',
     },
     {
-      id: CoreLanguage.Ukrainian,
+      id: LanguageCodes.UK,
       name: 'Українська',
       code: 'uk',
     },
@@ -77,8 +88,8 @@ export const CoreComponentDefinition: ComponentDefinition<CoreStringKey> = {
  * Core component strings for all default languages
  */
 export function createCoreComponentStrings() {
-  return createCompleteComponentStrings<CoreStringKey, CoreLanguage>({
-    [CoreLanguage.EnglishUS]: {
+  return createCompleteComponentStrings<CoreStringKey, CoreLanguageCode>({
+    [LanguageCodes.EN_US]: {
       // Common/General
       [CoreStringKey.Common_Yes]: 'Yes',
       [CoreStringKey.Common_No]: 'No',
@@ -133,7 +144,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_NoDataAvailable]: 'No data available',
     },
 
-    [CoreLanguage.EnglishUK]: {
+    [LanguageCodes.EN_GB]: {
       // Common/General (mostly same as US English)
       [CoreStringKey.Common_Yes]: 'Yes',
       [CoreStringKey.Common_No]: 'No',
@@ -188,7 +199,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_NoDataAvailable]: 'No data available',
     },
 
-    [CoreLanguage.French]: {
+    [LanguageCodes.FR]: {
       // Common/General
       [CoreStringKey.Common_Yes]: 'Oui',
       [CoreStringKey.Common_No]: 'Non',
@@ -244,7 +255,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_NoDataAvailable]: 'Aucune donnée disponible',
     },
 
-    [CoreLanguage.Spanish]: {
+    [LanguageCodes.ES]: {
       // Common/General
       [CoreStringKey.Common_Yes]: 'Sí',
       [CoreStringKey.Common_No]: 'No',
@@ -299,7 +310,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_NoDataAvailable]: 'No hay datos disponibles',
     },
 
-    [CoreLanguage.German]: {
+    [LanguageCodes.DE]: {
       // Common/General
       [CoreStringKey.Common_Yes]: 'Ja',
       [CoreStringKey.Common_No]: 'Nein',
@@ -355,7 +366,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_NoDataAvailable]: 'Keine Daten verfügbar',
     },
 
-    [CoreLanguage.MandarinChinese]: {
+    [LanguageCodes.ZH_CN]: {
       // Common/General
       [CoreStringKey.Common_Yes]: '是',
       [CoreStringKey.Common_No]: '否',
@@ -408,7 +419,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_NoDataAvailable]: '无可用数据',
     },
 
-    [CoreLanguage.Japanese]: {
+    [LanguageCodes.JA]: {
       // Common/General
       [CoreStringKey.Common_Yes]: 'はい',
       [CoreStringKey.Common_No]: 'いいえ',
@@ -462,7 +473,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_NoDataAvailable]: '利用可能なデータがありません',
     },
 
-    [CoreLanguage.Ukrainian]: {
+    [LanguageCodes.UK]: {
       // Common/General
       [CoreStringKey.Common_Yes]: 'Так',
       [CoreStringKey.Common_No]: 'Ні',
@@ -523,7 +534,7 @@ export function createCoreComponentStrings() {
  */
 export function createCoreComponentRegistration(): ComponentRegistration<
   CoreStringKey,
-  CoreLanguage
+  CoreLanguageCode
 > {
   return {
     component: CoreComponentDefinition,
@@ -536,9 +547,9 @@ export function createCoreComponentRegistration(): ComponentRegistration<
  */
 export function createCoreI18nEngine(
   instanceKey: string = DefaultInstanceKey,
-): PluginI18nEngine<CoreLanguage> {
+): PluginI18nEngine<CoreLanguageCode> {
   const languages = createDefaultLanguages();
-  const engine = PluginI18nEngine.createInstance<CoreLanguage>(
+  const engine = PluginI18nEngine.createInstance<CoreLanguageCode>(
     instanceKey,
     languages,
   );
@@ -549,7 +560,7 @@ export function createCoreI18nEngine(
 /**
  * Type alias for easier usage
  */
-export type CoreI18nEngine = PluginI18nEngine<CoreLanguage>;
+export type CoreI18nEngine = PluginI18nEngine<CoreLanguageCode>;
 
 /**
  * Helper function to get core translation
@@ -557,10 +568,10 @@ export type CoreI18nEngine = PluginI18nEngine<CoreLanguage>;
 export function getCoreTranslation(
   stringKey: CoreStringKey,
   variables?: Record<string, string | number>,
-  language?: CoreLanguage,
+  language?: CoreLanguageCode,
   instanceKey?: string,
 ): string {
-  const engine = PluginI18nEngine.getInstance<CoreLanguage>(instanceKey);
+  const engine = PluginI18nEngine.getInstance<CoreLanguageCode>(instanceKey);
   return engine.translate(CoreI18nComponentId, stringKey, variables, language);
 }
 
@@ -570,7 +581,7 @@ export function getCoreTranslation(
 export function safeCoreTranslation(
   stringKey: CoreStringKey,
   variables?: Record<string, string | number>,
-  language?: CoreLanguage,
+  language?: CoreLanguageCode,
   instanceKey?: string,
 ): string {
   try {

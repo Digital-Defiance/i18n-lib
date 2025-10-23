@@ -3,7 +3,8 @@ import {
   getCoreTranslation,
   safeCoreTranslation,
   CoreStringKey,
-  CoreLanguage,
+  CoreLanguageCode,
+  LanguageCodes,
   PluginI18nEngine,
 } from '../src';
 
@@ -24,7 +25,7 @@ describe('core-i18n', () => {
       const result = getCoreTranslation(
         CoreStringKey.Common_Yes,
         undefined,
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
         'test-core'
       );
       expect(result).toBe('Yes');
@@ -34,7 +35,7 @@ describe('core-i18n', () => {
       const result = getCoreTranslation(
         CoreStringKey.Common_Yes,
         undefined,
-        CoreLanguage.French,
+        LanguageCodes.FR,
         'test-core'
       );
       expect(result).toBe('Oui');
@@ -44,7 +45,7 @@ describe('core-i18n', () => {
       const result = getCoreTranslation(
         CoreStringKey.Common_Cancel,
         undefined,
-        CoreLanguage.Spanish,
+        LanguageCodes.ES,
         'test-core'
       );
       expect(result).toBe('Cancelar');
@@ -54,7 +55,7 @@ describe('core-i18n', () => {
       const result = getCoreTranslation(
         CoreStringKey.Error_ComponentNotFoundTemplate,
         { componentId: 'test-component' },
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
         'test-core'
       );
       expect(result).toBe('Component "test-component" not found');
@@ -64,7 +65,7 @@ describe('core-i18n', () => {
       const result = getCoreTranslation(
         CoreStringKey.Error_StringKeyNotFoundTemplate,
         { componentId: 'my-component', stringKey: 'my-key' },
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
         'test-core'
       );
       expect(result).toBe('String key "my-key" not found for component "my-component"');
@@ -75,7 +76,7 @@ describe('core-i18n', () => {
         getCoreTranslation(
           'InvalidKey' as CoreStringKey,
           undefined,
-          CoreLanguage.EnglishUS,
+          LanguageCodes.EN_US,
           'test-core'
         );
       }).toThrow();
@@ -88,7 +89,7 @@ describe('core-i18n', () => {
         const result = safeCoreTranslation(
           'NonExistentKey' as CoreStringKey,
           undefined,
-          CoreLanguage.EnglishUS,
+          LanguageCodes.EN_US,
           'test-core'
         );
         expect(result).toBe('[CoreStringKey.NonExistentKey]');
@@ -98,7 +99,7 @@ describe('core-i18n', () => {
         const result = safeCoreTranslation(
           'InvalidKey' as CoreStringKey,
           undefined,
-          CoreLanguage.EnglishUS,
+          LanguageCodes.EN_US,
           'test-core'
         );
         expect(result).not.toContain('{{');
@@ -110,7 +111,7 @@ describe('core-i18n', () => {
         const result = safeCoreTranslation(
           'MissingKey' as CoreStringKey,
           undefined,
-          CoreLanguage.EnglishUS,
+          LanguageCodes.EN_US,
           'test-core'
         );
         expect(result).toContain('CoreStringKey.');
@@ -122,7 +123,7 @@ describe('core-i18n', () => {
         const result = safeCoreTranslation(
           testKey,
           undefined,
-          CoreLanguage.EnglishUS,
+          LanguageCodes.EN_US,
           'test-core'
         );
         expect(result).toBe(`[CoreStringKey.${testKey}]`);
@@ -134,7 +135,7 @@ describe('core-i18n', () => {
         const result = safeCoreTranslation(
           CoreStringKey.Common_Yes,
           undefined,
-          CoreLanguage.EnglishUS,
+          LanguageCodes.EN_US,
           'test-core'
         );
         expect(result).toBe('Yes');
@@ -144,19 +145,19 @@ describe('core-i18n', () => {
         const result = safeCoreTranslation(
           CoreStringKey.Error_ComponentNotFoundTemplate,
           { componentId: 'test' },
-          CoreLanguage.EnglishUS,
+          LanguageCodes.EN_US,
           'test-core'
         );
         expect(result).toBe('Component "test" not found');
       });
 
       it('should work across all supported languages', () => {
-        const languages = [
-          CoreLanguage.EnglishUS,
-          CoreLanguage.EnglishUK,
-          CoreLanguage.French,
-          CoreLanguage.Spanish,
-          CoreLanguage.Ukrainian,
+        const languages: CoreLanguageCode[] = [
+          LanguageCodes.EN_US,
+          LanguageCodes.EN_GB,
+          LanguageCodes.FR,
+          LanguageCodes.ES,
+          LanguageCodes.UK,
         ];
 
         languages.forEach((lang) => {
@@ -179,7 +180,7 @@ describe('core-i18n', () => {
           safeCoreTranslation(
             'CompletelyInvalid' as CoreStringKey,
             undefined,
-            CoreLanguage.EnglishUS,
+            LanguageCodes.EN_US,
             'test-core'
           );
         }).not.toThrow();
@@ -189,7 +190,7 @@ describe('core-i18n', () => {
         const result = safeCoreTranslation(
           CoreStringKey.Error_ComponentNotFoundTemplate,
           undefined,
-          CoreLanguage.EnglishUS,
+          LanguageCodes.EN_US,
           'test-core'
         );
         // Should still work, just with {componentId} placeholder
@@ -201,7 +202,7 @@ describe('core-i18n', () => {
         const result = safeCoreTranslation(
           CoreStringKey.Common_Yes,
           undefined,
-          CoreLanguage.EnglishUS,
+          LanguageCodes.EN_US,
           'nonexistent-instance'
         );
         expect(result).toBe('[CoreStringKey.common_yes]');
@@ -223,7 +224,7 @@ describe('core-i18n', () => {
         const result = safeCoreTranslation(
           CoreStringKey.Common_Cancel,
           undefined,
-          CoreLanguage.EnglishUS,
+          LanguageCodes.EN_US,
           'test-core'
         );
         expect(result).toBe('Cancel');
@@ -247,7 +248,7 @@ describe('core-i18n', () => {
       const coreResult = safeCoreTranslation(
         'NonExistent' as CoreStringKey,
         undefined,
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
         'test-core'
       );
 
@@ -260,7 +261,7 @@ describe('core-i18n', () => {
       const result = safeCoreTranslation(
         'TestKey' as CoreStringKey,
         undefined,
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
         'test-core'
       );
       expect(result).toMatch(/^\[CoreStringKey\..+\]$/);
@@ -278,7 +279,7 @@ describe('core-i18n', () => {
         const result = safeCoreTranslation(
           key as CoreStringKey,
           undefined,
-          CoreLanguage.EnglishUS,
+          LanguageCodes.EN_US,
           'test-core'
         );
         expect(result).not.toContain('{{');
@@ -292,7 +293,7 @@ describe('core-i18n', () => {
       const result = safeCoreTranslation(
         CoreStringKey.Error_InvalidContextTemplate,
         { contextKey: 'myContext' },
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
         'test-core'
       );
       expect(result).toContain('myContext');
@@ -303,7 +304,7 @@ describe('core-i18n', () => {
       const result = safeCoreTranslation(
         CoreStringKey.Error_IncompleteRegistrationTemplate,
         { componentId: 'test-comp', missingCount: 5 },
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
         'test-core'
       );
       expect(result).toContain('test-comp');
@@ -314,7 +315,7 @@ describe('core-i18n', () => {
       const result = safeCoreTranslation(
         CoreStringKey.Error_ValidationFailedTemplate,
         { componentId: 'validator', errorCount: 42 },
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
         'test-core'
       );
       expect(result).toContain('validator');
@@ -332,7 +333,7 @@ describe('core-i18n', () => {
         const result = safeCoreTranslation(
           key,
           undefined,
-          CoreLanguage.EnglishUS,
+          LanguageCodes.EN_US,
           'test-core'
         );
         expect(result).toBeTruthy();
@@ -353,7 +354,7 @@ describe('core-i18n', () => {
         const result = safeCoreTranslation(
           key,
           variables,
-          CoreLanguage.EnglishUS,
+          LanguageCodes.EN_US,
           'test-core'
         );
         expect(result).toBeTruthy();
@@ -370,7 +371,7 @@ describe('core-i18n', () => {
         const result = safeCoreTranslation(
           key,
           undefined,
-          CoreLanguage.EnglishUS,
+          LanguageCodes.EN_US,
           'test-core'
         );
         expect(result).toBeTruthy();

@@ -27,8 +27,8 @@ export * from './validation-config';
 export * from './validation-result';
 
 export * from './core-i18n';
-export * from './core-language';
 export * from './core-string-key';
+export * from './language-codes';
 export * from './language-registry';
 export * from './plugin-i18n-engine';
 export * from './registry-config';

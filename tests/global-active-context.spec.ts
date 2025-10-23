@@ -5,7 +5,7 @@ import { ContextErrorType } from '../src/context-error-type';
 import { RegistryError } from '../src/registry-error';
 import { CurrencyCode } from '../src/currency-code';
 import { Timezone } from '../src/timezone';
-import { DefaultLanguage } from '../src/default-config';
+import { DefaultLanguageCode, LanguageCodes } from "../src";
 import { LanguageContextSpace } from '../src/types';
 
 interface TestActiveContext extends IActiveContext<string> {}
@@ -30,7 +30,7 @@ describe('GlobalActiveContext', () => {
     it('should create default context on first access', () => {
       const instance = GlobalActiveContext.instance;
       expect(instance.context).toBeDefined();
-      expect(instance.context.language).toBe(DefaultLanguage.EnglishUS);
+      expect(instance.context.language).toBe(LanguageCodes.EN_US);
     });
 
     it('should allow overriding instance', () => {

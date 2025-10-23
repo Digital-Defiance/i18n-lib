@@ -2,6 +2,7 @@ import { CurrencyCode } from './currency-code';
 import { I18nConfig } from './i18n-config';
 import { I18nContext } from './i18n-context';
 import { I18nEngine } from './i18n-engine';
+import { LanguageCodes } from './language-codes';
 import { Timezone } from './timezone';
 import {
   DefaultCurrencyCode,
@@ -20,22 +21,22 @@ export enum DefaultStringKey {
   Error_MissingTranslationKeyTemplate = 'error_missingTranslationKeyTemplate',
 }
 
-export enum DefaultLanguage {
-  EnglishUS = 'English (US)',
-  EnglishUK = 'English (UK)',
-  French = 'Français',
-  MandarinChinese = '中文',
-  Spanish = 'Español',
-  Ukrainian = 'Український',
-}
+// Default language codes used by the library
+export type DefaultLanguageCode = 
+  | typeof LanguageCodes.EN_US
+  | typeof LanguageCodes.EN_GB
+  | typeof LanguageCodes.FR
+  | typeof LanguageCodes.ES
+  | typeof LanguageCodes.ZH_CN
+  | typeof LanguageCodes.UK;
 
-export const DefaultLanguageCodes: LanguageCodeCollection<DefaultLanguage> = {
-  [DefaultLanguage.EnglishUS]: 'en',
-  [DefaultLanguage.EnglishUK]: 'en-GB',
-  [DefaultLanguage.French]: 'fr',
-  [DefaultLanguage.MandarinChinese]: 'zh-CN',
-  [DefaultLanguage.Spanish]: 'es',
-  [DefaultLanguage.Ukrainian]: 'uk',
+export const DefaultLanguageCodes: LanguageCodeCollection<DefaultLanguageCode> = {
+  [LanguageCodes.EN_US]: 'en-US',
+  [LanguageCodes.EN_GB]: 'en-GB',
+  [LanguageCodes.FR]: 'fr',
+  [LanguageCodes.ES]: 'es',
+  [LanguageCodes.ZH_CN]: 'zh-CN',
+  [LanguageCodes.UK]: 'uk',
 };
 
 // Global interface that can be augmented by consumers
@@ -43,8 +44,8 @@ declare global {
   namespace I18n {
     interface Config {
       StringKey: DefaultStringKey;
-      Language: DefaultLanguage;
-      LanguageCodes: LanguageCodeCollection<DefaultLanguage>;
+      Language: DefaultLanguageCode;
+      LanguageCodes: LanguageCodeCollection<DefaultLanguageCode>;
       engine: I18nEngine<
         I18n.Config['StringKey'],
         I18n.Config['Language'],
@@ -59,7 +60,7 @@ declare global {
 export type StringKey = I18n.Config['StringKey'];
 export type Language = I18n.Config['Language'];
 export type Engine = I18n.Config['engine'];
-export type LanguageCodes = I18n.Config['LanguageCodes'];
+export type DefaultLanguageCodesType = I18n.Config['LanguageCodes'];
 
 // Singleton instance that uses the augmented types
 export const getI18nEngine = (): Engine => I18nEngine.getInstance() as Engine;
@@ -73,7 +74,7 @@ const getConfig = <
   adminTimezone?: Timezone,
 ): I18nConfig<StringKey, Language, TConstants, TTranslationContext> => ({
   strings: {
-    [DefaultLanguage.EnglishUS]: {
+    [LanguageCodes.EN_US]: {
       [DefaultStringKey.Common_Test]: 'Test',
       [DefaultStringKey.Error_InstanceAlreadyExistsTemplate]:
         "Instance with key '{key}' already exists",
@@ -88,7 +89,7 @@ const getConfig = <
       [DefaultStringKey.Error_MissingTranslationKeyTemplate]:
         'Missing translation key for type: {type}',
     },
-    [DefaultLanguage.EnglishUK]: {
+    [LanguageCodes.EN_GB]: {
       [DefaultStringKey.Common_Test]: 'Test',
       [DefaultStringKey.Error_InstanceAlreadyExistsTemplate]:
         "Instance with key '{key}' already exists",
@@ -103,7 +104,7 @@ const getConfig = <
       [DefaultStringKey.Error_MissingTranslationKeyTemplate]:
         'Missing translation key for type: {type}',
     },
-    [DefaultLanguage.French]: {
+    [LanguageCodes.FR]: {
       [DefaultStringKey.Common_Test]: 'Test',
       [DefaultStringKey.Error_InstanceAlreadyExistsTemplate]:
         "Instance avec clé '{key}' existe déjà",
@@ -118,7 +119,7 @@ const getConfig = <
       [DefaultStringKey.Error_MissingTranslationKeyTemplate]:
         'Clé de traduction manquante pour le type: {type}',
     },
-    [DefaultLanguage.MandarinChinese]: {
+    [LanguageCodes.ZH_CN]: {
       [DefaultStringKey.Common_Test]: '测试',
       [DefaultStringKey.Error_InstanceAlreadyExistsTemplate]:
         "键为'{key}'的实例已存在",
@@ -133,7 +134,7 @@ const getConfig = <
       [DefaultStringKey.Error_MissingTranslationKeyTemplate]:
         '类型缺少翻译键: {type}',
     },
-    [DefaultLanguage.Spanish]: {
+    [LanguageCodes.ES]: {
       [DefaultStringKey.Common_Test]: 'Prueba',
       [DefaultStringKey.Error_InstanceAlreadyExistsTemplate]:
         "La instancia con clave '{key}' ya existe",
@@ -148,7 +149,7 @@ const getConfig = <
       [DefaultStringKey.Error_MissingTranslationKeyTemplate]:
         'Falta clave de traducción para el tipo: {type}',
     },
-    [DefaultLanguage.Ukrainian]: {
+    [LanguageCodes.UK]: {
       [DefaultStringKey.Common_Test]: 'Тест',
       [DefaultStringKey.Error_InstanceAlreadyExistsTemplate]:
         "Екземпляр з ключем '{key}' вже існує",
@@ -165,11 +166,11 @@ const getConfig = <
     },
   } as any,
   stringNames: Object.values(DefaultStringKey),
-  defaultLanguage: DefaultLanguage.EnglishUS,
+  defaultLanguage: LanguageCodes.EN_US,
   defaultTranslationContext: 'user' as TTranslationContext,
   defaultCurrencyCode: new CurrencyCode(DefaultCurrencyCode),
   languageCodes: DefaultLanguageCodes,
-  languages: Object.values(DefaultLanguage),
+  languages: [LanguageCodes.EN_US, LanguageCodes.EN_GB, LanguageCodes.FR, LanguageCodes.ES, LanguageCodes.ZH_CN, LanguageCodes.UK],
   constants: constants,
   enumName: 'DefaultStringKey',
   enumObj: DefaultStringKey as Record<string, DefaultStringKey>,
@@ -180,7 +181,7 @@ const getConfig = <
 export const getDefaultI18nEngine = <
   TConstants extends Record<string, any>,
   TTranslationContext extends string,
-  TContext extends I18nContext<DefaultLanguage, TTranslationContext>,
+  TContext extends I18nContext<DefaultLanguageCode, TTranslationContext>,
 >(
   constants: TConstants,
   timezone?: Timezone,
@@ -188,7 +189,7 @@ export const getDefaultI18nEngine = <
 ) =>
   new I18nEngine<
     DefaultStringKey,
-    DefaultLanguage,
+    DefaultLanguageCode,
     TConstants,
     TTranslationContext,
     TContext

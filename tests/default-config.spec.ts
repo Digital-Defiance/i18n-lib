@@ -1,5 +1,5 @@
 import {
-  DefaultLanguage,
+  DefaultLanguageCode,
   DefaultLanguageCodes,
   DefaultStringKey,
   Language,
@@ -7,6 +7,7 @@ import {
   getDefaultI18nEngine,
   getI18nEngine,
 } from '../src/default-config';
+import { LanguageCodes } from '../src';
 import { I18nEngine } from '../src/i18n-engine';
 
 describe('DefaultConfig', () => {
@@ -17,8 +18,8 @@ describe('DefaultConfig', () => {
   describe('Type Aliases', () => {
     it('should export correct type aliases', () => {
       expect(DefaultStringKey.Common_Test).toBe('common_test');
-      expect(DefaultLanguage.EnglishUS).toBe('English (US)');
-      expect(DefaultLanguageCodes[DefaultLanguage.EnglishUS]).toBe('en');
+      expect(LanguageCodes.EN_US).toBe('en-US');
+      expect(DefaultLanguageCodes[LanguageCodes.EN_US]).toBe('en-US');
     });
   });
 
@@ -29,8 +30,8 @@ describe('DefaultConfig', () => {
     });
 
     it('should allow Language to be used as DefaultLanguage', () => {
-      const lang: Language = DefaultLanguage.EnglishUS;
-      expect(lang).toBe('English (US)');
+      const lang: Language = LanguageCodes.EN_US;
+      expect(lang).toBe('en-US');
     });
   });
 
@@ -38,7 +39,7 @@ describe('DefaultConfig', () => {
     it('should create engine with default configuration', () => {
       const engine = getDefaultI18nEngine({});
       expect(engine).toBeInstanceOf(I18nEngine);
-      expect(engine.config.defaultLanguage).toBe(DefaultLanguage.EnglishUS);
+      expect(engine.config.defaultLanguage).toBe(LanguageCodes.EN_US);
     });
 
     it('should use provided constants', () => {

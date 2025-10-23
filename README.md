@@ -49,38 +49,36 @@ npm install @digitaldefiance/i18n-lib
 ```typescript
 import { I18nEngine, I18nConfig, createContext, CurrencyCode, Timezone } from '@digitaldefiance/i18n-lib';
 
-// Define your enums
+// Define your string keys
 enum MyStrings {
   Welcome = 'welcome',
   UserGreetingTemplate = 'userGreetingTemplate'
 }
 
-enum MyLanguages {
-  English = 'English',
-  Spanish = 'Spanish'
-}
+// Define your language codes (or use string literals)
+type MyLanguages = 'en-US' | 'es';
 
 // Configure the engine
 const config: I18nConfig<MyStrings, MyLanguages> = {
   stringNames: Object.values(MyStrings),
   strings: {
-    [MyLanguages.English]: {
+    'en-US': {
       [MyStrings.Welcome]: 'Welcome!',
       [MyStrings.UserGreetingTemplate]: 'Hello, {name}!'
     },
-    [MyLanguages.Spanish]: {
+    'es': {
       [MyStrings.Welcome]: '¡Bienvenido!',
       [MyStrings.UserGreetingTemplate]: '¡Hola, {name}!'
     }
   },
-  defaultLanguage: MyLanguages.English,
+  defaultLanguage: 'en-US',
   defaultTranslationContext: 'user',
   defaultCurrencyCode: new CurrencyCode('USD'),
   languageCodes: {
-    [MyLanguages.English]: 'en',
-    [MyLanguages.Spanish]: 'es'
+    'en-US': 'en-US',
+    'es': 'es'
   },
-  languages: Object.values(MyLanguages),
+  languages: ['en-US', 'es'],
   timezone: new Timezone('UTC'),
   adminTimezone: new Timezone('UTC')
 };
@@ -96,7 +94,7 @@ const greeting = i18n.translate(MyStrings.UserGreetingTemplate, { name: 'John' }
 // "Hello, John!"
 
 // Change language
-i18n.context = { language: MyLanguages.Spanish };
+i18n.context = { language: 'es' };
 const spanishGreeting = i18n.translate(MyStrings.UserGreetingTemplate, { name: 'Juan' });
 // "¡Hola, Juan!"
 ```
@@ -111,7 +109,8 @@ The new plugin-based architecture provides a component registration system with 
 import { 
   createCoreI18nEngine, 
   CoreStringKey, 
-  CoreLanguage,
+  CoreLanguageCode,
+  LanguageCodes,
   ComponentDefinition,
   ComponentRegistration
 } from '@digitaldefiance/i18n-lib';
@@ -138,26 +137,26 @@ const MyComponent: ComponentDefinition<MyComponentStringKey> = {
 
 // Define translations for all supported languages
 const myComponentStrings = {
-  [CoreLanguage.EnglishUS]: {
+  [LanguageCodes.EN_US]: {
     [MyComponentStringKey.Welcome]: 'Welcome to my component!',
     [MyComponentStringKey.Goodbye]: 'Goodbye from my component!',
     [MyComponentStringKey.UserGreetingTemplate]: 'Hello, {name}!'
   },
-  [CoreLanguage.French]: {
+  [LanguageCodes.FR]: {
     [MyComponentStringKey.Welcome]: 'Bienvenue dans mon composant !',
     [MyComponentStringKey.Goodbye]: 'Au revoir de mon composant !',
     [MyComponentStringKey.UserGreetingTemplate]: 'Bonjour, {name} !'
   },
-  [CoreLanguage.Spanish]: {
+  [LanguageCodes.ES]: {
     [MyComponentStringKey.Welcome]: '¡Bienvenido a mi componente!',
     [MyComponentStringKey.Goodbye]: '¡Adiós desde mi componente!',
     [MyComponentStringKey.UserGreetingTemplate]: '¡Hola, {name}!'
   }
-  // TypeScript ensures all CoreLanguages are handled
+  // TypeScript ensures all language codes are handled
 };
 
 // Register component (with validation)
-const registration: ComponentRegistration<MyComponentStringKey, CoreLanguage> = {
+const registration: ComponentRegistration<MyComponentStringKey, CoreLanguageCode> = {
   component: MyComponent,
   strings: myComponentStrings
 };
@@ -174,7 +173,7 @@ const greeting = i18n.translate('my-component', MyComponentStringKey.UserGreetin
 });
 
 // Change language - affects all components
-i18n.setLanguage(CoreLanguage.French);
+i18n.setLanguage(LanguageCodes.FR);
 const frenchWelcome = i18n.translate('my-component', MyComponentStringKey.Welcome);
 // "Bienvenue dans mon composant !"
 ```
@@ -198,6 +197,17 @@ The library includes several pre-built components:
 Provides essential system strings in 8 languages:
 
 - English (US/UK), French, Spanish, German, Chinese (Simplified), Japanese, Ukrainian
+
+**Language Codes**: Use `LanguageCodes` constants or define your own:
+```typescript
+import { LanguageCodes } from '@digitaldefiance/i18n-lib';
+
+// Common codes provided
+LanguageCodes.EN_US  // 'en-US'
+LanguageCodes.FR     // 'fr'
+LanguageCodes.ES     // 'es'
+// ... or use any string: 'custom-lang'
+```
 
 ```typescript
 import { createCoreI18nEngine, CoreStringKey } from '@digitaldefiance/i18n-lib';
@@ -1025,6 +1035,46 @@ MIT
 Part of the DigitalBurnbag project - a secure file sharing and automated protocol system.
 
 ## ChangeLog
+
+### Version 1.2.0
+
+- Thu Oct 23 2025 14:13:00 GMT-0700 (Pacific Daylight Time)
+
+#### Breaking Changes
+- **Removed `CoreLanguage` enum** - Replaced with `CoreLanguageCode` type and `LanguageCodes` constants
+- **Language identifiers now use BCP 47 codes** - Changed from descriptive names (e.g., `'English (US)'`) to standard codes (e.g., `'en-US'`)
+- **API changes**:
+  - `CoreLanguage` → `CoreLanguageCode` (union type)
+  - `DefaultLanguage` enum → `DefaultLanguageCode` type
+  - All language references updated to use `LanguageCodes` constants
+
+#### Added
+- **`LanguageCodes` constants object** - Provides standard BCP 47 language codes:
+  - `EN_US`, `EN_GB`, `FR`, `ES`, `DE`, `ZH_CN`, `JA`, `UK`
+- **`LanguageDisplayNames` mapping** - Maps language codes to human-readable names
+- **`CommonLanguageCode` type** - Type for built-in language codes
+- **`LanguageCode` type** - Generic string type for custom language codes
+- **Custom language code support** - Any string can now be used as a language code
+
+#### Changed
+- **Language code format** - All language identifiers now use BCP 47 standard (e.g., `'en-US'` instead of `'English (US)'`)
+- **Type system** - Languages are now string-based types instead of enums, allowing custom language codes
+- **Documentation** - Updated README with new API usage examples and language code constants
+
+#### Migration Guide
+```typescript
+// Before
+import { CoreLanguage } from '@digitaldefiance/i18n-lib';
+i18n.setLanguage(CoreLanguage.French);
+
+// After
+import { LanguageCodes } from '@digitaldefiance/i18n-lib';
+i18n.setLanguage(LanguageCodes.FR);
+
+// Extending with custom language codes
+type MyLanguageCodes = CoreLanguageCode | 'pt-BR' | 'it';
+const myEngine = PluginI18nEngine.createInstance<MyLanguageCodes>('custom', languages);
+```
 
 ### Version 1.1.10
 

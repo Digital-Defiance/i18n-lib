@@ -1,8 +1,9 @@
 import {
-  DefaultLanguage,
+  DefaultLanguageCode,
   I18nEngine,
   buildReasonMap,
   isTemplate,
+  LanguageCodes,
 } from '../src';
 
 describe('Template Processing with buildReasonMap', () => {
@@ -28,17 +29,17 @@ describe('Template Processing with buildReasonMap', () => {
     const engine = new I18nEngine({
       stringNames: Object.values(reasonMap),
       strings: {
-        [DefaultLanguage.EnglishUS]: {
+        [LanguageCodes.EN_US]: {
           [reasonMap[TestErrorType.SimpleError]]: 'Simple error occurred',
           [reasonMap[TestErrorType.TemplateError]]:
             'Template error: {message} with code {code}',
         },
       },
-      defaultLanguage: DefaultLanguage.EnglishUS,
+      defaultLanguage: LanguageCodes.EN_US,
       defaultTranslationContext: 'user',
       defaultCurrencyCode: { code: 'USD' } as any,
-      languageCodes: { [DefaultLanguage.EnglishUS]: 'en' },
-      languages: [DefaultLanguage.EnglishUS],
+      languageCodes: { [LanguageCodes.EN_US]: 'en' },
+      languages: [LanguageCodes.EN_US],
       timezone: { name: 'UTC' } as any,
       adminTimezone: { name: 'UTC' } as any,
     });

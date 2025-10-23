@@ -2,7 +2,7 @@ import { IActiveContext } from './active-context';
 import { ContextError } from './context-error';
 import { ContextErrorType } from './context-error-type';
 import { CurrencyCode } from './currency-code';
-import { DefaultLanguage } from './default-config';
+import { DefaultLanguageCode } from './default-config';
 import { IGlobalActiveContext } from './i-global-active-context';
 import { Timezone } from './timezone';
 import {
@@ -14,8 +14,7 @@ import {
 export class GlobalActiveContext<TLanguage extends string, TActiveContext extends IActiveContext<TLanguage>> implements IGlobalActiveContext<TLanguage, TActiveContext> {
   protected static _contextMap: Map<string, IActiveContext<any>> = new Map();
   public static readonly defaultContextKey = 'default';
-  public static readonly defaultLanguage: DefaultLanguage =
-    DefaultLanguage.EnglishUS;
+  public static readonly defaultLanguage: DefaultLanguageCode = 'en-US';
 
   private static _instance: GlobalActiveContext<any, any> | undefined;
   public static get instance(): GlobalActiveContext<any, any> {

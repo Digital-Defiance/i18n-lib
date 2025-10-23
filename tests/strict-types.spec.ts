@@ -10,7 +10,7 @@ import { createCompleteComponentStrings } from '../src/strict-types';
 //
 // Example (uncomment to verify):
 // const shouldFail = createCompleteComponentStrings<CoreStringKey, CoreLanguage>({
-//   [CoreLanguage.EnglishUS]: { [CoreStringKey.Common_Yes]: 'Yes' } // Missing many keys
+//   [LanguageCodes.EN_US]: { [CoreStringKey.Common_Yes]: 'Yes' } // Missing many keys
 // }); // <-- Should produce a compile error for missing keys.
 //
 // Here we only include a minimal valid smoke scenario indirectly by importing

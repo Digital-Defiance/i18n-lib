@@ -1,4 +1,4 @@
-import { CoreLanguage } from './core-language';
+import { CoreLanguageCode } from './core-i18n';
 import { CoreStringKey } from './core-string-key';
 import { RegistryErrorType } from './registry-error-type';
 import { TranslationEngine, createTranslatedError } from './typed-error';
@@ -43,7 +43,7 @@ export class RegistryError extends Error {
     engine: TranslationEngine,
     type: RegistryErrorType,
     variables?: Record<string, string | number>,
-    language?: CoreLanguage,
+    language?: CoreLanguageCode,
     metadata?: Record<string, any>,
   ): RegistryError {
     const error = createTranslatedError(

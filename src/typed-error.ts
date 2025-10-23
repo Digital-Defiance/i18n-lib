@@ -3,7 +3,7 @@ import { DefaultStringKey, Language, StringKey } from './default-config';
 import { I18nEngine } from './i18n-engine';
 
 // New plugin architecture imports
-import { CoreLanguage } from './core-language';
+import { CoreLanguageCode } from './core-i18n';
 import { CoreStringKey } from './core-string-key';
 import { PluginI18nEngine } from './plugin-i18n-engine';
 
@@ -135,7 +135,7 @@ export abstract class TypedError<
 export abstract class PluginTypedError<
   TEnum extends Record<string, string>,
   TStringKey extends string,
-  TLanguages extends string = CoreLanguage,
+  TLanguages extends string = string,
 > extends Error {
   constructor(
     engine: PluginI18nEngine<TLanguages>,
@@ -180,10 +180,10 @@ export abstract class CoreTypedError<
   TEnum extends Record<string, string>,
 > extends Error {
   constructor(
-    engine: PluginI18nEngine<CoreLanguage>,
+    engine: PluginI18nEngine<CoreLanguageCode>,
     public readonly type: TEnum[keyof TEnum],
     public readonly reasonMap: CompleteReasonMap<TEnum, CoreStringKey>,
-    public readonly language?: CoreLanguage,
+    public readonly language?: CoreLanguageCode,
     public readonly otherVars?: Record<string, string | number>,
   ) {
     const key = reasonMap[type];
@@ -220,7 +220,7 @@ export abstract class CoreTypedError<
 export function createPluginTypedError<
   TEnum extends Record<string, string>,
   TStringKey extends string,
-  TLanguages extends string = CoreLanguage,
+  TLanguages extends string = string,
 >(
   componentId: string,
   type: TEnum[keyof TEnum],
@@ -245,10 +245,10 @@ export function createCoreTypedError<TEnum extends Record<string, string>>(
   type: TEnum[keyof TEnum],
   reasonMap: CompleteReasonMap<TEnum, CoreStringKey>,
   otherVars?: Record<string, string | number>,
-  language?: CoreLanguage,
+  language?: CoreLanguageCode,
   instanceKey?: string,
 ): Error {
-  const engine = PluginI18nEngine.getInstance<CoreLanguage>(instanceKey);
+  const engine = PluginI18nEngine.getInstance<CoreLanguageCode>(instanceKey);
 
   return new (class extends CoreTypedError<TEnum> {
     constructor() {
@@ -321,7 +321,7 @@ const coreErrorReasonMap: CompleteReasonMap<typeof DatabaseErrorType, CoreString
 
 class DatabaseError extends CoreTypedError<typeof DatabaseErrorType> {
   constructor(
-    engine: PluginI18nEngine<CoreLanguage>,
+    engine: PluginI18nEngine<CoreLanguageCode>,
     type: DatabaseErrorType,
     otherVars?: Record<string, string | number>,
     language?: CoreLanguage
@@ -331,7 +331,7 @@ class DatabaseError extends CoreTypedError<typeof DatabaseErrorType> {
 }
 
 // Usage:
-// const engine = PluginI18nEngine.getInstance<CoreLanguage>();
+// const engine = PluginI18nEngine.getInstance<CoreLanguageCode>();
 // throw new DatabaseError(engine, DatabaseErrorType.ConnectionFailed);
 */
 
@@ -355,9 +355,9 @@ const userErrorReasonMap: CompleteReasonMap<typeof UserErrorType, UserErrorStrin
   [UserErrorType.AccountLocked]: UserErrorStringKey.AccountLockedMessage
 };
 
-class UserError extends PluginTypedError<typeof UserErrorType, UserErrorStringKey, CoreLanguage> {
+class UserError extends PluginTypedError<typeof UserErrorType, UserErrorStringKey, CoreLanguageCode> {
   constructor(
-    engine: PluginI18nEngine<CoreLanguage>,
+    engine: PluginI18nEngine<CoreLanguageCode>,
     type: UserErrorType,
     otherVars?: Record<string, string | number>,
     language?: CoreLanguage
@@ -367,7 +367,7 @@ class UserError extends PluginTypedError<typeof UserErrorType, UserErrorStringKe
 }
 
 // Usage:
-// const engine = PluginI18nEngine.getInstance<CoreLanguage>();
+// const engine = PluginI18nEngine.getInstance<CoreLanguageCode>();
 // throw new UserError(engine, UserErrorType.UserNotFound, { username: 'john_doe' });
 */
 

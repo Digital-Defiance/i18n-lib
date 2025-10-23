@@ -1,6 +1,6 @@
 import { IActiveContext } from './active-context';
 import { CurrencyCode } from './currency-code';
-import { DefaultLanguage } from './default-config';
+import { DefaultLanguageCode } from './default-config';
 import { Timezone } from './timezone';
 import { LanguageContextSpace } from './types';
 

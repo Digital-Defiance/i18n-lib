@@ -1,4 +1,4 @@
-import { CoreLanguage } from '../src/core-language';
+import { CoreLanguageCode, LanguageCodes } from '../src';
 import { RegistryError } from '../src/registry-error';
 import { RegistryErrorType } from '../src/registry-error-type';
 import { TranslationEngine } from '../src/typed-error';
@@ -53,7 +53,7 @@ describe('RegistryError', () => {
         mockEngine,
         RegistryErrorType.ComponentNotFound,
         { componentId: 'test-component' },
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
         { componentId: 'test-component' },
       );
 
@@ -64,7 +64,7 @@ describe('RegistryError', () => {
         'core',
         'error_componentNotFoundTemplate',
         { componentId: 'test-component' },
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
       );
     });
 
@@ -73,7 +73,7 @@ describe('RegistryError', () => {
         mockEngine,
         RegistryErrorType.ValidationFailed,
         { errors: 'Missing required fields' },
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
         { validationErrors: ['field1', 'field2'] },
       );
 
@@ -82,7 +82,7 @@ describe('RegistryError', () => {
         'core',
         'error_validationFailedTemplate',
         { errors: 'Missing required fields' },
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
       );
     });
 
@@ -97,7 +97,7 @@ describe('RegistryError', () => {
         failingEngine,
         RegistryErrorType.DuplicateComponent,
         undefined,
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
         { componentId: 'test' },
       );
 
@@ -112,7 +112,7 @@ describe('RegistryError', () => {
         null as any,
         RegistryErrorType.LanguageNotFound,
         undefined,
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
         { languageId: 'missing' },
       );
 

@@ -5,7 +5,8 @@ import {
   ComponentRegistration,
   LanguageDefinition,
   CoreStringKey,
-  CoreLanguage,
+  CoreLanguageCode,
+  LanguageCodes,
   createCoreI18nEngine,
 } from '../src';
 
@@ -346,7 +347,7 @@ describe('TranslatableGenericError', () => {
         'core',
         CoreStringKey.Error_AccessDenied,
         undefined,
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
         undefined,
         'core-errors',
       );
@@ -359,7 +360,7 @@ describe('TranslatableGenericError', () => {
         'core',
         CoreStringKey.Error_ComponentNotFoundTemplate,
         { componentId: 'my-component' },
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
         undefined,
         'core-errors',
       );
@@ -372,7 +373,7 @@ describe('TranslatableGenericError', () => {
         'core',
         CoreStringKey.Common_Yes,
         undefined,
-        CoreLanguage.EnglishUS,
+        LanguageCodes.EN_US,
         undefined,
         'core-errors',
       );
@@ -381,7 +382,7 @@ describe('TranslatableGenericError', () => {
         'core',
         CoreStringKey.Common_Yes,
         undefined,
-        CoreLanguage.French,
+        LanguageCodes.FR,
         undefined,
         'core-errors',
       );

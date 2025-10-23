@@ -1,8 +1,9 @@
 import {
-  DefaultLanguage,
+  DefaultLanguageCode,
   DefaultStringKey,
   getDefaultI18nEngine,
 } from '../src/default-config';
+import { LanguageCodes } from '../src';
 import { I18nEngine } from '../src/i18n-engine';
 import {
   BaseTypedError,
@@ -30,7 +31,7 @@ const reasonMap: CompleteReasonMap<typeof TestErrorType, DefaultStringKey> = {
 class TestError extends TypedError<typeof TestErrorType, DefaultStringKey> {
   constructor(
     type: TestErrorType,
-    language?: DefaultLanguage,
+    language?: DefaultLanguageCode,
     otherVars?: Record<string, string | number>,
   ) {
     const engine = getDefaultI18nEngine({}, undefined, undefined);
@@ -54,7 +55,7 @@ describe('TypedError', () => {
   it('should create error with templated translation', () => {
     const error = new TestError(
       TestErrorType.Template,
-      DefaultLanguage.EnglishUS,
+      LanguageCodes.EN_US,
       { key: 'testKey', language: 'English' },
     );
     expect(error.message).toBe(
@@ -63,14 +64,14 @@ describe('TypedError', () => {
   });
 
   it('should work with different languages', () => {
-    const error = new TestError(TestErrorType.Basic, DefaultLanguage.French);
+    const error = new TestError(TestErrorType.Basic, LanguageCodes.FR);
     expect(error.message).toBe('Test');
   });
 
   it('should create templated error in different language', () => {
     const error = new TestError(
       TestErrorType.Template,
-      DefaultLanguage.French,
+      LanguageCodes.FR,
       { key: 'testKey', language: 'Français' },
     );
     expect(error.message).toBe(
