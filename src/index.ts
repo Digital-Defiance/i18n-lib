@@ -35,6 +35,7 @@ export * from './registry-config';
 
 export * from './registry-error';
 export * from './registry-error-type';
+export * from './translation-engine';
 export * from './translation-request';
 export * from './translation-response';
 

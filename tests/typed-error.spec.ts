@@ -161,6 +161,12 @@ describe('TypedError', () => {
 
     it('should create translated error with engine', () => {
       const mockEngine: TranslationEngine = {
+        translate: (key, variables, language) => {
+          if (key === 'networkErrorKey') {
+            return `Network error: ${variables?.code || 'unknown'}`;
+          }
+          return 'Fallback message';
+        },
         safeTranslate: (componentId, key, variables, language) => {
           if (key === 'networkErrorKey') {
             return `Network error: ${variables?.code || 'unknown'}`;
@@ -190,6 +196,9 @@ describe('TypedError', () => {
 
     it('should fallback when engine fails', () => {
       const failingEngine: TranslationEngine = {
+        translate: () => {
+          throw new Error('Translation failed');
+        },
         safeTranslate: () => {
           throw new Error('Translation failed');
         },

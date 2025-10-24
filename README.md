@@ -1059,6 +1059,22 @@ Part of the DigitalBurnbag project - a secure file sharing and automated protoco
 
 ## ChangeLog
 
+### Version 1.2.2
+
+- Thu Oct 23 2025 18:40:00 GMT-0700 (Pacific Daylight Time)
+
+**i18n Library - TranslationEngine Interface Refactoring**
+
+- Made `TranslationEngine` interface generic with `TStringKey` type parameter for improved type safety
+- Changed `translate` and `safeTranslate` methods from optional to required in `TranslationEngine` interface
+- Exported `TranslationEngine` from `typed-error.ts` for consistent usage across packages
+- Updated `TypedHandleableError` in ecies-lib to use generic `TranslationEngine<TStringKey>` instead of inline interface types
+- Updated test mocks to implement both required `translate` and `safeTranslate` methods
+
+**Breaking Changes:**
+- Any code implementing `TranslationEngine` must now provide both `translate` and `safeTranslate` methods (previously optional)
+- `TranslationEngine` now requires explicit type parameter when used (e.g., `TranslationEngine<EciesStringKey>`)
+
 ### Version 1.2.1
 
 - Thu Oct 23 2025 15:10:00 GMT-0700 (Pacific Daylight Time)

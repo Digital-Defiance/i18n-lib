@@ -6,18 +6,9 @@ import { I18nEngine } from './i18n-engine';
 import { CoreLanguageCode } from './core-i18n';
 import { CoreStringKey } from './core-string-key';
 import { PluginI18nEngine } from './plugin-i18n-engine';
+import { TranslationEngine } from './translation-engine';
 
-/**
- * Interface for engines that can translate strings (unified interface)
- */
-export interface TranslationEngine {
-  safeTranslate(
-    componentId: string,
-    stringKey: string,
-    variables?: Record<string, string | number>,
-    language?: string,
-  ): string;
-}
+export { TranslationEngine };
 
 /**
  * Type constraint to ensure reasonMap has entries for all enum values

@@ -36,6 +36,15 @@ describe('RegistryError', () => {
 
     beforeEach(() => {
       mockEngine = {
+        translate: jest.fn((key, variables, language) => {
+          if (key === 'error_componentNotFoundTemplate') {
+            return `Component '${variables?.componentId}' not found`;
+          }
+          if (key === 'error_validationFailedTemplate') {
+            return `Validation failed: ${variables?.errors}`;
+          }
+          return 'Unknown error';
+        }),
         safeTranslate: jest.fn((componentId, key, variables, language) => {
           if (key === 'error_componentNotFoundTemplate') {
             return `Component '${variables?.componentId}' not found`;
@@ -88,6 +97,9 @@ describe('RegistryError', () => {
 
     it('should fallback when engine fails', () => {
       const failingEngine: TranslationEngine = {
+        translate: () => {
+          throw new Error('Translation failed');
+        },
         safeTranslate: () => {
           throw new Error('Translation failed');
         },
