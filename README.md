@@ -1059,6 +1059,11 @@ Part of the DigitalBurnbag project - a secure file sharing and automated protoco
 
 ## ChangeLog
 
+### Version 1.2.3
+
+- Thu Oct 23 2025 18:50:00 GMT-0700 (Pacific Daylight Time)
+  - Minor update to fix safeTranslate being private
+
 ### Version 1.2.2
 
 - Thu Oct 23 2025 18:40:00 GMT-0700 (Pacific Daylight Time)

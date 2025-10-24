@@ -80,7 +80,7 @@ export abstract class BaseTypedError<
 
     if (key && engine) {
       // Try to translate the error message using the engine
-      message = engine.safeTranslate(componentId, key, variables, language);
+      message = engine.safeTranslate(key, variables, language);
     } else {
       // Fallback to a basic English message
       message = `Error: ${type}${
@@ -270,7 +270,7 @@ export function createTranslatedError<
   if (key && engine) {
     try {
       // Try to translate the error message using the engine
-      message = engine.safeTranslate(componentId, key, variables, language);
+      message = engine.safeTranslate(key, variables, language);
     } catch (translationError) {
       // Fallback if translation fails
       message = `Error: ${type}${

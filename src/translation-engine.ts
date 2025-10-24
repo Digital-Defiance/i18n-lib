@@ -4,5 +4,5 @@
  */
 export interface TranslationEngine<TStringKey extends string = string> {
   translate: (key: TStringKey, vars?: Record<string, string | number>, lang?: any) => string;
-  safeTranslate: (componentId: string, key: TStringKey, vars?: Record<string, string | number>, lang?: any) => string;
+  safeTranslate: (key: TStringKey, vars?: Record<string, string | number>, lang?: any) => string;
 }

@@ -45,7 +45,7 @@ describe('RegistryError', () => {
           }
           return 'Unknown error';
         }),
-        safeTranslate: jest.fn((componentId, key, variables, language) => {
+        safeTranslate: jest.fn((key, variables, language) => {
           if (key === 'error_componentNotFoundTemplate') {
             return `Component '${variables?.componentId}' not found`;
           }
@@ -70,7 +70,6 @@ describe('RegistryError', () => {
       expect(error.type).toBe(RegistryErrorType.ComponentNotFound);
       expect(error.metadata).toEqual({ componentId: 'test-component' });
       expect(mockEngine.safeTranslate).toHaveBeenCalledWith(
-        'core',
         'error_componentNotFoundTemplate',
         { componentId: 'test-component' },
         LanguageCodes.EN_US,
@@ -88,7 +87,6 @@ describe('RegistryError', () => {
 
       expect(error.type).toBe(RegistryErrorType.ValidationFailed);
       expect(mockEngine.safeTranslate).toHaveBeenCalledWith(
-        'core',
         'error_validationFailedTemplate',
         { errors: 'Missing required fields' },
         LanguageCodes.EN_US,

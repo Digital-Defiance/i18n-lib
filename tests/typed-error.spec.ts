@@ -167,7 +167,7 @@ describe('TypedError', () => {
           }
           return 'Fallback message';
         },
-        safeTranslate: (componentId, key, variables, language) => {
+        safeTranslate: (key, variables, language) => {
           if (key === 'networkErrorKey') {
             return `Network error: ${variables?.code || 'unknown'}`;
           }

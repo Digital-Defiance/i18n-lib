@@ -295,7 +295,7 @@ export class I18nEngine<
    * @param language The language to translate to
    * @returns The translated string or the key if translation fails
    */
-  private safeTranslate(
+  public safeTranslate(
     key: TStringKey,
     vars?: Record<string, string | number>,
     language?: TLanguage,
