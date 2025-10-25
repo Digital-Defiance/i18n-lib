@@ -93,13 +93,13 @@ export class GlobalActiveContext<TLanguage extends string, TActiveContext extend
     );
   }
 
-  public setUserLanguage<StringLanguage extends string>(
-    language: StringLanguage,
+  public setUserLanguage(
+    language: TLanguage,
     key: string = GlobalActiveContext.defaultContextKey,
   ): void {
     const context = GlobalActiveContext._contextMap.get(
       key,
-    ) as IActiveContext<StringLanguage>;
+    ) as IActiveContext<TLanguage>;
     if (context) {
       context.language = language;
       return;
@@ -115,13 +115,13 @@ export class GlobalActiveContext<TLanguage extends string, TActiveContext extend
     this.context.language = lang;
   }
 
-  public setCurrencyCode<StringLanguage extends string>(
+  public setCurrencyCode(
     code: CurrencyCode,
     key: string = GlobalActiveContext.defaultContextKey,
   ): void {
     const context = GlobalActiveContext._contextMap.get(
       key,
-    ) as IActiveContext<StringLanguage>;
+    ) as IActiveContext<TLanguage>;
     if (context) {
       context.currencyCode = code;
       return;
@@ -141,13 +141,13 @@ export class GlobalActiveContext<TLanguage extends string, TActiveContext extend
    * Sets the admin language for console operations
    * @param language The language to set for admin operations
    */
-  public setAdminLanguage<StringLanguage extends string>(
-    language: StringLanguage,
+  public setAdminLanguage(
+    language: TLanguage,
     key: string = GlobalActiveContext.defaultContextKey,
   ): void {
     const context = GlobalActiveContext._contextMap.get(
       key,
-    ) as IActiveContext<StringLanguage>;
+    ) as IActiveContext<TLanguage>;
     if (context) {
       context.adminLanguage = language;
       return;
@@ -167,13 +167,13 @@ export class GlobalActiveContext<TLanguage extends string, TActiveContext extend
    * Sets the language context for the current context
    * @param context The language context to set
    */
-  public setLanguageContextSpace<StringLanguage extends string>(
+  public setLanguageContextSpace(
     context: LanguageContextSpace,
     key: string = GlobalActiveContext.defaultContextKey,
   ): void {
     const ctx = GlobalActiveContext._contextMap.get(
       key,
-    ) as IActiveContext<StringLanguage>;
+    ) as IActiveContext<TLanguage>;
     if (ctx) {
       ctx.currentContext = context;
       return;
@@ -181,12 +181,12 @@ export class GlobalActiveContext<TLanguage extends string, TActiveContext extend
     throw new ContextError(ContextErrorType.InvalidContext, key);
   }
 
-  public getLanguageContextSpace<StringLanguage extends string>(
+  public getLanguageContextSpace(
     key: string = GlobalActiveContext.defaultContextKey,
   ): LanguageContextSpace {
     const ctx = GlobalActiveContext._contextMap.get(
       key,
-    ) as IActiveContext<StringLanguage>;
+    ) as IActiveContext<TLanguage>;
     if (ctx) {
       return ctx.currentContext;
     }
@@ -201,13 +201,13 @@ export class GlobalActiveContext<TLanguage extends string, TActiveContext extend
     this.context.currentContext = context;
   }
 
-  public setUserTimezone<StringLanguage extends string>(
+  public setUserTimezone(
     tz: Timezone,
     key: string = GlobalActiveContext.defaultContextKey,
   ): void {
     const ctx = GlobalActiveContext._contextMap.get(
       key,
-    ) as IActiveContext<StringLanguage>;
+    ) as IActiveContext<TLanguage>;
     if (ctx) {
       ctx.timezone = tz;
       return;
@@ -223,13 +223,13 @@ export class GlobalActiveContext<TLanguage extends string, TActiveContext extend
     this.context.timezone = tz;
   }
 
-  public setAdminTimezone<StringLanguage extends string>(
+  public setAdminTimezone(
     tz: Timezone,
     key: string = GlobalActiveContext.defaultContextKey,
   ): void {
     const ctx = GlobalActiveContext._contextMap.get(
       key,
-    ) as IActiveContext<StringLanguage>;
+    ) as IActiveContext<TLanguage>;
     if (ctx) {
       ctx.adminTimezone = tz;
       return;

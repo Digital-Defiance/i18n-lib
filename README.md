@@ -1059,6 +1059,11 @@ Part of the DigitalBurnbag project - a secure file sharing and automated protoco
 
 ## ChangeLog
 
+### Version 1.2.4
+
+- Sat Oct 25 2025 14:29:00 GMT-0700 (Pacific Daylight Time)
+  - Remove StringLanguage generic for TLanguage in GlobalActiveLanguage
+
 ### Version 1.2.3
 
 - Thu Oct 23 2025 18:50:00 GMT-0700 (Pacific Daylight Time)
