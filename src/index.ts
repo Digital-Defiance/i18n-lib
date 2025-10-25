@@ -38,6 +38,7 @@ export * from './registry-error-type';
 export * from './translation-engine';
 export * from './translation-request';
 export * from './translation-response';
+export * from './create-translation-adapter';
 
 // Re-export for convenience
 export { createCoreI18nEngine as createCoreI18n } from './core-i18n';

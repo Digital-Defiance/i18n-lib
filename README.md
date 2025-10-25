@@ -1059,6 +1059,28 @@ Part of the DigitalBurnbag project - a secure file sharing and automated protoco
 
 ## ChangeLog
 
+### Version 1.2.5
+
+- Sat Oct 25 2025 15:0100 GMT-0700 (Pacific Daylight Time)
+
+#### Added
+- **`createTranslationAdapter`** - Generic utility function to adapt `PluginI18nEngine` instances to the `TranslationEngine` interface, enabling seamless integration with error classes and other components expecting the simpler interface
+  - Maintains full type safety with generic string key and language types
+  - Provides graceful error handling with fallback to key strings
+  - Zero overhead - direct delegation to underlying `PluginI18nEngine`
+  - Comprehensive test coverage (19 tests)
+
+#### Benefits
+- Eliminates need for custom adapter implementations in consuming packages
+- Standardizes translation engine integration across the monorepo
+- Simplifies error class constructors that require translation engines
+
+#### Migration
+Packages using custom translation adapters can now replace them with:
+```typescript
+import { createTranslationAdapter } from '@digitaldefiance/i18n-lib';
+const adapter = createTranslationAdapter(pluginEngine, 'component-id');
+ 
 ### Version 1.2.4
 
 - Sat Oct 25 2025 14:29:00 GMT-0700 (Pacific Daylight Time)
