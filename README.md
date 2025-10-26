@@ -2215,16 +2215,16 @@ For issues, questions, or contributions:
 
 ## ChangeLog
 
-### Version 1.3.0
+### Version 1.3.1
 
-- **Changed**: `CoreLanguageCode` now derived from `LanguageCodes` for type safety
-  - Type: `typeof LanguageCodes[keyof typeof LanguageCodes]`
-  - Maintains compile-time type safety while using registry as single source
-  - No breaking changes - existing code continues to work
+- **Changed**: `CoreLanguageCode` is now `string` - Language Registry is single source of truth
+  - Use `engine.getLanguageRegistry().getLanguageIds()` for runtime validation
+  - Use `getCoreLanguageCodes()` for static arrays (Mongoose schemas, etc.)
+  - Runtime validation via registry, not compile-time types
 - **Added**: `getCoreLanguageCodes()` - Get core language codes as runtime array
 - **Added**: `getCoreLanguageDefinitions()` - Get core language definitions
-- **Improved**: Language Registry is now the single source of truth
-- **Benefit**: Type safety + runtime flexibility without duplication
+- **Philosophy**: Registry-based validation over hardcoded types
+- **Benefit**: Maximum flexibility - add languages without code changes
 
 ### Version 1.2.5
 

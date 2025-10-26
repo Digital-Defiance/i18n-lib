@@ -1,4 +1,4 @@
-import { CoreLanguageCode } from './core-i18n';
+// CoreLanguageCode is deprecated - using string
 import { CoreStringKey } from './core-string-key';
 import { RegistryErrorType } from './registry-error-type';
 import { TranslationEngine, createTranslatedError } from './typed-error';
@@ -43,7 +43,7 @@ export class RegistryError extends Error {
     engine: TranslationEngine,
     type: RegistryErrorType,
     variables?: Record<string, string | number>,
-    language?: CoreLanguageCode,
+    language?: string,
     metadata?: Record<string, any>,
   ): RegistryError {
     const error = createTranslatedError(

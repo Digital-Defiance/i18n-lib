@@ -3,7 +3,7 @@ import { DefaultStringKey, Language, StringKey } from './default-config';
 import { I18nEngine } from './i18n-engine';
 
 // New plugin architecture imports
-import { CoreLanguageCode } from './core-i18n';
+// CoreLanguageCode is deprecated - using string for flexibility
 import { CoreStringKey } from './core-string-key';
 import { PluginI18nEngine } from './plugin-i18n-engine';
 import { TranslationEngine } from './translation-engine';
@@ -171,10 +171,10 @@ export abstract class CoreTypedError<
   TEnum extends Record<string, string>,
 > extends Error {
   constructor(
-    engine: PluginI18nEngine<CoreLanguageCode>,
+    engine: PluginI18nEngine<string>,
     public readonly type: TEnum[keyof TEnum],
     public readonly reasonMap: CompleteReasonMap<TEnum, CoreStringKey>,
-    public readonly language?: CoreLanguageCode,
+    public readonly language?: string,
     public readonly otherVars?: Record<string, string | number>,
   ) {
     const key = reasonMap[type];
@@ -236,10 +236,10 @@ export function createCoreTypedError<TEnum extends Record<string, string>>(
   type: TEnum[keyof TEnum],
   reasonMap: CompleteReasonMap<TEnum, CoreStringKey>,
   otherVars?: Record<string, string | number>,
-  language?: CoreLanguageCode,
+  language?: string,
   instanceKey?: string,
 ): Error {
-  const engine = PluginI18nEngine.getInstance<CoreLanguageCode>(instanceKey);
+  const engine = PluginI18nEngine.getInstance<string>(instanceKey);
 
   return new (class extends CoreTypedError<TEnum> {
     constructor() {
@@ -322,7 +322,7 @@ class DatabaseError extends CoreTypedError<typeof DatabaseErrorType> {
 }
 
 // Usage:
-// const engine = PluginI18nEngine.getInstance<CoreLanguageCode>();
+// const engine = PluginI18nEngine.getInstance<string>();
 // throw new DatabaseError(engine, DatabaseErrorType.ConnectionFailed);
 */
 
@@ -346,19 +346,19 @@ const userErrorReasonMap: CompleteReasonMap<typeof UserErrorType, UserErrorStrin
   [UserErrorType.AccountLocked]: UserErrorStringKey.AccountLockedMessage
 };
 
-class UserError extends PluginTypedError<typeof UserErrorType, UserErrorStringKey, CoreLanguageCode> {
+class UserError extends PluginTypedError<typeof UserErrorType, UserErrorStringKey, string> {
   constructor(
-    engine: PluginI18nEngine<CoreLanguageCode>,
+    engine: PluginI18nEngine<string>,
     type: UserErrorType,
     otherVars?: Record<string, string | number>,
-    language?: CoreLanguageCode
+    language?: string
   ) {
     super(engine, 'user-system', type, userErrorReasonMap, language, otherVars);
   }
 }
 
 // Usage:
-// const engine = PluginI18nEngine.getInstance<CoreLanguageCode>();
+// const engine = PluginI18nEngine.getInstance<string>();
 // throw new UserError(engine, UserErrorType.UserNotFound, { username: 'john_doe' });
 */
 

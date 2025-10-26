@@ -12,10 +12,17 @@ import { PluginI18nEngine } from './plugin-i18n-engine';
 import { createCompleteComponentStrings } from './strict-types';
 
 /**
- * Core language code type - derived from LanguageCodes for type safety
- * Use this for type parameters when you want to restrict to core languages only
+ * Core language code type - union of supported language codes
+ * Provides compile-time type safety for core languages
+ * For custom languages, extend this type or use string
  */
 export type CoreLanguageCode = typeof LanguageCodes[keyof typeof LanguageCodes];
+
+/**
+ * Flexible language code type - use when you want runtime-only validation
+ * Alias for string to indicate it's a language code
+ */
+export type FlexibleLanguageCode = string;
 
 const DefaultInstanceKey = 'default';
 
@@ -83,7 +90,7 @@ export const CoreComponentDefinition: ComponentDefinition<CoreStringKey> = {
  * Core component strings for all default languages
  */
 export function createCoreComponentStrings() {
-  return createCompleteComponentStrings<CoreStringKey, CoreLanguageCode>({
+  return createCompleteComponentStrings<CoreStringKey, string>({
     [LanguageCodes.EN_US]: {
       // Common/General
       [CoreStringKey.Common_Yes]: 'Yes',
@@ -529,7 +536,7 @@ export function createCoreComponentStrings() {
  */
 export function createCoreComponentRegistration(): ComponentRegistration<
   CoreStringKey,
-  CoreLanguageCode
+  string
 > {
   return {
     component: CoreComponentDefinition,
@@ -553,12 +560,13 @@ export function getCoreLanguageDefinitions(): LanguageDefinition[] {
 
 /**
  * Create a pre-configured I18n engine with core components
+ * Returns engine with string type - use registry for language validation
  */
 export function createCoreI18nEngine(
   instanceKey: string = DefaultInstanceKey,
-): PluginI18nEngine<CoreLanguageCode> {
+): PluginI18nEngine<string> {
   const languages = createDefaultLanguages();
-  const engine = PluginI18nEngine.createInstance<CoreLanguageCode>(
+  const engine = PluginI18nEngine.createInstance<string>(
     instanceKey,
     languages,
   );
@@ -569,7 +577,7 @@ export function createCoreI18nEngine(
 /**
  * Type alias for easier usage
  */
-export type CoreI18nEngine = PluginI18nEngine<CoreLanguageCode>;
+export type CoreI18nEngine = PluginI18nEngine<string>;
 
 /**
  * Helper function to get core translation
@@ -577,10 +585,10 @@ export type CoreI18nEngine = PluginI18nEngine<CoreLanguageCode>;
 export function getCoreTranslation(
   stringKey: CoreStringKey,
   variables?: Record<string, string | number>,
-  language?: CoreLanguageCode,
+  language?: string,
   instanceKey?: string,
 ): string {
-  const engine = PluginI18nEngine.getInstance<CoreLanguageCode>(instanceKey);
+  const engine = PluginI18nEngine.getInstance<string>(instanceKey);
   return engine.translate(CoreI18nComponentId, stringKey, variables, language);
 }
 
@@ -590,7 +598,7 @@ export function getCoreTranslation(
 export function safeCoreTranslation(
   stringKey: CoreStringKey,
   variables?: Record<string, string | number>,
-  language?: CoreLanguageCode,
+  language?: string,
   instanceKey?: string,
 ): string {
   try {
