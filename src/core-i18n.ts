@@ -11,16 +11,11 @@ import { createLanguageDefinitions } from './language-registry';
 import { PluginI18nEngine } from './plugin-i18n-engine';
 import { createCompleteComponentStrings } from './strict-types';
 
-// Core language codes type
-export type CoreLanguageCode = 
-  | typeof LanguageCodes.EN_US
-  | typeof LanguageCodes.EN_GB
-  | typeof LanguageCodes.FR
-  | typeof LanguageCodes.ES
-  | typeof LanguageCodes.DE
-  | typeof LanguageCodes.ZH_CN
-  | typeof LanguageCodes.JA
-  | typeof LanguageCodes.UK;
+/**
+ * Core language code type - derived from LanguageCodes for type safety
+ * Use this for type parameters when you want to restrict to core languages only
+ */
+export type CoreLanguageCode = typeof LanguageCodes[keyof typeof LanguageCodes];
 
 const DefaultInstanceKey = 'default';
 
@@ -540,6 +535,20 @@ export function createCoreComponentRegistration(): ComponentRegistration<
     component: CoreComponentDefinition,
     strings: createCoreComponentStrings(),
   };
+}
+
+/**
+ * Get core language codes as array (for Mongoose enums, etc.)
+ */
+export function getCoreLanguageCodes(): string[] {
+  return Object.values(LanguageCodes);
+}
+
+/**
+ * Get core language definitions
+ */
+export function getCoreLanguageDefinitions(): LanguageDefinition[] {
+  return createDefaultLanguages();
 }
 
 /**

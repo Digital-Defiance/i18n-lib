@@ -351,7 +351,7 @@ class UserError extends PluginTypedError<typeof UserErrorType, UserErrorStringKe
     engine: PluginI18nEngine<CoreLanguageCode>,
     type: UserErrorType,
     otherVars?: Record<string, string | number>,
-    language?: CoreLanguage
+    language?: CoreLanguageCode
   ) {
     super(engine, 'user-system', type, userErrorReasonMap, language, otherVars);
   }

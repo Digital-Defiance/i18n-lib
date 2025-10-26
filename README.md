@@ -1,48 +1,126 @@
 # @digitaldefiance/i18n-lib
 
-A comprehensive TypeScript internationalization library with plugin-based component registration, enum translation support, template processing, and context management.
+A comprehensive, production-ready TypeScript internationalization (i18n) library featuring plugin-based architecture, compile-time type safety, component registration, enum translation, template processing, and advanced context management. Built for enterprise applications requiring robust multilingual support with zero-knowledge security patterns.
 
-## 🚀 New Plugin-Based Architecture
+## 🚀 Plugin-Based Architecture
 
-**Version 1.1.0** introduces a revolutionary plugin-based architecture with component registration and rigid compile-time type safety:
+**Version 1.1.0+** introduces a revolutionary plugin-based architecture with component registration and rigid compile-time type safety:
 
-- **Component Registration System**: Register translation components with their own string keys
-- **Language Plugin Support**: Add new languages dynamically with validation
-- **Compile-Time Type Safety**: TypeScript ensures all strings are complete for all languages
-- **Automatic Validation**: Comprehensive validation with detailed error reporting
-- **Fallback System**: Intelligent fallback to default languages with missing translation detection
-- **Multi-Instance Support**: Named instances for different application contexts
+- **Component Registration System**: Register translation components with their own isolated string keys
+- **Language Plugin Support**: Add new languages dynamically with automatic validation
+- **Compile-Time Type Safety**: TypeScript ensures all strings are complete for all languages at build time
+- **Automatic Validation**: Comprehensive validation with detailed error reporting and missing key detection
+- **Intelligent Fallback System**: Graceful degradation to default languages with missing translation tracking
+- **Multi-Instance Support**: Named instances for different application contexts (admin, user, API, etc.)
+- **Global Context Management**: Centralized context with per-instance language, currency, and timezone settings
+- **Translation Adapters**: Generic adapter utilities for seamless integration with error classes and other components
 
 ## Features
 
-### Core Features
+### Core Translation Features
 
-- **Type-Safe Translations**: Full TypeScript support with generic types for strings and languages
-- **Plugin Architecture**: Register components and languages dynamically with full type safety
+- **Type-Safe Translations**: Full TypeScript support with generic types for strings, languages, and contexts
+- **Plugin Architecture**: Register components and languages dynamically with full compile-time type safety
 - **Configuration Validation**: Automatic validation ensures all languages have complete string collections
-- **Localized Error Messages**: Error messages can be translated using the engine's own translation system
-- **Enum Translation Registry**: Translate enum values with complete type safety
-- **Template Processing**: Advanced template system with `{{EnumName.EnumKey}}` patterns and variable replacement
-- **Context Management**: Admin vs user translation contexts with automatic language switching
-- **Singleton Pattern**: Efficient instance management with named instances
-- **Currency Formatting**: Built-in currency formatting utilities with locale support
-- **Fallback System**: Graceful degradation when translations are missing
+- **Localized Error Messages**: Error messages translated using the engine's own translation system
+- **Enum Translation Registry**: Translate enum values with complete type safety and automatic validation
+- **Advanced Template Processing**: 
+  - Component-based patterns: `{{componentId.stringKey}}`
+  - Legacy enum patterns: `{{EnumName.EnumKey}}`
+  - Variable replacement: `{variableName}`
+  - Nested template support with multiple variable objects
+- **Context Management**: 
+  - Admin vs user translation contexts
+  - Automatic language switching based on context
+  - Per-instance context isolation
+  - Global context with named instance support
+- **Currency Formatting**: Built-in currency formatting utilities with locale-aware symbol positioning
+- **Timezone Support**: Validated timezone handling with moment-timezone integration
+- **Intelligent Fallback System**: 
+  - Graceful degradation when translations are missing
+  - Fallback to default language with tracking
+  - Placeholder generation for missing keys: `[componentId.stringKey]`
 - **Extensible Configuration**: Module augmentation support for layered library extension
-- **Backward Compatibility**: Legacy I18nEngine remains fully supported
+- **Backward Compatibility**: Legacy I18nEngine remains fully supported for migration paths
 
-### New Plugin Features
+### Plugin System Features
 
-- **Component Registry**: Manage translation components with validation
-- **Language Registry**: Dynamic language registration with metadata
-- **Type-Safe Registration**: Compile-time guarantees for translation completeness
-- **Validation Reporting**: Detailed missing translation reports
-- **Plugin System**: Modular component architecture
+- **Component Registry**: 
+  - Manage translation components with automatic validation
+  - Component isolation with independent string key namespaces
+  - Dynamic component registration and updates
+  - Comprehensive validation reporting
+- **Language Registry**: 
+  - Dynamic language registration with metadata (name, code, default flag)
+  - BCP 47 language code support
+  - Language lookup by ID or ISO code
+  - Display name mapping for UI rendering
+- **Type-Safe Registration**: 
+  - Compile-time guarantees for translation completeness
+  - Strict type helpers for enforcing complete translations
+  - Partial registration support with fallback generation
+- **Validation System**:
+  - Detailed missing translation reports
+  - Per-component validation results
+  - Global validation across all components
+  - Configurable validation strictness
+- **Instance Management**:
+  - Named instances for different application contexts
+  - Singleton pattern with automatic default instance
+  - Instance cleanup utilities for testing
+  - Per-instance context and configuration
+
+### Advanced Features
+
+- **Translatable Errors**: 
+  - Generic translatable error class for any component
+  - Automatic translation with fallback support
+  - Error retranslation for dynamic language switching
+  - Metadata attachment for debugging
+- **Translation Adapters**: 
+  - Generic adapter creation for PluginI18nEngine
+  - Seamless integration with error classes
+  - Zero-overhead delegation pattern
+- **Context Change Monitoring**: 
+  - Reactive context proxies with change listeners
+  - Property-level change notifications
+  - Error-safe listener execution
+- **Strict Type Enforcement**: 
+  - Compile-time completeness checking
+  - Helper functions for strict translation maps
+  - Type utilities for extracting string keys and languages
+- **Testing Utilities**: 
+  - Instance cleanup methods
+  - Component registry reset
+  - Global engine reset for test isolation
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Plugin-Based Architecture](#plugin-based-architecture)
+- [Core Components](#core-components)
+- [Advanced Features](#advanced-features)
+- [API Reference](#api-reference)
+- [Type Definitions](#type-definitions)
+- [Testing](#testing)
+- [Best Practices](#best-practices)
+- [Migration Guide](#migration-guide)
+- [Changelog](#changelog)
 
 ## Installation
 
 ```bash
 npm install @digitaldefiance/i18n-lib
+# or
+yarn add @digitaldefiance/i18n-lib
 ```
+
+### Dependencies
+
+- `currency-codes`: Currency code validation
+- `moment-timezone`: Timezone validation and handling
+- TypeScript 4.5+ recommended for full type safety
 
 ## Quick Start
 
@@ -99,6 +177,174 @@ const spanishGreeting = i18n.translate(MyStrings.UserGreetingTemplate, { name: '
 // "¡Hola, Juan!"
 ```
 
+## Core Components
+
+The library is built around several key components that work together to provide comprehensive i18n support:
+
+### Component Registry
+
+Manages translation components with automatic validation:
+
+```typescript
+import { ComponentRegistry, ComponentDefinition, ComponentRegistration } from '@digitaldefiance/i18n-lib';
+
+// Define component
+const myComponent: ComponentDefinition<MyStringKeys> = {
+  id: 'my-component',
+  name: 'My Component',
+  stringKeys: Object.values(MyStringKeys)
+};
+
+// Register with translations
+const registration: ComponentRegistration<MyStringKeys, Languages> = {
+  component: myComponent,
+  strings: {
+    'en-US': { /* translations */ },
+    'fr': { /* translations */ }
+  }
+};
+```
+
+**Key Features:**
+- Component isolation with independent string key namespaces
+- Automatic validation of translation completeness
+- Dynamic component registration and updates
+- Fallback generation for missing translations
+- Detailed validation reporting
+
+### Language Registry
+
+Manages supported languages with metadata:
+
+```typescript
+import { LanguageRegistry, LanguageDefinition, createLanguageDefinition } from '@digitaldefiance/i18n-lib';
+
+const registry = new LanguageRegistry<'en-US' | 'fr' | 'es'>();
+
+// Register languages
+registry.registerLanguage(createLanguageDefinition('en-US', 'English (US)', 'en-US', true));
+registry.registerLanguage(createLanguageDefinition('fr', 'Français', 'fr'));
+
+// Query languages
+const language = registry.getLanguage('en-US');
+const byCode = registry.getLanguageByCode('fr');
+const allLanguages = registry.getAllLanguages();
+const displayNames = registry.getLanguageDisplayNames();
+
+// Get language codes for Mongoose enum
+const languageCodes = registry.getLanguageIds(); // ['en-US', 'fr', 'es']
+const isoCodes = registry.getLanguageCodes(); // ['en-US', 'fr', 'es']
+```
+
+**Key Features:**
+- BCP 47 language code support
+- Language lookup by ID or ISO code
+- Display name mapping for UI rendering
+- Default language management
+- Duplicate detection and validation
+- Extract language codes for schema definitions
+
+### Enum Translation Registry
+
+Translates enum values with type safety:
+
+```typescript
+import { EnumTranslationRegistry } from '@digitaldefiance/i18n-lib';
+
+enum Status {
+  Active = 'active',
+  Inactive = 'inactive'
+}
+
+const enumRegistry = new EnumTranslationRegistry<string, 'en-US' | 'fr'>(
+  ['en-US', 'fr'],
+  (key, vars) => engine.translate('core', key, vars)
+);
+
+enumRegistry.register(Status, {
+  'en-US': {
+    [Status.Active]: 'Active',
+    [Status.Inactive]: 'Inactive'
+  },
+  'fr': {
+    [Status.Active]: 'Actif',
+    [Status.Inactive]: 'Inactif'
+  }
+}, 'Status');
+
+const translated = enumRegistry.translate(Status, Status.Active, 'fr'); // 'Actif'
+```
+
+**Key Features:**
+- Complete enum coverage validation
+- Numeric and string enum support
+- Automatic key resolution for numeric enums
+- Localized error messages
+
+### Global Active Context
+
+Centralized context management for all engine instances:
+
+```typescript
+import { GlobalActiveContext, IActiveContext } from '@digitaldefiance/i18n-lib';
+
+const globalContext = GlobalActiveContext.getInstance<'en-US' | 'fr', IActiveContext<'en-US' | 'fr'>>();
+
+// Create context for an instance
+globalContext.createContext('en-US', 'en-US', 'my-app');
+
+// Update context properties
+globalContext.setUserLanguage('fr', 'my-app');
+globalContext.setAdminLanguage('en-US', 'my-app');
+globalContext.setCurrencyCode(new CurrencyCode('EUR'), 'my-app');
+globalContext.setUserTimezone(new Timezone('Europe/Paris'), 'my-app');
+
+// Get context
+const context = globalContext.getContext('my-app');
+console.log(context.language); // 'fr'
+console.log(context.adminLanguage); // 'en-US'
+```
+
+**Key Features:**
+- Per-instance context isolation
+- User and admin language separation
+- Currency code management
+- Timezone handling
+- Context space management (admin, user, system, api)
+
+### Context Manager
+
+Reactive context with change listeners:
+
+```typescript
+import { ContextManager } from '@digitaldefiance/i18n-lib';
+
+interface AppContext {
+  language: string;
+  theme: string;
+}
+
+const manager = new ContextManager<AppContext>();
+
+// Add change listener
+manager.addListener((property, oldValue, newValue) => {
+  console.log(`${property} changed from ${oldValue} to ${newValue}`);
+});
+
+// Create reactive proxy
+const context = { language: 'en', theme: 'dark' };
+const reactiveContext = manager.createProxy(context);
+
+// Changes trigger listeners
+reactiveContext.language = 'fr'; // Logs: "language changed from en to fr"
+```
+
+**Key Features:**
+- Property-level change notifications
+- Multiple listener support
+- Error-safe listener execution
+- Proxy-based reactivity
+
 ## 🆕 Plugin-Based Architecture (New in v1.1.0)
 
 The new plugin-based architecture provides a component registration system with rigid compile-time type safety.
@@ -108,9 +354,10 @@ The new plugin-based architecture provides a component registration system with 
 ```typescript
 import { 
   createCoreI18nEngine, 
-  CoreStringKey, 
+  CoreStringKey,
   CoreLanguageCode,
   LanguageCodes,
+  getCoreLanguageCodes,
   ComponentDefinition,
   ComponentRegistration
 } from '@digitaldefiance/i18n-lib';
@@ -118,8 +365,15 @@ import {
 // Create engine with default languages and core strings
 const i18n = createCoreI18nEngine('myapp');
 
-// Use core translations
-const welcomeMessage = i18n.translate('core', CoreStringKey.System_Welcome);
+// Type-safe language parameter
+const lang: CoreLanguageCode = LanguageCodes.FR; // Type-checked!
+
+// Get supported language codes from registry (runtime)
+const supportedLanguages = i18n.getLanguageRegistry().getLanguageIds();
+// ['en-US', 'en-GB', 'fr', 'es', 'de', 'zh-CN', 'ja', 'uk']
+
+// Use core translations with type safety
+const welcomeMessage = i18n.translate('core', CoreStringKey.System_Welcome, undefined, lang);
 const errorMessage = i18n.translate('core', CoreStringKey.Error_ValidationFailed);
 
 // Define your own component with type safety
@@ -258,6 +512,296 @@ const userNotFound = i18n.translate(
   UserStringKey.Error_UserNotFoundTemplate, 
   { username: 'john_doe' }
 );
+```
+
+## Advanced Features
+
+### Translation Adapters
+
+Create adapters to use PluginI18nEngine with components expecting the TranslationEngine interface:
+
+```typescript
+import { createTranslationAdapter, PluginI18nEngine, TranslationEngine } from '@digitaldefiance/i18n-lib';
+
+const pluginEngine = PluginI18nEngine.getInstance<'en-US' | 'fr'>();
+
+// Create adapter for a specific component
+const adapter: TranslationEngine<MyStringKey> = createTranslationAdapter(
+  pluginEngine,
+  'my-component'
+);
+
+// Use with error classes or other components
+class MyError extends Error {
+  constructor(
+    type: ErrorType,
+    engine: TranslationEngine<ErrorStringKey>
+  ) {
+    const message = engine.translate(type);
+    super(message);
+  }
+}
+
+const error = new MyError(ErrorType.NotFound, adapter);
+```
+
+**Key Features:**
+- Zero-overhead delegation to PluginI18nEngine
+- Maintains full type safety
+- Graceful error handling with fallback to key strings
+- Seamless integration with existing code
+
+### Translatable Errors
+
+Generic error class with automatic translation:
+
+```typescript
+import { TranslatableGenericError, PluginI18nEngine } from '@digitaldefiance/i18n-lib';
+
+enum UserErrorKey {
+  UserNotFound = 'userNotFound',
+  InvalidCredentials = 'invalidCredentials'
+}
+
+// Throw translatable error
+throw new TranslatableGenericError(
+  'user-errors',
+  UserErrorKey.UserNotFound,
+  { username: 'john_doe' },
+  'en-US',
+  { userId: 123 },
+  'myapp'
+);
+
+// Create with explicit engine
+const engine = PluginI18nEngine.getInstance<'en-US' | 'fr'>();
+const error = TranslatableGenericError.withEngine(
+  engine,
+  'user-errors',
+  UserErrorKey.InvalidCredentials,
+  undefined,
+  'fr'
+);
+
+// Retranslate dynamically
+try {
+  // ... code that throws TranslatableGenericError
+} catch (error) {
+  if (error instanceof TranslatableGenericError) {
+    const localizedMessage = error.retranslate('fr', 'myapp');
+    sendToUser(localizedMessage);
+  }
+}
+```
+
+**Key Features:**
+- Works with any registered component
+- Uses safeTranslate for consistent fallback behavior
+- Stores error context for retranslation
+- Never throws during construction
+- Metadata attachment for debugging
+
+### Typed Errors
+
+Base classes for creating strongly-typed error hierarchies:
+
+```typescript
+import { BaseTypedError, CompleteReasonMap, TranslationEngine } from '@digitaldefiance/i18n-lib';
+
+enum DatabaseErrorType {
+  ConnectionFailed = 'connectionFailed',
+  QueryTimeout = 'queryTimeout'
+}
+
+enum DatabaseErrorKey {
+  ConnectionFailedMessage = 'connectionFailedMessage',
+  QueryTimeoutMessage = 'queryTimeoutMessage'
+}
+
+const reasonMap: CompleteReasonMap<typeof DatabaseErrorType, DatabaseErrorKey> = {
+  [DatabaseErrorType.ConnectionFailed]: DatabaseErrorKey.ConnectionFailedMessage,
+  [DatabaseErrorType.QueryTimeout]: DatabaseErrorKey.QueryTimeoutMessage
+};
+
+class DatabaseError extends BaseTypedError<typeof DatabaseErrorType, DatabaseErrorKey> {
+  static create(
+    engine: TranslationEngine<DatabaseErrorKey>,
+    type: DatabaseErrorType,
+    metadata?: Record<string, any>
+  ): DatabaseError {
+    return DatabaseError.createTranslated(
+      engine,
+      'database',
+      type,
+      reasonMap,
+      undefined,
+      undefined,
+      metadata
+    );
+  }
+}
+```
+
+**Key Features:**
+- Complete enum coverage enforcement
+- Translation engine integration
+- Simple and translated error creation
+- Metadata support
+
+### Template Processing
+
+Advanced template system with multiple pattern types:
+
+```typescript
+import { PluginI18nEngine } from '@digitaldefiance/i18n-lib';
+
+const engine = PluginI18nEngine.getInstance<'en-US'>();
+
+// Component-based patterns
+const message1 = engine.t(
+  '{{core.Common_Welcome}} {{user.UserGreetingTemplate}}',
+  'en-US',
+  { name: 'John' }
+);
+// "Welcome Hello, John!"
+
+// Variable replacement
+const message2 = engine.t(
+  'User {username} has {count} messages',
+  'en-US',
+  { username: 'john_doe', count: 5 }
+);
+// "User john_doe has 5 messages"
+
+// Mixed patterns
+const message3 = engine.t(
+  '{{core.System_Welcome}}, {name}! {{core.System_PleaseWait}}',
+  'en-US',
+  { name: 'Alice' }
+);
+// "Welcome, Alice! Please wait..."
+```
+
+**Pattern Types:**
+- `{{componentId.stringKey}}`: Component-based translation
+- `{variableName}`: Variable replacement
+- Template strings automatically use first variable object
+- Multiple variable objects merged for replacement
+
+### Currency Formatting
+
+Locale-aware currency formatting:
+
+```typescript
+import { getCurrencyFormat, CurrencyCode } from '@digitaldefiance/i18n-lib';
+
+// Get format details
+const usdFormat = getCurrencyFormat('en-US', 'USD');
+console.log(usdFormat);
+// {
+//   symbol: '$',
+//   position: 'prefix',
+//   groupSeparator: ',',
+//   decimalSeparator: '.'
+// }
+
+const eurFormat = getCurrencyFormat('de-DE', 'EUR');
+console.log(eurFormat);
+// {
+//   symbol: '€',
+//   position: 'postfix',
+//   groupSeparator: '.',
+//   decimalSeparator: ','
+// }
+
+// Validate currency codes
+const currencyCode = new CurrencyCode('USD');
+console.log(currencyCode.value); // 'USD'
+console.log(CurrencyCode.values); // Array of all valid ISO 4217 codes
+```
+
+**Key Features:**
+- ISO 4217 currency code validation
+- Locale-aware symbol positioning
+- Group and decimal separator detection
+- Intl.NumberFormat integration
+
+### Timezone Handling
+
+Validated timezone management:
+
+```typescript
+import { Timezone, isValidTimezone } from '@digitaldefiance/i18n-lib';
+
+// Create validated timezone
+const tz = new Timezone('America/New_York');
+console.log(tz.value); // 'America/New_York'
+
+// Validate timezone strings
+if (isValidTimezone('Europe/Paris')) {
+  const parisTz = new Timezone('Europe/Paris');
+}
+
+// Invalid timezone throws error
+try {
+  new Timezone('Invalid/Timezone');
+} catch (error) {
+  console.error('Invalid timezone');
+}
+```
+
+**Key Features:**
+- Moment-timezone validation
+- Immutable timezone values
+- Validation utilities
+- IANA timezone database support
+
+### Utility Functions
+
+Helper functions for common operations:
+
+```typescript
+import {
+  replaceVariables,
+  isTemplate,
+  toStringKey,
+  buildReasonMap,
+  validateReasonMap,
+  createCompleteReasonMap
+} from '@digitaldefiance/i18n-lib';
+
+// Variable replacement
+const result = replaceVariables(
+  'Hello, {name}! You have {count} messages.',
+  { name: 'John', count: 5 }
+);
+// "Hello, John! You have 5 messages."
+
+// Template detection
+if (isTemplate('userGreetingTemplate')) {
+  // Handle as template
+}
+
+// String key construction
+const key = toStringKey('error', 'validation', 'failed');
+// 'error_validation_failed'
+
+// Reason map building
+enum ErrorType {
+  NotFound = 'notFound',
+  AccessDenied = 'accessDenied'
+}
+
+const reasonMap = buildReasonMap(ErrorType, ['error']);
+// {
+//   notFound: 'error_notFound',
+//   accessDenied: 'error_accessDenied'
+// }
+
+// Validate reason map completeness
+if (validateReasonMap(ErrorType, reasonMap)) {
+  // All enum values are mapped
+}
 ```
 
 ### Advanced Plugin Usage
@@ -676,6 +1220,144 @@ I18nEngine.clearInstances();
 I18nEngine.removeInstance('main');
 ```
 
+## Supported Languages
+
+The library includes pre-built translations for 8 languages in the core component:
+
+| Language Code | Display Name | ISO Code |
+|--------------|--------------|----------|
+| `en-US` | English (US) | en-US |
+| `en-GB` | English (UK) | en-GB |
+| `fr` | Français | fr |
+| `es` | Español | es |
+| `de` | Deutsch | de |
+| `zh-CN` | 中文 (简体) | zh-CN |
+| `ja` | 日本語 | ja |
+| `uk` | Українська | uk |
+
+### Language Code Constants
+
+```typescript
+import { LanguageCodes, LanguageDisplayNames, getCoreLanguageCodes } from '@digitaldefiance/i18n-lib';
+
+// Use constants for type safety
+const lang = LanguageCodes.FR; // 'fr'
+const displayName = LanguageDisplayNames[LanguageCodes.FR]; // 'Français'
+
+// Get all core language codes as array (for Mongoose enums, etc.)
+const coreLanguageCodes = getCoreLanguageCodes();
+// ['en-US', 'en-GB', 'fr', 'es', 'de', 'zh-CN', 'ja', 'uk']
+
+// All available codes
+const codes = {
+  EN_US: 'en-US',
+  EN_GB: 'en-GB',
+  FR: 'fr',
+  ES: 'es',
+  DE: 'de',
+  ZH_CN: 'zh-CN',
+  JA: 'ja',
+  UK: 'uk'
+};
+```
+
+### Custom Language Codes
+
+Extend core languages with custom ones while maintaining type safety:
+
+```typescript
+import { 
+  CoreLanguageCode,
+  getCoreLanguageDefinitions, 
+  createLanguageDefinition,
+  PluginI18nEngine
+} from '@digitaldefiance/i18n-lib';
+
+// Define custom language type extending core
+type MyLanguageCode = CoreLanguageCode | 'pt-BR' | 'it';
+
+// Create engine with extended languages
+const engine = PluginI18nEngine.createInstance<MyLanguageCode>(
+  'myapp',
+  [
+    ...getCoreLanguageDefinitions(),
+    createLanguageDefinition('pt-BR', 'Português (Brasil)', 'pt-BR'),
+    createLanguageDefinition('it', 'Italiano', 'it')
+  ]
+);
+
+// Type-safe language usage
+const lang1: MyLanguageCode = 'en-US'; // ✓ Core language
+const lang2: MyLanguageCode = 'pt-BR'; // ✓ Custom language
+const lang3: MyLanguageCode = 'invalid'; // ✗ Type error!
+```
+
+### Helper Functions for Mongoose Schemas
+
+Extract language codes from the registry (single source of truth):
+
+```typescript
+import { PluginI18nEngine, getCoreLanguageCodes, LanguageCodes } from '@digitaldefiance/i18n-lib';
+import { Schema } from 'mongoose';
+
+// Static approach: Get core language codes as array
+const coreLanguageCodes = getCoreLanguageCodes();
+// ['en-US', 'en-GB', 'fr', 'es', 'de', 'zh-CN', 'ja', 'uk']
+
+// Dynamic approach: Get from engine instance (includes custom languages)
+const engine = PluginI18nEngine.getInstance<string>();
+const languageIds = engine.getLanguageRegistry().getLanguageIds();
+const isoCodes = engine.getLanguageRegistry().getLanguageCodes();
+
+// Use in Mongoose schema
+const userSchema = new Schema({
+  language: {
+    type: String,
+    enum: coreLanguageCodes, // Static core languages
+    default: LanguageCodes.EN_US
+  },
+  adminLanguage: {
+    type: String,
+    enum: languageIds, // Dynamic from registry
+    default: LanguageCodes.EN_US
+  }
+});
+
+// Get display names for validation messages
+const displayNames = engine.getLanguageRegistry().getLanguageDisplayNames();
+// { 'en-US': 'English (US)', 'fr': 'Français', ... }
+```
+
+## Core String Keys
+
+The core component provides 40+ system strings organized by category:
+
+### Common Strings
+- `Common_Yes`, `Common_No`, `Common_Cancel`, `Common_OK`
+- `Common_Save`, `Common_Delete`, `Common_Edit`, `Common_Create`, `Common_Update`
+- `Common_Loading`, `Common_Error`, `Common_Success`, `Common_Warning`, `Common_Info`
+- `Common_Disposed`
+
+### Error Messages
+- `Error_InvalidInput`, `Error_NetworkError`, `Error_NotFound`
+- `Error_AccessDenied`, `Error_InternalServer`, `Error_ValidationFailed`
+- `Error_RequiredField`, `Error_InvalidContextTemplate`
+- `Error_MissingTranslationKeyTemplate`
+
+### Registry Error Templates
+- `Error_ComponentNotFoundTemplate`
+- `Error_LanguageNotFoundTemplate`
+- `Error_StringKeyNotFoundTemplate`
+- `Error_IncompleteRegistrationTemplate`
+- `Error_DuplicateComponentTemplate`
+- `Error_DuplicateLanguageTemplate`
+- `Error_ValidationFailedTemplate`
+
+### System Messages
+- `System_Welcome`, `System_Goodbye`, `System_PleaseWait`
+- `System_ProcessingRequest`, `System_OperationComplete`
+- `System_NoDataAvailable`
+
 ## API Reference
 
 ### Plugin Architecture API
@@ -1008,6 +1690,133 @@ If localized error messages aren't provided, the engine falls back to English te
 - `Missing translation for key '{key}' in language '{language}'`
 - `Default language '{language}' has no string collection`
 
+## Error Handling
+
+The library provides comprehensive error handling with localized error messages:
+
+### Registry Errors
+
+```typescript
+import { RegistryError, RegistryErrorType } from '@digitaldefiance/i18n-lib';
+
+try {
+  engine.registerComponent(invalidRegistration);
+} catch (error) {
+  if (error instanceof RegistryError) {
+    console.error(`Error type: ${error.type}`);
+    console.error(`Metadata:`, error.metadata);
+    
+    switch (error.type) {
+      case RegistryErrorType.ComponentNotFound:
+        // Handle missing component
+        break;
+      case RegistryErrorType.DuplicateComponent:
+        // Handle duplicate registration
+        break;
+      case RegistryErrorType.ValidationFailed:
+        // Handle validation failure
+        break;
+    }
+  }
+}
+```
+
+**Error Types:**
+- `ComponentNotFound`: Component ID not registered
+- `LanguageNotFound`: Language not registered
+- `StringKeyNotFound`: Translation key not found
+- `IncompleteRegistration`: Missing translations detected
+- `DuplicateComponent`: Component already registered
+- `DuplicateLanguage`: Language already registered
+- `ValidationFailed`: Validation check failed
+
+### Context Errors
+
+```typescript
+import { ContextError, ContextErrorType } from '@digitaldefiance/i18n-lib';
+
+try {
+  const context = globalContext.getContext('invalid-key');
+} catch (error) {
+  if (error instanceof ContextError) {
+    console.error(`Invalid context: ${error.contextKey}`);
+  }
+}
+```
+
+### Safe Translation
+
+Use `safeTranslate` to prevent errors:
+
+```typescript
+// Regular translate throws on missing key
+try {
+  const text = engine.translate('component', 'missingKey');
+} catch (error) {
+  // Handle error
+}
+
+// Safe translate returns placeholder
+const text = engine.safeTranslate('component', 'missingKey');
+// Returns: "[component.missingKey]"
+```
+
+## Validation
+
+### Component Validation
+
+```typescript
+// Validate during registration
+const result = engine.registerComponent(registration);
+
+if (!result.isValid) {
+  console.error('Validation errors:', result.errors);
+  console.warn('Missing keys:', result.missingKeys);
+  
+  result.missingKeys.forEach(missing => {
+    console.log(`Missing: ${missing.stringKey} for ${missing.languageId} in ${missing.componentId}`);
+  });
+}
+```
+
+### Global Validation
+
+```typescript
+// Validate all components
+const validation = engine.validateAllComponents();
+
+if (!validation.isValid) {
+  console.error('Errors:', validation.errors);
+  console.warn('Warnings:', validation.warnings);
+}
+
+// Example output:
+// Errors: ["Component 'user' missing strings for language 'de'"]
+// Warnings: ["Component 'user' missing key 'greeting' for language 'fr'"]
+```
+
+### Validation Configuration
+
+```typescript
+import { ValidationConfig } from '@digitaldefiance/i18n-lib';
+
+const strictConfig: ValidationConfig = {
+  requireCompleteStrings: true,
+  allowPartialRegistration: false,
+  fallbackLanguageId: 'en-US'
+};
+
+const lenientConfig: ValidationConfig = {
+  requireCompleteStrings: false,
+  allowPartialRegistration: true,
+  fallbackLanguageId: 'en-US'
+};
+
+const engine = new PluginI18nEngine(languages, {
+  validation: strictConfig
+});
+```
+
 ## Best Practices
 
 ### Plugin Architecture (Recommended for New Projects)
@@ -1049,15 +1858,373 @@ const text = modern.translate('my-component', MyStrings.Welcome);
 
 Both systems can coexist in the same application during migration.
 
+## Performance Considerations
+
+### Instance Management
+
+- Use named instances to isolate different application contexts
+- Reuse instances rather than creating new ones
+- Clean up instances in tests to prevent memory leaks
+
+### Translation Caching
+
+- Translations are stored in memory for fast access
+- Component strings are validated once during registration
+- Fallback translations are generated during registration, not at runtime
+
+### Type Safety Overhead
+
+- Compile-time type checking has zero runtime cost
+- Generic types are erased during compilation
+- Validation runs only during registration, not translation
+
+## Security Considerations
+
+### Zero-Knowledge Patterns
+
+The library is designed to support zero-knowledge security patterns:
+
+- No translation data is sent to external services
+- All translations are stored locally
+- No telemetry or analytics
+- Suitable for sensitive applications
+
+### Input Sanitization
+
+Always sanitize user input before using in translations:
+
+```typescript
+import { replaceVariables } from '@digitaldefiance/i18n-lib';
+
+// BAD: Direct user input
+const message = engine.translate('component', 'template', {
+  userInput: req.body.unsafeInput
+});
+
+// GOOD: Sanitized input
+const message = engine.translate('component', 'template', {
+  userInput: sanitize(req.body.unsafeInput)
+});
+```
+
+### Error Message Exposure
+
+Be careful not to expose sensitive information in error messages:
+
+```typescript
+// BAD: Exposes internal details
+throw new TranslatableGenericError(
+  'auth',
+  'loginFailed',
+  { password: user.password }, // Don't include sensitive data
+  language
+);
+
+// GOOD: Safe error message
+throw new TranslatableGenericError(
+  'auth',
+  'loginFailed',
+  { username: user.username },
+  language,
+  { userId: user.id } // Metadata for logging only
+);
+```
+
+## Mongoose Integration
+
+### Schema Definition with Language Enums
+
+```typescript
+import { Schema, model } from 'mongoose';
+import { LanguageCodes, getCoreLanguageCodes } from '@digitaldefiance/i18n-lib';
+
+// Get core language codes from helper (single source of truth)
+const supportedLanguages = getCoreLanguageCodes();
+// ['en-US', 'en-GB', 'fr', 'es', 'de', 'zh-CN', 'ja', 'uk']
+
+const userSchema = new Schema({
+  language: {
+    type: String,
+    enum: supportedLanguages,
+    default: LanguageCodes.EN_US,
+    required: true
+  },
+  adminLanguage: {
+    type: String,
+    enum: supportedLanguages,
+    default: LanguageCodes.EN_US
+  }
+});
+
+export const User = model('User', userSchema);
+```
+
+### Dynamic Language Enum from Engine
+
+```typescript
+import { PluginI18nEngine } from '@digitaldefiance/i18n-lib';
+
+// Get languages from engine instance
+const engine = PluginI18nEngine.getInstance();
+const registry = engine.getLanguageRegistry();
+
+// Extract for Mongoose
+const languageEnum = registry.getLanguageIds();
+const defaultLanguage = registry.getDefaultLanguageId();
+
+const contentSchema = new Schema({
+  language: {
+    type: String,
+    enum: languageEnum,
+    default: defaultLanguage
+  }
+});
+```
+
+### Validation with Display Names
+
+```typescript
+import { PluginI18nEngine } from '@digitaldefiance/i18n-lib';
+
+const engine = PluginI18nEngine.getInstance();
+const displayNames = engine.getLanguageRegistry().getLanguageDisplayNames();
+
+const settingsSchema = new Schema({
+  language: {
+    type: String,
+    enum: Object.keys(displayNames),
+    validate: {
+      validator: (v: string) => v in displayNames,
+      message: (props) => {
+        const validLanguages = Object.entries(displayNames)
+          .map(([code, name]) => `${name} (${code})`)
+          .join(', ');
+        return `${props.value} is not a valid language. Valid options: ${validLanguages}`;
+      }
+    }
+  }
+});
+```
+
+## Integration Examples
+
+### Express.js Middleware
+
+```typescript
+import { PluginI18nEngine, CoreLanguageCode } from '@digitaldefiance/i18n-lib';
+import { Request, Response, NextFunction } from 'express';
+
+const engine = PluginI18nEngine.getInstance<CoreLanguageCode>();
+
+function i18nMiddleware(req: Request, res: Response, next: NextFunction) {
+  // Get language from header, query, or cookie
+  const language = (req.headers['accept-language'] || 
+                   req.query.lang || 
+                   req.cookies.language || 
+                   'en-US') as CoreLanguageCode;
+  
+  // Set language for this request (type-safe)
+  engine.setLanguage(language);
+  
+  // Add translation helper to response locals
+  res.locals.t = (componentId: string, key: string, vars?: any) => {
+    return engine.translate(componentId, key, vars, language);
+  };
+  
+  next();
+}
+
+app.use(i18nMiddleware);
+```
+
+### React Integration
+
+```typescript
+import React, { createContext, useContext, useState } from 'react';
+import { PluginI18nEngine, CoreLanguageCode, LanguageCodes } from '@digitaldefiance/i18n-lib';
+
+const I18nContext = createContext<{
+  engine: PluginI18nEngine<CoreLanguageCode>;
+  language: CoreLanguageCode;
+  setLanguage: (lang: CoreLanguageCode) => void;
+} | null>(null);
+
+export function I18nProvider({ children }: { children: React.ReactNode }) {
+  const [engine] = useState(() => PluginI18nEngine.getInstance<CoreLanguageCode>());
+  const [language, setLanguageState] = useState<CoreLanguageCode>(LanguageCodes.EN_US);
+  
+  const setLanguage = (lang: CoreLanguageCode) => {
+    engine.setLanguage(lang);
+    setLanguageState(lang);
+  };
+  
+  return (
+    <I18nContext.Provider value={{ engine, language, setLanguage }}>
+      {children}
+    </I18nContext.Provider>
+  );
+}
+
+export function useI18n() {
+  const context = useContext(I18nContext);
+  if (!context) throw new Error('useI18n must be used within I18nProvider');
+  
+  const t = (componentId: string, key: string, vars?: any) => {
+    return context.engine.translate(componentId, key, vars, context.language);
+  };
+  
+  return { ...context, t };
+}
+
+// Usage in component
+function MyComponent() {
+  const { t, language, setLanguage } = useI18n();
+  
+  return (
+    <div>
+      <h1>{t('core', CoreStringKey.System_Welcome)}</h1>
+      <button onClick={() => setLanguage('fr')}>
+        Switch to French
+      </button>
+    </div>
+  );
+}
+```
+
+### Vue.js Plugin
+
+```typescript
+import { Plugin } from 'vue';
+import { PluginI18nEngine, CoreLanguageCode } from '@digitaldefiance/i18n-lib';
+
+const i18nPlugin: Plugin = {
+  install(app, options) {
+    const engine = PluginI18nEngine.getInstance<CoreLanguageCode>();
+    
+    app.config.globalProperties.$t = (
+      componentId: string,
+      key: string,
+      vars?: any
+    ) => {
+      return engine.translate(componentId, key, vars);
+    };
+    
+    app.config.globalProperties.$i18n = engine;
+  }
+};
+
+export default i18nPlugin;
+
+// Usage in component
+// <template>
+//   <div>{{ $t('core', 'System_Welcome') }}</div>
+// </template>
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**Issue: "Instance with key 'X' not found"**
+```typescript
+// Solution: Create instance before using
+const engine = PluginI18nEngine.createInstance('myapp', languages);
+// Or use default instance
+const engine = PluginI18nEngine.getInstance(); // Uses 'default' key
+```
+
+**Issue: "Component 'X' not found"**
+```typescript
+// Solution: Register component before translating
+engine.registerComponent(myComponentRegistration);
+const text = engine.translate('my-component', 'key');
+```
+
+**Issue: "Language 'X' not found"**
+```typescript
+// Solution: Register language before using
+engine.registerLanguage(createLanguageDefinition('fr', 'Français', 'fr'));
+engine.setLanguage('fr');
+```
+
+**Issue: Missing translations in production**
+```typescript
+// Solution: Use validation to catch missing translations
+const validation = engine.validateAllComponents();
+if (!validation.isValid) {
+  console.error('Missing translations:', validation.errors);
+  // Fix translations before deploying
+}
+```
+
+**Issue: Type errors with string keys**
+```typescript
+// Solution: Use enum values, not strings
+enum MyKeys {
+  Welcome = 'welcome'
+}
+
+// BAD
+engine.translate('component', 'welcome'); // Type error
+
+// GOOD
+engine.translate('component', MyKeys.Welcome);
+```
+
 ## License
 
-MIT
+MIT License - See LICENSE file for details
 
 ## Repository
 
-Part of the DigitalBurnbag project - a secure file sharing and automated protocol system.
+Part of the [DigitalBurnbag](https://github.com/Digital-Defiance/DigitalBurnbag) project - a secure file sharing and automated protocol system with zero-knowledge encryption.
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Ensure all tests pass
+5. Submit a pull request
+
+### Development Setup
+
+```bash
+# Clone repository
+git clone https://github.com/Digital-Defiance/DigitalBurnbag.git
+cd DigitalBurnbag/packages/digitaldefiance-i18n-lib
+
+# Install dependencies
+yarn install
+
+# Run tests
+yarn test
+
+# Build
+yarn build
+```
+
+## Support
+
+For issues, questions, or contributions:
+- GitHub Issues: https://github.com/Digital-Defiance/DigitalBurnbag/issues
+- Documentation: See README.md and inline code documentation
+- Examples: See `examples/` directory in repository
 
 ## ChangeLog
+
+### Version 1.3.0
+
+- **Changed**: `CoreLanguageCode` now derived from `LanguageCodes` for type safety
+  - Type: `typeof LanguageCodes[keyof typeof LanguageCodes]`
+  - Maintains compile-time type safety while using registry as single source
+  - No breaking changes - existing code continues to work
+- **Added**: `getCoreLanguageCodes()` - Get core language codes as runtime array
+- **Added**: `getCoreLanguageDefinitions()` - Get core language definitions
+- **Improved**: Language Registry is now the single source of truth
+- **Benefit**: Type safety + runtime flexibility without duplication
 
 ### Version 1.2.5
 
