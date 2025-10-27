@@ -3,7 +3,6 @@ import {
   getCoreTranslation,
   safeCoreTranslation,
   CoreStringKey,
-  CoreLanguageCode,
   LanguageCodes,
   PluginI18nEngine,
 } from '../src';
@@ -152,7 +151,7 @@ describe('core-i18n', () => {
       });
 
       it('should work across all supported languages', () => {
-        const languages: CoreLanguageCode[] = [
+        const languages: string[] = [
           LanguageCodes.EN_US,
           LanguageCodes.EN_GB,
           LanguageCodes.FR,

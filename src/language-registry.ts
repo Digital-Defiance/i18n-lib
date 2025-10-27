@@ -129,6 +129,39 @@ export class LanguageRegistry<TLanguages extends string> {
   }
 
   /**
+   * Get matching language code with fallback logic:
+   * 1. Try requested code
+   * 2. Fall back to user default
+   * 3. Fall back to site default
+   */
+  public getMatchingLanguageCode(
+    requestedCode?: string,
+    userDefaultCode?: string,
+  ): string {
+    // Try requested code first
+    if (requestedCode && this.hasLanguageCode(requestedCode)) {
+      return requestedCode;
+    }
+
+    // Try user default
+    if (userDefaultCode && this.hasLanguageCode(userDefaultCode)) {
+      return userDefaultCode;
+    }
+
+    // Fall back to site default
+    const defaultLanguage = this.getDefaultLanguage();
+    if (!defaultLanguage) {
+      throw RegistryError.createSimple(
+        RegistryErrorType.LanguageNotFound,
+        'No default language configured',
+        {},
+      );
+    }
+
+    return defaultLanguage.code;
+  }
+
+  /**
    * Set the default language
    */
   public setDefaultLanguage(languageId: TLanguages): void {

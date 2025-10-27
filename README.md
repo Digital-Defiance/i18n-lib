@@ -234,6 +234,17 @@ const displayNames = registry.getLanguageDisplayNames();
 // Get language codes for Mongoose enum
 const languageCodes = registry.getLanguageIds(); // ['en-US', 'fr', 'es']
 const isoCodes = registry.getLanguageCodes(); // ['en-US', 'fr', 'es']
+
+// Get matching language code with fallback logic
+const matchedCode = registry.getMatchingLanguageCode(
+  'de-DE',      // Requested code (not registered)
+  'fr',         // User default (registered)
+  // Falls back to site default if neither match
+);
+// Returns: 'fr' (user default)
+
+const defaultCode = registry.getMatchingLanguageCode();
+// Returns: 'en-US' (site default)
 ```
 
 **Key Features:**
@@ -243,6 +254,53 @@ const isoCodes = registry.getLanguageCodes(); // ['en-US', 'fr', 'es']
 - Default language management
 - Duplicate detection and validation
 - Extract language codes for schema definitions
+- Intelligent language code matching with fallback chain
+
+### Language Code Resolution
+
+The Language Registry provides intelligent language code matching with a fallback chain for handling user preferences and browser language headers:
+
+```typescript
+import { LanguageRegistry } from '@digitaldefiance/i18n-lib';
+
+const registry = new LanguageRegistry<'en-US' | 'fr' | 'es'>();
+registry.registerLanguages([
+  createLanguageDefinition('en-US', 'English (US)', 'en-US', true),
+  createLanguageDefinition('fr', 'Français', 'fr'),
+  createLanguageDefinition('es', 'Español', 'es'),
+]);
+
+// Fallback chain: requested → user default → site default
+const languageCode = registry.getMatchingLanguageCode(
+  req.headers['accept-language'],  // 1. Try requested code first
+  req.user?.siteLanguage,           // 2. Fall back to user default
+  // 3. Falls back to site default if neither match
+);
+
+// Example scenarios:
+registry.getMatchingLanguageCode('fr', 'es');      // Returns: 'fr' (requested exists)
+registry.getMatchingLanguageCode('de', 'es');      // Returns: 'es' (user default exists)
+registry.getMatchingLanguageCode('de', 'it');      // Returns: 'en-US' (site default)
+registry.getMatchingLanguageCode();                // Returns: 'en-US' (site default)
+registry.getMatchingLanguageCode('', '');          // Returns: 'en-US' (empty strings ignored)
+```
+
+**Use Cases:**
+- HTTP Accept-Language header processing
+- User preference resolution
+- Browser language detection with fallback
+- Multi-tenant applications with per-user defaults
+
+**Error Handling:**
+```typescript
+try {
+  const emptyRegistry = new LanguageRegistry();
+  emptyRegistry.getMatchingLanguageCode('en-US');
+} catch (error) {
+  // Throws RegistryError if no default language configured
+  console.error('No default language configured');
+}
+```
 
 ### Enum Translation Registry
 
@@ -1391,6 +1449,7 @@ The core component provides 40+ system strings organized by category:
 - `hasLanguage(language)` - Check if language exists
 - `setLanguage(language)` - Set current language
 - `getLanguageByCode(code)` - Get language by ISO code
+- `getMatchingLanguageCode(requestedCode?, userDefaultCode?)` - Get matching language code with fallback logic
 
 **Validation**
 
@@ -2214,6 +2273,10 @@ For issues, questions, or contributions:
 - Examples: See `examples/` directory in repository
 
 ## ChangeLog
+
+### Version 1.3.2
+
+- Add functionality to Language Registry for getMatchingLanguageCode
 
 ### Version 1.3.1
 

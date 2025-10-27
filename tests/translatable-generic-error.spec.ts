@@ -5,7 +5,6 @@ import {
   ComponentRegistration,
   LanguageDefinition,
   CoreStringKey,
-  CoreLanguageCode,
   LanguageCodes,
   createCoreI18nEngine,
 } from '../src';

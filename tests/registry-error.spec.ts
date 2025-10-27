@@ -1,4 +1,4 @@
-import { CoreLanguageCode, LanguageCodes } from '../src';
+import { LanguageCodes } from '../src';
 import { RegistryError } from '../src/registry-error';
 import { RegistryErrorType } from '../src/registry-error-type';
 import { TranslationEngine } from '../src/typed-error';
