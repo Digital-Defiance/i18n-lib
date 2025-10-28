@@ -2274,6 +2274,10 @@ For issues, questions, or contributions:
 
 ## ChangeLog
 
+### Version 1.3.5
+
+- CommonJS
+
 ### Version 1.3.4
 
 - Deprecate clearAllInstances
