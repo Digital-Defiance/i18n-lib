@@ -7,25 +7,25 @@ import { RegistryError } from './registry-error';
 import { RegistryErrorType } from './registry-error-type';
 
 /**
- * Registry for managing supported languages
+ * Static singleton registry for managing supported languages globally
  */
-export class LanguageRegistry<TLanguages extends string> {
-  private readonly languages = new Map<TLanguages, LanguageDefinition>();
-  private readonly languagesByCodes = new Map<string, TLanguages>();
-  private defaultLanguageId: TLanguages | null = null;
+export class LanguageRegistry {
+  private static languages = new Map<string, LanguageDefinition>();
+  private static languagesByCodes = new Map<string, string>();
+  private static defaultLanguageId: string | null = null;
 
-  constructor() {
-    // Empty constructor - languages are registered via registerLanguage method
+  private constructor() {
+    // Private constructor - use static methods
   }
 
   /**
    * Register a new language
    */
-  public registerLanguage(language: LanguageDefinition): void {
-    const languageId = language.id as TLanguages;
+  public static registerLanguage(language: LanguageDefinition): void {
+    const languageId = language.id;
 
     // Check for duplicate language ID
-    if (this.languages.has(languageId)) {
+    if (LanguageRegistry.languages.has(languageId)) {
       throw RegistryError.createSimple(
         RegistryErrorType.DuplicateLanguage,
         `Language '${languageId}' is already registered`,
@@ -34,8 +34,8 @@ export class LanguageRegistry<TLanguages extends string> {
     }
 
     // Check for duplicate language code
-    if (this.languagesByCodes.has(language.code)) {
-      const existingLanguageId = this.languagesByCodes.get(language.code)!;
+    if (LanguageRegistry.languagesByCodes.has(language.code)) {
+      const existingLanguageId = LanguageRegistry.languagesByCodes.get(language.code)!;
       throw RegistryError.createSimple(
         RegistryErrorType.DuplicateLanguage,
         `Language code '${language.code}' is already used by language '${existingLanguageId}'`,
@@ -44,88 +44,88 @@ export class LanguageRegistry<TLanguages extends string> {
     }
 
     // Register the language
-    this.languages.set(languageId, language);
-    this.languagesByCodes.set(language.code, languageId);
+    LanguageRegistry.languages.set(languageId, language);
+    LanguageRegistry.languagesByCodes.set(language.code, languageId);
 
     // Set as default if specified or if it's the first language
-    if (language.isDefault || this.defaultLanguageId === null) {
-      this.defaultLanguageId = languageId;
+    if (language.isDefault || LanguageRegistry.defaultLanguageId === null) {
+      LanguageRegistry.defaultLanguageId = languageId;
     }
   }
 
   /**
    * Register multiple languages at once
    */
-  public registerLanguages(languages: readonly LanguageDefinition[]): void {
+  public static registerLanguages(languages: readonly LanguageDefinition[]): void {
     for (const language of languages) {
-      this.registerLanguage(language);
+      LanguageRegistry.registerLanguage(language);
     }
   }
 
   /**
    * Get a language by its ID
    */
-  public getLanguage(languageId: TLanguages): LanguageDefinition | undefined {
-    return this.languages.get(languageId);
+  public static getLanguage(languageId: string): LanguageDefinition | undefined {
+    return LanguageRegistry.languages.get(languageId);
   }
 
   /**
    * Get a language by its code
    */
-  public getLanguageByCode(code: string): LanguageDefinition | undefined {
-    const languageId = this.languagesByCodes.get(code);
-    return languageId ? this.languages.get(languageId) : undefined;
+  public static getLanguageByCode(code: string): LanguageDefinition | undefined {
+    const languageId = LanguageRegistry.languagesByCodes.get(code);
+    return languageId ? LanguageRegistry.languages.get(languageId) : undefined;
   }
 
   /**
    * Get all registered languages
    */
-  public getAllLanguages(): ReadonlyArray<LanguageDefinition> {
-    return Array.from(this.languages.values());
+  public static getAllLanguages(): ReadonlyArray<LanguageDefinition> {
+    return Array.from(LanguageRegistry.languages.values());
   }
 
   /**
    * Get all language IDs
    */
-  public getLanguageIds(): readonly TLanguages[] {
-    return Array.from(this.languages.keys());
+  public static getLanguageIds(): readonly string[] {
+    return Array.from(LanguageRegistry.languages.keys());
   }
 
   /**
    * Get all language codes
    */
-  public getLanguageCodes(): readonly string[] {
-    return Array.from(this.languagesByCodes.keys());
+  public static getLanguageCodes(): readonly string[] {
+    return Array.from(LanguageRegistry.languagesByCodes.keys());
   }
 
   /**
    * Check if a language is registered
    */
-  public hasLanguage(languageId: TLanguages): boolean {
-    return this.languages.has(languageId);
+  public static hasLanguage(languageId: string): boolean {
+    return LanguageRegistry.languages.has(languageId);
   }
 
   /**
    * Check if a language code is registered
    */
-  public hasLanguageCode(code: string): boolean {
-    return this.languagesByCodes.has(code);
+  public static hasLanguageCode(code: string): boolean {
+    return LanguageRegistry.languagesByCodes.has(code);
   }
 
   /**
    * Get the default language
    */
-  public getDefaultLanguage(): LanguageDefinition | null {
-    return this.defaultLanguageId
-      ? this.languages.get(this.defaultLanguageId) || null
+  public static getDefaultLanguage(): LanguageDefinition | null {
+    return LanguageRegistry.defaultLanguageId
+      ? LanguageRegistry.languages.get(LanguageRegistry.defaultLanguageId) || null
       : null;
   }
 
   /**
    * Get the default language ID
    */
-  public getDefaultLanguageId(): TLanguages | null {
-    return this.defaultLanguageId;
+  public static getDefaultLanguageId(): string | null {
+    return LanguageRegistry.defaultLanguageId;
   }
 
   /**
@@ -134,22 +134,22 @@ export class LanguageRegistry<TLanguages extends string> {
    * 2. Fall back to user default
    * 3. Fall back to site default
    */
-  public getMatchingLanguageCode(
+  public static getMatchingLanguageCode(
     requestedCode?: string,
     userDefaultCode?: string,
   ): string {
     // Try requested code first
-    if (requestedCode && this.hasLanguageCode(requestedCode)) {
+    if (requestedCode && LanguageRegistry.hasLanguageCode(requestedCode)) {
       return requestedCode;
     }
 
     // Try user default
-    if (userDefaultCode && this.hasLanguageCode(userDefaultCode)) {
+    if (userDefaultCode && LanguageRegistry.hasLanguageCode(userDefaultCode)) {
       return userDefaultCode;
     }
 
     // Fall back to site default
-    const defaultLanguage = this.getDefaultLanguage();
+    const defaultLanguage = LanguageRegistry.getDefaultLanguage();
     if (!defaultLanguage) {
       throw RegistryError.createSimple(
         RegistryErrorType.LanguageNotFound,
@@ -164,35 +164,35 @@ export class LanguageRegistry<TLanguages extends string> {
   /**
    * Set the default language
    */
-  public setDefaultLanguage(languageId: TLanguages): void {
-    if (!this.languages.has(languageId)) {
+  public static setDefaultLanguage(languageId: string): void {
+    if (!LanguageRegistry.languages.has(languageId)) {
       throw RegistryError.createSimple(
         RegistryErrorType.LanguageNotFound,
         `Language '${languageId}' not found`,
         { languageId },
       );
     }
-    this.defaultLanguageId = languageId;
+    LanguageRegistry.defaultLanguageId = languageId;
   }
 
   /**
    * Get the number of registered languages
    */
-  public getLanguageCount(): number {
-    return this.languages.size;
+  public static getLanguageCount(): number {
+    return LanguageRegistry.languages.size;
   }
 
   /**
    * Validate that all required languages are present
    */
-  public validateRequiredLanguages(
-    requiredLanguages: readonly TLanguages[],
+  public static validateRequiredLanguages(
+    requiredLanguages: readonly string[],
   ): LanguageValidationResult {
-    const missingLanguages: TLanguages[] = [];
+    const missingLanguages: string[] = [];
     const errors: string[] = [];
 
     for (const languageId of requiredLanguages) {
-      if (!this.languages.has(languageId)) {
+      if (!LanguageRegistry.languages.has(languageId)) {
         missingLanguages.push(languageId);
         errors.push(`Required language '${languageId}' is not registered`);
       }
@@ -208,9 +208,9 @@ export class LanguageRegistry<TLanguages extends string> {
   /**
    * Create a mapping of language IDs to their display names
    */
-  public getLanguageDisplayNames(): Record<TLanguages, string> {
-    const result = {} as Record<TLanguages, string>;
-    for (const [languageId, language] of this.languages) {
+  public static getLanguageDisplayNames(): Record<string, string> {
+    const result: Record<string, string> = {};
+    for (const [languageId, language] of LanguageRegistry.languages) {
       result[languageId] = language.name;
     }
     return result;
@@ -219,9 +219,9 @@ export class LanguageRegistry<TLanguages extends string> {
   /**
    * Create a mapping of language IDs to their codes
    */
-  public getLanguageCodeMapping(): Record<TLanguages, string> {
-    const result = {} as Record<TLanguages, string>;
-    for (const [languageId, language] of this.languages) {
+  public static getLanguageCodeMapping(): Record<string, string> {
+    const result: Record<string, string> = {};
+    for (const [languageId, language] of LanguageRegistry.languages) {
       result[languageId] = language.code;
     }
     return result;
@@ -230,22 +230,22 @@ export class LanguageRegistry<TLanguages extends string> {
   /**
    * Find languages by partial name match (case-insensitive)
    */
-  public findLanguagesByName(
+  public static findLanguagesByName(
     partialName: string,
   ): readonly LanguageDefinition[] {
     const searchTerm = partialName.toLowerCase();
-    return Array.from(this.languages.values()).filter((language) =>
+    return Array.from(LanguageRegistry.languages.values()).filter((language) =>
       language.name.toLowerCase().includes(searchTerm),
     );
   }
 
   /**
-   * Clear all registered languages
+   * Clear all registered languages (useful for testing)
    */
-  public clear(): void {
-    this.languages.clear();
-    this.languagesByCodes.clear();
-    this.defaultLanguageId = null;
+  public static clear(): void {
+    LanguageRegistry.languages.clear();
+    LanguageRegistry.languagesByCodes.clear();
+    LanguageRegistry.defaultLanguageId = null;
   }
 }
 

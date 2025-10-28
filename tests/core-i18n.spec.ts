@@ -11,12 +11,12 @@ describe('core-i18n', () => {
   let engine: ReturnType<typeof createCoreI18nEngine>;
 
   beforeEach(() => {
-    PluginI18nEngine.clearAllInstances();
+    PluginI18nEngine.resetAll();
     engine = createCoreI18nEngine('test-core');
   });
 
   afterEach(() => {
-    PluginI18nEngine.clearAllInstances();
+    PluginI18nEngine.resetAll();
   });
 
   describe('getCoreTranslation', () => {
@@ -197,7 +197,7 @@ describe('core-i18n', () => {
       });
 
       it('should handle missing instance gracefully', () => {
-        PluginI18nEngine.clearAllInstances();
+        PluginI18nEngine.resetAll();
         const result = safeCoreTranslation(
           CoreStringKey.Common_Yes,
           undefined,
@@ -381,7 +381,7 @@ describe('core-i18n', () => {
 
   describe('createCoreI18nEngine', () => {
     it('should create engine with default instance key', () => {
-      PluginI18nEngine.clearAllInstances();
+      PluginI18nEngine.resetAll();
       const defaultEngine = createCoreI18nEngine();
       expect(defaultEngine).toBeDefined();
     });

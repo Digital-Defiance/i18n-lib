@@ -2,6 +2,7 @@ import {
   ComponentDefinition,
   ComponentRegistration,
   LanguageDefinition,
+  LanguageRegistry,
   PluginI18nEngine,
   RegistryError,
   CurrencyCode,
@@ -44,12 +45,12 @@ describe('PluginI18nEngine', () => {
   let engine: PluginI18nEngine<'en' | 'fr' | 'es'>;
 
   beforeEach(() => {
-    PluginI18nEngine.clearAllInstances();
+    PluginI18nEngine.resetAll();
     engine = new PluginI18nEngine([englishLang, frenchLang, spanishLang]);
   });
 
   afterEach(() => {
-    PluginI18nEngine.clearAllInstances();
+    PluginI18nEngine.resetAll();
   });
 
   describe('constructor and initialization', () => {
@@ -67,14 +68,14 @@ describe('PluginI18nEngine', () => {
     });
 
     it('should throw error if no languages provided', () => {
-      PluginI18nEngine.clearAllInstances();
+      PluginI18nEngine.resetAll();
       expect(() => {
         new PluginI18nEngine([]);
       }).toThrow('At least one language must be provided');
     });
 
     it('should use first language as default if no default specified', () => {
-      PluginI18nEngine.clearAllInstances();
+      PluginI18nEngine.resetAll();
       const langs = [
         { id: 'fr', name: 'French', code: 'fr' },
         { id: 'en', name: 'English', code: 'en' },
@@ -584,10 +585,9 @@ describe('PluginI18nEngine', () => {
   });
 
   describe('registry access', () => {
-    it('should provide access to language registry', () => {
-      const langRegistry = engine.getLanguageRegistry();
-      expect(langRegistry).toBeDefined();
-      expect(typeof langRegistry.registerLanguage).toBe('function');
+    it('should provide access to language registry via static class', () => {
+      expect(typeof LanguageRegistry.registerLanguage).toBe('function');
+      expect(typeof LanguageRegistry.getLanguageIds).toBe('function');
     });
 
     it('should provide access to component registry', () => {

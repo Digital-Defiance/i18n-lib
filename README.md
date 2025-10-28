@@ -2274,6 +2274,10 @@ For issues, questions, or contributions:
 
 ## ChangeLog
 
+### Version 1.3.3
+
+- Make LanguageRegistry static
+
 ### Version 1.3.2
 
 - Add functionality to Language Registry for getMatchingLanguageCode

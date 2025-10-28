@@ -23,7 +23,6 @@ import { EnumLanguageTranslation } from './types';
  * Plugin-based I18n Engine with registration capabilities
  */
 export class PluginI18nEngine<TLanguages extends string> {
-  private readonly languageRegistry: LanguageRegistry<TLanguages>;
   private readonly componentRegistry: ComponentRegistry<TLanguages>;
   private readonly enumRegistry: EnumTranslationRegistry<string, TLanguages>;
   private readonly config: RegistryConfig<TLanguages>;
@@ -37,6 +36,8 @@ export class PluginI18nEngine<TLanguages extends string> {
     language?: TLanguages,
     ...otherVars: Record<string, string | number>[]
   ) => string;
+
+
 
   /**
    * Static instances for semi-singleton pattern
@@ -71,8 +72,14 @@ export class PluginI18nEngine<TLanguages extends string> {
       ...config,
     };
 
-    // Initialize registries
-    this.languageRegistry = new LanguageRegistry<TLanguages>();
+    // Register initial languages in static registry (skip if already registered)
+    for (const lang of initialLanguages) {
+      if (!LanguageRegistry.hasLanguage(lang.id)) {
+        LanguageRegistry.registerLanguage(lang);
+      }
+    }
+
+    // Initialize component registry (per-instance)
     this.componentRegistry = new ComponentRegistry<TLanguages>(
       initialLanguages.map((l) => l.id as TLanguages),
       this.config.validation,
@@ -82,9 +89,6 @@ export class PluginI18nEngine<TLanguages extends string> {
       (key: string, vars?: Record<string, any>) =>
         this.safeTranslate('core', key, vars),
     );
-
-    // Register initial languages
-    this.languageRegistry.registerLanguages(initialLanguages);
 
     // Initialize context key for this engine instance
     this.contextKey = PluginI18nEngine.DefaultInstanceKey;
@@ -199,20 +203,20 @@ export class PluginI18nEngine<TLanguages extends string> {
   }
 
   /**
-   * Register a new language
+   * Register a new language (updates static registry)
    */
   public registerLanguage(language: LanguageDefinition): void {
-    this.languageRegistry.registerLanguage(language);
+    LanguageRegistry.registerLanguage(language);
 
     // Update component registry with new language
-    const newLanguages = this.languageRegistry.getLanguageIds();
+    const newLanguages = LanguageRegistry.getLanguageIds();
     this.componentRegistry.updateRegisteredLanguages(
       newLanguages as TLanguages[],
     );
   }
 
   /**
-   * Register multiple languages
+   * Register multiple languages (updates static registry)
    */
   public registerLanguages(languages: readonly LanguageDefinition[]): void {
     for (const language of languages) {
@@ -357,7 +361,7 @@ export class PluginI18nEngine<TLanguages extends string> {
    * Set current language
    */
   public setLanguage(language: TLanguages): void {
-    if (!this.languageRegistry.hasLanguage(language)) {
+    if (!LanguageRegistry.hasLanguage(language)) {
       throw RegistryError.createSimple(
         RegistryErrorType.LanguageNotFound,
         `Language '${language}' is not registered`,
@@ -369,10 +373,10 @@ export class PluginI18nEngine<TLanguages extends string> {
   }
 
   /**
-   * Get available languages
+   * Get available languages from static registry
    */
   public getLanguages(): readonly LanguageDefinition[] {
-    return this.languageRegistry.getAllLanguages();
+    return LanguageRegistry.getAllLanguages();
   }
 
   /**
@@ -390,24 +394,17 @@ export class PluginI18nEngine<TLanguages extends string> {
   }
 
   /**
-   * Check if a language is registered
+   * Check if a language is registered in static registry
    */
   public hasLanguage(language: TLanguages): boolean {
-    return this.languageRegistry.hasLanguage(language);
+    return LanguageRegistry.hasLanguage(language);
   }
 
   /**
-   * Get language by code
+   * Get language by code from static registry
    */
   public getLanguageByCode(code: string): LanguageDefinition | undefined {
-    return this.languageRegistry.getLanguageByCode(code);
-  }
-
-  /**
-   * Get language registry for direct access
-   */
-  public getLanguageRegistry(): LanguageRegistry<TLanguages> {
-    return this.languageRegistry;
+    return LanguageRegistry.getLanguageByCode(code);
   }
 
   /**
@@ -437,7 +434,7 @@ export class PluginI18nEngine<TLanguages extends string> {
     let isValid = true;
 
     const components = this.getComponents();
-    const languages = this.languageRegistry.getLanguageIds();
+    const languages = LanguageRegistry.getLanguageIds();
 
     for (const component of components) {
       const componentStrings = this.componentRegistry.getComponentStrings(
@@ -451,7 +448,7 @@ export class PluginI18nEngine<TLanguages extends string> {
       }
 
       for (const language of languages) {
-        const languageStrings = componentStrings[language];
+        const languageStrings = componentStrings[language as TLanguages];
 
         if (!languageStrings) {
           errors.push(
@@ -523,5 +520,6 @@ export class PluginI18nEngine<TLanguages extends string> {
     }
     PluginI18nEngine._instances.clear();
     PluginI18nEngine._defaultKey = null;
+    LanguageRegistry.clear();
   }
 }

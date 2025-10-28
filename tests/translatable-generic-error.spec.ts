@@ -32,7 +32,7 @@ describe('TranslatableGenericError', () => {
   let engine: PluginI18nEngine<'en' | 'fr'>;
 
   beforeEach(() => {
-    PluginI18nEngine.clearAllInstances();
+    PluginI18nEngine.resetAll();
     engine = PluginI18nEngine.createInstance('test-errors', [
       englishLang,
       frenchLang,
@@ -64,7 +64,7 @@ describe('TranslatableGenericError', () => {
   });
 
   afterEach(() => {
-    PluginI18nEngine.clearAllInstances();
+    PluginI18nEngine.resetAll();
   });
 
   describe('constructor', () => {

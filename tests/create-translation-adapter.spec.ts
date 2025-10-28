@@ -42,7 +42,7 @@ describe('createTranslationAdapter', () => {
   let pluginEngine: PluginI18nEngine<typeof LanguageCodes.EN_US | typeof LanguageCodes.FR>;
 
   beforeEach(() => {
-    PluginI18nEngine.clearAllInstances();
+    PluginI18nEngine.resetAll();
     pluginEngine = new PluginI18nEngine(testLanguages);
 
     const registration: ComponentRegistration<TestStringKey, typeof LanguageCodes.EN_US | typeof LanguageCodes.FR> = {
@@ -58,7 +58,7 @@ describe('createTranslationAdapter', () => {
   });
 
   afterEach(() => {
-    PluginI18nEngine.clearAllInstances();
+    PluginI18nEngine.resetAll();
   });
 
   describe('Basic functionality', () => {
