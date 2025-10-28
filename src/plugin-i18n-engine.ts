@@ -479,14 +479,6 @@ export class PluginI18nEngine<TLanguages extends string> {
   }
 
   /**
-   * Clear all named instances (useful for testing)
-   */
-  public static clearAllInstances(): void {
-    PluginI18nEngine._instances.clear();
-    PluginI18nEngine._defaultKey = null;
-  }
-
-  /**
    * Remove a specific named instance
    */
   public static removeInstance(key?: string): boolean {

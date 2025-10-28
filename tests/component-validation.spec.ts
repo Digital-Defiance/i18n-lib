@@ -510,12 +510,12 @@ describe('Component Registration Validation', () => {
   describe('Instance Management and Cleanup', () => {
     beforeEach(() => {
       // Clean up instances before each test for proper isolation
-      PluginI18nEngine.clearAllInstances();
+      PluginI18nEngine.resetAll();
     });
 
     afterEach(() => {
       // Clean up instances after each test for proper isolation
-      PluginI18nEngine.clearAllInstances();
+      PluginI18nEngine.resetAll();
     });
 
     describe('Instance creation and retrieval', () => {
@@ -597,7 +597,7 @@ describe('Component Registration Validation', () => {
         expect(PluginI18nEngine.hasInstance()).toBe(true);
         expect(PluginI18nEngine.hasInstance('test')).toBe(true);
 
-        PluginI18nEngine.clearAllInstances();
+        PluginI18nEngine.resetAll();
 
         expect(PluginI18nEngine.hasInstance()).toBe(false);
         expect(PluginI18nEngine.hasInstance('test')).toBe(false);
@@ -649,7 +649,7 @@ describe('Component Registration Validation', () => {
       });
 
       it('should handle resetAll when no instances exist', () => {
-        PluginI18nEngine.clearAllInstances();
+        PluginI18nEngine.resetAll();
 
         // Should not throw
         expect(() => {
@@ -682,7 +682,7 @@ describe('Component Registration Validation', () => {
         expect(engine.hasComponent('cleanup-test')).toBe(true);
 
         // Clear instances should allow new engines to start fresh
-        PluginI18nEngine.clearAllInstances();
+        PluginI18nEngine.resetAll();
 
         const newEngine = new PluginI18nEngine([englishLang]);
         expect(newEngine.hasComponent('cleanup-test')).toBe(false);
