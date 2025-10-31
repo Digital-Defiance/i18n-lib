@@ -14,15 +14,10 @@ enum TestLanguages {
   French = 'French',
 }
 
-type TestContext = 'admin' | 'user' | 'guest';
-
 describe('context utilities', () => {
   describe('createContext', () => {
     it('should create a context with default values', () => {
-      const context = createContext(
-        TestLanguages.English,
-        'admin' as TestContext,
-      );
+      const context = createContext(TestLanguages.English, 'admin');
 
       expect(context).toEqual({
         language: TestLanguages.English,
@@ -35,10 +30,7 @@ describe('context utilities', () => {
     });
 
     it('should create context with different language and context', () => {
-      const context = createContext(
-        TestLanguages.Spanish,
-        'user' as TestContext,
-      );
+      const context = createContext(TestLanguages.Spanish, 'user');
 
       expect(context).toEqual({
         language: TestLanguages.Spanish,
@@ -53,10 +45,7 @@ describe('context utilities', () => {
 
   describe('setLanguage', () => {
     it('should update the language property', () => {
-      const context = createContext(
-        TestLanguages.English,
-        'admin' as TestContext,
-      );
+      const context = createContext(TestLanguages.English, 'admin');
 
       setLanguage(context, TestLanguages.Spanish);
 
@@ -65,10 +54,7 @@ describe('context utilities', () => {
     });
 
     it('should work with different language types', () => {
-      const context = createContext(
-        TestLanguages.English,
-        'admin' as TestContext,
-      );
+      const context = createContext(TestLanguages.English, 'admin');
 
       setLanguage(context, TestLanguages.French);
 
@@ -78,10 +64,7 @@ describe('context utilities', () => {
 
   describe('setAdminLanguage', () => {
     it('should update the adminLanguage property', () => {
-      const context = createContext(
-        TestLanguages.English,
-        'admin' as TestContext,
-      );
+      const context = createContext(TestLanguages.English, 'admin');
 
       setAdminLanguage(context, TestLanguages.Spanish);
 
@@ -90,10 +73,7 @@ describe('context utilities', () => {
     });
 
     it('should work independently of regular language', () => {
-      const context = createContext(
-        TestLanguages.English,
-        'admin' as TestContext,
-      );
+      const context = createContext(TestLanguages.English, 'admin');
       setLanguage(context, TestLanguages.French);
 
       setAdminLanguage(context, TestLanguages.Spanish);
@@ -105,36 +85,21 @@ describe('context utilities', () => {
 
   describe('setContext', () => {
     it('should update the currentContext property', () => {
-      const context = createContext(
-        TestLanguages.English,
-        'admin' as TestContext,
-      );
+      const context = createContext(TestLanguages.English, 'admin');
 
-      setContext(context, 'user' as TestContext);
+      setContext(context, 'user');
 
       expect(context.currentContext).toBe('user');
       expect(context.language).toBe(TestLanguages.English); // Should remain unchanged
       expect(context.adminLanguage).toBe(TestLanguages.English); // Should remain unchanged
     });
 
-    it('should work with custom context types', () => {
-      const context = createContext(
-        TestLanguages.English,
-        'admin' as TestContext,
-      );
 
-      setContext(context, 'guest' as TestContext);
-
-      expect(context.currentContext).toBe('guest');
-    });
   });
 
   describe('setTimezone', () => {
     it('should update the timezone property', () => {
-      const context = createContext(
-        TestLanguages.English,
-        'admin' as TestContext,
-      );
+      const context = createContext(TestLanguages.English, 'admin');
       const newTimezone = new Timezone('America/New_York');
 
       setTimezone(context, newTimezone);
@@ -146,10 +111,7 @@ describe('context utilities', () => {
     });
 
     it('should work with different timezone values', () => {
-      const context = createContext(
-        TestLanguages.English,
-        'admin' as TestContext,
-      );
+      const context = createContext(TestLanguages.English, 'admin');
       const europeTimezone = new Timezone('Europe/London');
 
       setTimezone(context, europeTimezone);
@@ -160,10 +122,7 @@ describe('context utilities', () => {
 
   describe('setAdminTimezone', () => {
     it('should update the adminTimezone property', () => {
-      const context = createContext(
-        TestLanguages.English,
-        'admin' as TestContext,
-      );
+      const context = createContext(TestLanguages.English, 'admin');
       const newAdminTimezone = new Timezone('Asia/Tokyo');
 
       setAdminTimezone(context, newAdminTimezone);
@@ -175,10 +134,7 @@ describe('context utilities', () => {
     });
 
     it('should work independently of regular timezone', () => {
-      const context = createContext(
-        TestLanguages.English,
-        'admin' as TestContext,
-      );
+      const context = createContext(TestLanguages.English, 'admin');
       const userTimezone = new Timezone('America/Los_Angeles');
       const adminTimezone = new Timezone('Europe/Paris');
 
@@ -192,16 +148,13 @@ describe('context utilities', () => {
 
   describe('integration', () => {
     it('should allow chaining all context modifications', () => {
-      const context = createContext(
-        TestLanguages.English,
-        'admin' as TestContext,
-      );
+      const context = createContext(TestLanguages.English, 'admin');
       const userTimezone = new Timezone('America/Chicago');
       const adminTimezone = new Timezone('Europe/Berlin');
 
       setLanguage(context, TestLanguages.Spanish);
       setAdminLanguage(context, TestLanguages.French);
-      setContext(context, 'user' as TestContext);
+      setContext(context, 'user');
       setTimezone(context, userTimezone);
       setAdminTimezone(context, adminTimezone);
 
@@ -216,15 +169,12 @@ describe('context utilities', () => {
     });
 
     it('should maintain object reference', () => {
-      const context = createContext(
-        TestLanguages.English,
-        'admin' as TestContext,
-      );
+      const context = createContext(TestLanguages.English, 'admin');
       const originalRef = context;
 
       setLanguage(context, TestLanguages.Spanish);
       setAdminLanguage(context, TestLanguages.French);
-      setContext(context, 'user' as TestContext);
+      setContext(context, 'user');
       setTimezone(context, new Timezone('Pacific/Auckland'));
       setAdminTimezone(context, new Timezone('Atlantic/Azores'));
 

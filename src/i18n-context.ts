@@ -5,14 +5,11 @@ import { LanguageContextSpace } from './types';
 /**
  * I18n context interface
  */
-export interface I18nContext<
-  TLanguage extends string,
-  TTranslationContext extends string = LanguageContextSpace,
-> {
+export interface I18nContext<TLanguage extends string> {
   language: TLanguage;
   adminLanguage: TLanguage;
   currencyCode: CurrencyCode;
-  currentContext: TTranslationContext;
+  currentContext: LanguageContextSpace;
   timezone: Timezone;
   adminTimezone: Timezone;
 }

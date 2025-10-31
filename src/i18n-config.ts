@@ -13,12 +13,11 @@ export interface I18nConfig<
   TStringKey extends string,
   TLanguage extends string,
   TConstants extends Record<string, any> = Record<string, any>,
-  TTranslationContext extends string = LanguageContextSpace,
 > {
   stringNames: TStringKey[];
   strings: MasterStringsCollection<TStringKey, TLanguage>;
   defaultLanguage: TLanguage;
-  defaultTranslationContext: TTranslationContext;
+  defaultTranslationContext: LanguageContextSpace;
   defaultCurrencyCode: CurrencyCode;
   languageCodes: LanguageCodeCollection<TLanguage>;
   languages: TLanguage[];

@@ -7,6 +7,7 @@ import { I18nEngine } from './i18n-engine';
 import { CoreStringKey } from './core-string-key';
 import { PluginI18nEngine } from './plugin-i18n-engine';
 import { TranslationEngine } from './translation-engine';
+import { LanguageContextSpace } from './types';
 
 export { TranslationEngine };
 
@@ -100,7 +101,7 @@ export abstract class TypedError<
   TStringKey extends string = StringKey,
 > extends Error {
   constructor(
-    engine: I18nEngine<TStringKey, Language, Record<string, any>, string>,
+    engine: I18nEngine<TStringKey, Language, Record<string, any>>,
     public readonly type: TEnum[keyof TEnum],
     public readonly reasonMap: CompleteReasonMap<TEnum, TStringKey>,
     public readonly language?: Language,

@@ -351,10 +351,12 @@ export class PluginI18nEngine<TLanguages extends string> {
 
   /**
    * Get current language from global context
+   * Respects language context space (admin vs user)
    */
   private getCurrentLanguage(): TLanguages {
     const globalContext = GlobalActiveContext.getInstance<TLanguages, IActiveContext<TLanguages>>();
-    return globalContext.getContext(this.contextKey).language;
+    const context = globalContext.getContext(this.contextKey);
+    return context.currentContext === 'admin' ? context.adminLanguage : context.language;
   }
 
   /**

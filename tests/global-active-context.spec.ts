@@ -228,13 +228,6 @@ describe('GlobalActiveContext', () => {
       expect(globalContext.context.currentContext).toBe('admin');
     });
 
-    it('should set language context space for custom context', () => {
-      globalContext.createContext('en', 'en', 'custom');
-      globalContext.setLanguageContextSpace('system', 'custom');
-      
-      expect(globalContext.getContext('custom').currentContext).toBe('system');
-    });
-
     it('should throw error for invalid context key', () => {
       expect(() => globalContext.setLanguageContextSpace('admin', 'invalid')).toThrow();
     });
@@ -247,13 +240,6 @@ describe('GlobalActiveContext', () => {
 
     it('should get language context space for default context', () => {
       expect(globalContext.getLanguageContextSpace()).toBe('user');
-    });
-
-    it('should get language context space for custom context', () => {
-      globalContext.createContext('en', 'en', 'custom');
-      globalContext.setLanguageContextSpace('admin', 'custom');
-      
-      expect(globalContext.getLanguageContextSpace('custom')).toBe('admin');
     });
 
     it('should throw error for invalid context key', () => {

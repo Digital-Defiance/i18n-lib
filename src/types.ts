@@ -5,7 +5,7 @@ import { LanguageDefinition } from './language-definition';
 /**
  * Standard language context spaces
  */
-export type LanguageContextSpace = 'admin' | 'user' | 'system' | 'api';
+export type LanguageContextSpace = 'admin' | 'user';
 
 /**
  * Default currency code
@@ -21,11 +21,6 @@ export const DefaultTimezone: string = 'UTC';
  * Currency position type
  */
 export type CurrencyPosition = 'prefix' | 'postfix' | 'infix';
-
-/**
- * Custom language context type
- */
-export type CustomLanguageContext<T extends string = LanguageContextSpace> = T;
 
 /**
  * Collection of localized strings for a specific language

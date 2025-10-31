@@ -3,7 +3,7 @@ import { EnumTranslationRegistry } from './enum-registry';
 import { I18nConfig } from './i18n-config';
 import { I18nContext } from './i18n-context';
 import { createTemplateProcessor } from './template';
-import { EnumLanguageTranslation } from './types';
+import { EnumLanguageTranslation, LanguageContextSpace } from './types';
 import { isTemplate, replaceVariables } from './utils';
 
 /**
@@ -13,10 +13,8 @@ export class I18nEngine<
   TStringKey extends string,
   TLanguage extends string,
   TConstants extends Record<string, any> = Record<string, any>,
-  TTranslationContext extends string = string,
-  TContext extends I18nContext<TLanguage, TTranslationContext> = I18nContext<
-    TLanguage,
-    TTranslationContext
+  TContext extends I18nContext<TLanguage> = I18nContext<
+    TLanguage
   >,
 > {
   /**
@@ -29,8 +27,7 @@ export class I18nEngine<
   public readonly config: I18nConfig<
     TStringKey,
     TLanguage,
-    TConstants,
-    TTranslationContext
+    TConstants
   >;
 
   /**
@@ -67,7 +64,7 @@ export class I18nEngine<
    * @throws Error if an instance with the same key already exists
    */
   constructor(
-    config: I18nConfig<TStringKey, TLanguage, TConstants, TTranslationContext>,
+    config: I18nConfig<TStringKey, TLanguage, TConstants>,
     key?: string,
     newContext: () => TContext = () =>
       createContext(
@@ -76,7 +73,7 @@ export class I18nEngine<
         config.defaultCurrencyCode,
         config.timezone,
         config.adminTimezone,
-      ),
+      ) as TContext,
   ) {
     this.validateConfig(config);
     this.config = config;
@@ -437,7 +434,7 @@ export class I18nEngine<
    * @throws Error if validation fails
    */
   private validateConfig(
-    config: I18nConfig<TStringKey, TLanguage, TConstants, TTranslationContext>,
+    config: I18nConfig<TStringKey, TLanguage, TConstants>,
   ): void {
     // Check that default language exists
     if (!config.strings[config.defaultLanguage]) {
@@ -473,7 +470,7 @@ export class I18nEngine<
   private getValidationError(
     key: TStringKey,
     vars: Record<string, any>,
-    config: I18nConfig<TStringKey, TLanguage, TConstants, TTranslationContext>,
+    config: I18nConfig<TStringKey, TLanguage, TConstants>,
   ): string {
     try {
       const strings = config.strings[config.defaultLanguage];

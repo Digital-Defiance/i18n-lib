@@ -90,25 +90,6 @@ describe('GlobalActiveContext E2E', () => {
       expect(globalContext.getContext('tenant2').timezone.value).toBe('Europe/Paris');
     });
 
-    it('should handle context switching in API operations', () => {
-      globalContext.createContext(LanguageCodes.EN_US);
-      
-      // Start in user context
-      expect(globalContext.languageContextSpace).toBe('user');
-      
-      // Switch to API context for logging
-      globalContext.languageContextSpace = 'api';
-      expect(globalContext.context.currentContext).toBe('api');
-      
-      // Switch to system context for internal operations
-      globalContext.languageContextSpace = 'system';
-      expect(globalContext.context.currentContext).toBe('system');
-      
-      // Return to user context
-      globalContext.languageContextSpace = 'user';
-      expect(globalContext.context.currentContext).toBe('user');
-    });
-
     it('should handle singleton instance across modules', () => {
       // Simulate different modules accessing the singleton
       const instance1 = GlobalActiveContext.getInstance<DefaultLanguageCode, TestActiveContext>();
@@ -153,7 +134,7 @@ describe('GlobalActiveContext E2E', () => {
     it('should handle language context space transitions', () => {
       globalContext.createContext(LanguageCodes.EN_US);
       
-      const contexts: LanguageContextSpace[] = ['user', 'admin', 'system', 'api'];
+      const contexts: LanguageContextSpace[] = ['user', 'admin'];
       
       contexts.forEach(contextSpace => {
         globalContext.languageContextSpace = contextSpace;

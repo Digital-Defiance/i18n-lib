@@ -49,8 +49,7 @@ declare global {
       engine: I18nEngine<
         I18n.Config['StringKey'],
         I18n.Config['Language'],
-        Record<any, any>,
-        string
+        Record<any, any>
       >;
     }
   }
@@ -67,12 +66,11 @@ export const getI18nEngine = (): Engine => I18nEngine.getInstance() as Engine;
 
 const getConfig = <
   TConstants extends Record<string, any>,
-  TTranslationContext extends string = LanguageContextSpace,
 >(
   constants: TConstants,
   timezone?: Timezone,
   adminTimezone?: Timezone,
-): I18nConfig<StringKey, Language, TConstants, TTranslationContext> => ({
+): I18nConfig<StringKey, Language, TConstants> => ({
   strings: {
     [LanguageCodes.EN_US]: {
       [DefaultStringKey.Common_Test]: 'Test',
@@ -167,7 +165,7 @@ const getConfig = <
   } as any,
   stringNames: Object.values(DefaultStringKey),
   defaultLanguage: LanguageCodes.EN_US,
-  defaultTranslationContext: 'user' as TTranslationContext,
+  defaultTranslationContext: 'user' as LanguageContextSpace,
   defaultCurrencyCode: new CurrencyCode(DefaultCurrencyCode),
   languageCodes: DefaultLanguageCodes,
   languages: [LanguageCodes.EN_US, LanguageCodes.EN_GB, LanguageCodes.FR, LanguageCodes.ES, LanguageCodes.ZH_CN, LanguageCodes.UK],
@@ -180,8 +178,7 @@ const getConfig = <
 
 export const getDefaultI18nEngine = <
   TConstants extends Record<string, any>,
-  TTranslationContext extends string,
-  TContext extends I18nContext<DefaultLanguageCode, TTranslationContext>,
+  TContext extends I18nContext<DefaultLanguageCode>,
 >(
   constants: TConstants,
   timezone?: Timezone,
@@ -191,13 +188,12 @@ export const getDefaultI18nEngine = <
     DefaultStringKey,
     DefaultLanguageCode,
     TConstants,
-    TTranslationContext,
     TContext
   >(
-    getConfig<TConstants, TTranslationContext>(
+    getConfig<TConstants>(
       constants,
       timezone,
       adminTimezone,
     ),
-    'user' as TTranslationContext,
+    'user' as LanguageContextSpace,
   );

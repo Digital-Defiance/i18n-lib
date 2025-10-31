@@ -2274,6 +2274,11 @@ For issues, questions, or contributions:
 
 ## ChangeLog
 
+### Version 1.3.6
+
+- Simplify LanguageContextSpace and generics related to it
+- Make plugin engine respect admin context
+
 ### Version 1.3.5
 
 - CommonJS

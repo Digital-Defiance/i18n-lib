@@ -12,20 +12,13 @@ import { LanguageContextSpace } from './types';
  * @param defaultAdminTimezone - The default admin timezone (defaults to UTC)
  * @returns A new I18nContext instance
  */
-export function createContext<
-  TLanguage extends string,
-  TTranslationContext extends string = LanguageContextSpace,
-  TContext extends I18nContext<TLanguage, TTranslationContext> = I18nContext<
-    TLanguage,
-    TTranslationContext
-  >,
->(
+export function createContext<TLanguage extends string>(
   defaultLanguage: TLanguage,
-  defaultContext: TTranslationContext,
+  defaultContext: LanguageContextSpace = 'admin',
   defaultCurrencyCode: CurrencyCode = new CurrencyCode('USD'),
   defaultTimezone: Timezone = new Timezone('UTC'),
   defaultAdminTimezone: Timezone = new Timezone('UTC'),
-): TContext {
+): I18nContext<TLanguage> {
   return {
     language: defaultLanguage,
     adminLanguage: defaultLanguage,
@@ -33,7 +26,7 @@ export function createContext<
     currentContext: defaultContext,
     timezone: defaultTimezone,
     adminTimezone: defaultAdminTimezone,
-  } as TContext;
+  };
 }
 
 /**
@@ -41,10 +34,10 @@ export function createContext<
  * @param context - The I18n context to modify
  * @param language - The language to set
  */
-export function setLanguage<
-  TLanguage extends string,
-  TContext extends string = LanguageContextSpace,
->(context: I18nContext<TLanguage, TContext>, language: TLanguage): void {
+export function setLanguage<TLanguage extends string>(
+  context: I18nContext<TLanguage>,
+  language: TLanguage,
+): void {
   context.language = language;
 }
 
@@ -53,10 +46,10 @@ export function setLanguage<
  * @param context - The I18n context to modify
  * @param language - The admin language to set
  */
-export function setAdminLanguage<
-  TLanguage extends string,
-  TContext extends string = LanguageContextSpace,
->(context: I18nContext<TLanguage, TContext>, language: TLanguage): void {
+export function setAdminLanguage<TLanguage extends string>(
+  context: I18nContext<TLanguage>,
+  language: TLanguage,
+): void {
   context.adminLanguage = language;
 }
 
@@ -65,10 +58,10 @@ export function setAdminLanguage<
  * @param context - The I18n context to modify
  * @param languageContext - The language context to set
  */
-export function setContext<
-  TLanguage extends string,
-  TContext extends string = LanguageContextSpace,
->(context: I18nContext<TLanguage, TContext>, languageContext: TContext): void {
+export function setContext<TLanguage extends string>(
+  context: I18nContext<TLanguage>,
+  languageContext: LanguageContextSpace,
+): void {
   context.currentContext = languageContext;
 }
 
@@ -77,10 +70,10 @@ export function setContext<
  * @param context - The I18n context to modify
  * @param timezone - The timezone to set
  */
-export function setTimezone<
-  TLanguage extends string,
-  TContext extends string = LanguageContextSpace,
->(context: I18nContext<TLanguage, TContext>, timezone: Timezone): void {
+export function setTimezone<TLanguage extends string>(
+  context: I18nContext<TLanguage>,
+  timezone: Timezone,
+): void {
   context.timezone = timezone;
 }
 
@@ -89,9 +82,9 @@ export function setTimezone<
  * @param context - The I18n context to modify
  * @param timezone - The admin timezone to set
  */
-export function setAdminTimezone<
-  TLanguage extends string,
-  TContext extends string = LanguageContextSpace,
->(context: I18nContext<TLanguage, TContext>, timezone: Timezone): void {
+export function setAdminTimezone<TLanguage extends string>(
+  context: I18nContext<TLanguage>,
+  timezone: Timezone,
+): void {
   context.adminTimezone = timezone;
 }
