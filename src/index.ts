@@ -22,7 +22,7 @@ export * from './i18n-engine';
 export * from './language-definition';
 export * from './template';
 export * from './timezone';
-export * from './translatable-generic-error';
+export * from './plugin-translatable-generic-error';
 export * from './typed-error';
 export * from './typed-handleable';
 export * from './types';
@@ -34,13 +34,16 @@ export * from './core-string-key';
 export * from './language-codes';
 export * from './language-registry';
 export * from './plugin-i18n-engine';
+export * from './plugin-translatable-generic-error';
+export * from './plugin-translatable-handleable-generic';
+export * from './plugin-typed-handleable';
 export * from './registry-config';
-
 export * from './registry-error';
 export * from './registry-error-type';
 export * from './translation-engine';
 export * from './translation-request';
 export * from './translation-response';
+export * from './translatable';
 export * from './create-translation-adapter';
 
 // Re-export for convenience

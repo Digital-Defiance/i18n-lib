@@ -1,5 +1,5 @@
 import {
-  TranslatableGenericError,
+  PluginTranslatableGenericError as TranslatableGenericError,
   PluginI18nEngine,
   ComponentDefinition,
   ComponentRegistration,

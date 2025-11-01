@@ -3,7 +3,7 @@ import { PluginI18nEngine } from './plugin-i18n-engine';
 /**
  * Generic translatable error that works with any plugin engine and component
  */
-export class TranslatableGenericError<
+export class PluginTranslatableGenericError<
   TStringKey extends string = string,
   TLanguage extends string = string,
 > extends Error {
@@ -66,7 +66,7 @@ export class TranslatableGenericError<
     variables?: Record<string, string | number>,
     language?: TLanguage,
     metadata?: Record<string, any>,
-  ): TranslatableGenericError<TStringKey, TLanguage> {
+  ): PluginTranslatableGenericError<TStringKey, TLanguage> {
     const translatedMessage = engine.safeTranslate(
       componentId,
       stringKey,
@@ -74,7 +74,7 @@ export class TranslatableGenericError<
       language,
     );
 
-    const error = Object.create(TranslatableGenericError.prototype);
+    const error = Object.create(PluginTranslatableGenericError.prototype);
     Error.call(error, translatedMessage);
     error.name = 'TranslatableGenericError';
     error.stringKey = stringKey;

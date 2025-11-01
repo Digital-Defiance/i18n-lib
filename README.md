@@ -2274,6 +2274,10 @@ For issues, questions, or contributions:
 
 ## ChangeLog
 
+### Version 1.3.9
+
+- Add more handleable/typed classes
+
 ### Version 1.3.8
 
 - Add TypedHandleable
