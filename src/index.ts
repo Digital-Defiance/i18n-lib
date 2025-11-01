@@ -24,6 +24,7 @@ export * from './template';
 export * from './timezone';
 export * from './translatable-generic-error';
 export * from './typed-error';
+export * from './typed-handleable';
 export * from './types';
 export * from './utils';
 export * from './validation-config';

@@ -2274,6 +2274,10 @@ For issues, questions, or contributions:
 
 ## ChangeLog
 
+### Version 1.3.8
+
+- Add TypedHandleable
+
 ### Version 1.3.7
 
 - Add handleable at i18n level
