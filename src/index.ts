@@ -45,6 +45,7 @@ export * from './translation-request';
 export * from './translation-response';
 export * from './translatable';
 export * from './create-translation-adapter';
+export * from './unified-translator';
 
 // Re-export for convenience
 export { createCoreI18nEngine as createCoreI18n } from './core-i18n';
