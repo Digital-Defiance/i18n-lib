@@ -13,6 +13,9 @@ export * from './currency-format';
 export * from './default-config';
 export * from './enum-registry';
 export * from './global-active-context';
+export * from './handleable';
+export * from './i-handleable';
+export * from './i-handleable-error-options';
 export * from './i-global-active-context';
 export * from './i18n-context';
 export * from './i18n-engine';
@@ -25,7 +28,6 @@ export * from './types';
 export * from './utils';
 export * from './validation-config';
 export * from './validation-result';
-
 export * from './core-i18n';
 export * from './core-string-key';
 export * from './language-codes';

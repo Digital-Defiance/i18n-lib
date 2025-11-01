@@ -2274,6 +2274,11 @@ For issues, questions, or contributions:
 
 ## ChangeLog
 
+### Version 1.3.7
+
+- Add handleable at i18n level
+- Add TranslatableGenericHandleable at i18n level
+
 ### Version 1.3.6
 
 - Simplify LanguageContextSpace and generics related to it
