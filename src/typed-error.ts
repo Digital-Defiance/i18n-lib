@@ -24,7 +24,6 @@ export type CompleteReasonMap<
  */
 export abstract class BaseTypedError<
   TEnum extends Record<string, string>,
-  TStringKey extends string,
 > extends Error {
   constructor(
     public readonly type: TEnum[keyof TEnum],
@@ -40,8 +39,7 @@ export abstract class BaseTypedError<
    */
   static createSimple<
     TEnum extends Record<string, string>,
-    TStringKey extends string,
-    TError extends BaseTypedError<TEnum, TStringKey>,
+    TError extends BaseTypedError<TEnum>,
   >(
     this: new (
       type: TEnum[keyof TEnum],
@@ -61,7 +59,7 @@ export abstract class BaseTypedError<
   static createTranslated<
     TEnum extends Record<string, string>,
     TStringKey extends string,
-    TError extends BaseTypedError<TEnum, TStringKey>,
+    TError extends BaseTypedError<TEnum>,
   >(
     this: new (
       type: TEnum[keyof TEnum],
@@ -69,7 +67,6 @@ export abstract class BaseTypedError<
       metadata?: Record<string, any>,
     ) => TError,
     engine: TranslationEngine,
-    componentId: string,
     type: TEnum[keyof TEnum],
     reasonMap: CompleteReasonMap<TEnum, TStringKey>,
     variables?: Record<string, string | number>,

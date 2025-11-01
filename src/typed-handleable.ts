@@ -2,32 +2,33 @@ import { HandleableErrorOptions } from './i-handleable-error-options';
 import { IHandleable } from './i-handleable';
 import { HandleableError } from './handleable';
 import { CompleteReasonMap, TranslationEngine } from './typed-error';
-import { DefaultLanguageCode, Language } from './default-config';
-import { I18nEngine } from './i18n-engine';
+import { PluginI18nEngine } from './plugin-i18n-engine';
 import { CoreStringKey } from './core-string-key';
+import { CoreLanguageCode } from './core-i18n';
 
 export class TypedHandleableError<
   TEnum extends Record<string, string>,
   TStringKey extends string,
+  TLanguage extends CoreLanguageCode = CoreLanguageCode,
 > extends HandleableError implements IHandleable {
   public readonly type: TEnum[keyof TEnum];
   public readonly reasonMap: CompleteReasonMap<TEnum, TStringKey>;
   public readonly engine: TranslationEngine<TStringKey>;
-  public readonly language?: Language;
+  public readonly language?: TLanguage;
   public readonly otherVars?: Record<string, string | number>;
 
   constructor(
     type: TEnum[keyof TEnum],
     reasonMap: CompleteReasonMap<TEnum, TStringKey>,
     engine: TranslationEngine<TStringKey>,
-    language?: Language,
+    language?: TLanguage,
     otherVars?: Record<string, string | number>,
     options?: HandleableErrorOptions,
   ) {
     const key = reasonMap[type];
     if (!key) {
-      const coreEngine = I18nEngine.getInstance<I18nEngine<CoreStringKey, DefaultLanguageCode, any, any>>();
-      throw new Error(coreEngine.translate(CoreStringKey.Error_MissingTranslationKeyTemplate, {
+      const coreEngine = PluginI18nEngine.getInstance<TLanguage>();
+      throw new Error(coreEngine.translate('core', CoreStringKey.Error_MissingTranslationKeyTemplate, {
         stringKey: key as string,
       }));
     }
