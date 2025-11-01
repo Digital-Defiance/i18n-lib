@@ -88,4 +88,9 @@ export class UnifiedTranslator<TLanguage extends string = string> {
   getLanguage(): TLanguage {
     return this.defaultLanguage;
   }
+
+  clearSources(): void {
+    this.sources.clear();
+    this.defaultSource = undefined;
+  }
 }

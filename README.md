@@ -2274,6 +2274,10 @@ For issues, questions, or contributions:
 
 ## ChangeLog
 
+### Version 1.3.11
+
+- Export i18nconfig
+
 ### Version 1.3.10
 
 - Add UnifiedTranslator

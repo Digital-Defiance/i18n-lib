@@ -17,6 +17,7 @@ export * from './handleable';
 export * from './i-handleable';
 export * from './i-handleable-error-options';
 export * from './i-global-active-context';
+export * from './i18n-config';
 export * from './i18n-context';
 export * from './i18n-engine';
 export * from './language-definition';

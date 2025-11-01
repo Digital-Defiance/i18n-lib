@@ -244,4 +244,12 @@ export class GlobalActiveContext<TLanguage extends string, TActiveContext extend
   public set adminTimezone(tz: Timezone) {
     this.context.adminTimezone = tz;
   }
+
+  /**
+   * Clear all contexts (useful for testing)
+   */
+  public static clearAll(): void {
+    GlobalActiveContext._contextMap.clear();
+    GlobalActiveContext._instance = undefined;
+  }
 }

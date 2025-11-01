@@ -508,12 +508,13 @@ export class PluginI18nEngine<TLanguages extends string> {
    * Useful for test cleanup
    */
   public static resetAll(): void {
-    for (const [key, engine] of PluginI18nEngine._instances) {
-      // Clear component registrations for each engine
+    // Clear component registrations for each engine BEFORE clearing instances
+    for (const engine of PluginI18nEngine._instances.values()) {
       engine.clearAllComponents();
     }
     PluginI18nEngine._instances.clear();
     PluginI18nEngine._defaultKey = null;
     LanguageRegistry.clear();
+    GlobalActiveContext.clearAll();
   }
 }
