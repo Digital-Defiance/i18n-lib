@@ -2274,6 +2274,10 @@ For issues, questions, or contributions:
 
 ## ChangeLog
 
+### Version 1.3.14
+
+- Re-export with js again
+
 ### Version 1.3.13
 
 - Migrate to es2022/nx monorepo
