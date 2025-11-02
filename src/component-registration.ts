@@ -10,4 +10,7 @@ export interface ComponentRegistration<
 > {
   readonly component: ComponentDefinition<TStringKeys>;
   readonly strings: PartialComponentLanguageStrings<TStringKeys, TLanguages>;
+  readonly enumName?: string;
+  readonly enumObject?: Record<string, TStringKeys>;
+  readonly aliases?: readonly string[];
 }

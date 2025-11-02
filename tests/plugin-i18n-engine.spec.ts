@@ -151,6 +151,64 @@ describe('PluginI18nEngine', () => {
     });
   });
 
+  describe('component alias resolution', () => {
+    enum AliasStrings {
+      WelcomeMessage = 'welcomeMessage',
+      FarewellTemplate = 'farewellTemplate',
+    }
+
+    beforeEach(() => {
+      const aliasComponent: ComponentDefinition<AliasStrings> = {
+        id: 'alias-component',
+        name: 'Alias Component',
+        stringKeys: Object.values(AliasStrings),
+      };
+
+      const aliasRegistration: ComponentRegistration<AliasStrings, 'en' | 'fr' | 'es'> = {
+        component: aliasComponent,
+        strings: {
+          en: {
+            [AliasStrings.WelcomeMessage]: 'Alias welcome',
+            [AliasStrings.FarewellTemplate]: 'Goodbye, {name}!'
+          },
+          fr: {
+            [AliasStrings.WelcomeMessage]: 'Alias bienvenue',
+            [AliasStrings.FarewellTemplate]: 'Au revoir, {name}!'
+          },
+          es: {
+            [AliasStrings.WelcomeMessage]: 'Alias bienvenido',
+            [AliasStrings.FarewellTemplate]: '¡Adiós, {name}!'
+          },
+        },
+        enumName: 'AliasStrings',
+        enumObject: AliasStrings,
+        aliases: ['AliasComponent'],
+      };
+
+      engine.registerComponent(aliasRegistration);
+    });
+
+    it('should translate using enum name prefixes in templates', () => {
+      const result = engine.t('{{AliasStrings.WelcomeMessage}}');
+      expect(result).toBe('Alias welcome');
+    });
+
+    it('should translate using explicit aliases for component id', () => {
+      const result = engine.t('{{AliasComponent.WelcomeMessage}}', 'fr');
+      expect(result).toBe('Alias bienvenue');
+    });
+
+    it('should translate using component id with canonical keys', () => {
+      const result = engine.t('{{alias-component.farewellTemplate}}', 'es', { name: 'Carlos' });
+      expect(result).toBe('¡Adiós, Carlos!');
+    });
+
+    it('should translate template strings using enum keys', () => {
+      const result = engine.t('{{AliasStrings.FarewellTemplate}}', 'en', { name: 'Jamie' });
+      expect(result).toBe('Goodbye, Jamie!');
+    });
+  });
+
   describe('t function (template processor)', () => {
     beforeEach(() => {
       // Register core component for t function testing

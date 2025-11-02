@@ -24,19 +24,19 @@ A comprehensive, production-ready TypeScript internationalization (i18n) library
 - **Configuration Validation**: Automatic validation ensures all languages have complete string collections
 - **Localized Error Messages**: Error messages translated using the engine's own translation system
 - **Enum Translation Registry**: Translate enum values with complete type safety and automatic validation
-- **Advanced Template Processing**: 
-  - Component-based patterns: `{{componentId.stringKey}}`
+- **Advanced Template Processing**:
+  - Component-based patterns: `{{componentId.stringKey}}` (supports component IDs, registered aliases, or enum-name prefixes such as `{{SuiteCoreStringKey.User_Login}}`)
   - Legacy enum patterns: `{{EnumName.EnumKey}}`
   - Variable replacement: `{variableName}`
   - Nested template support with multiple variable objects
-- **Context Management**: 
+- **Context Management**:
   - Admin vs user translation contexts
   - Automatic language switching based on context
   - Per-instance context isolation
   - Global context with named instance support
 - **Currency Formatting**: Built-in currency formatting utilities with locale-aware symbol positioning
 - **Timezone Support**: Validated timezone handling with moment-timezone integration
-- **Intelligent Fallback System**: 
+- **Intelligent Fallback System**:
   - Graceful degradation when translations are missing
   - Fallback to default language with tracking
   - Placeholder generation for missing keys: `[componentId.stringKey]`
@@ -45,17 +45,17 @@ A comprehensive, production-ready TypeScript internationalization (i18n) library
 
 ### Plugin System Features
 
-- **Component Registry**: 
+- **Component Registry**:
   - Manage translation components with automatic validation
   - Component isolation with independent string key namespaces
   - Dynamic component registration and updates
   - Comprehensive validation reporting
-- **Language Registry**: 
+- **Language Registry**:
   - Dynamic language registration with metadata (name, code, default flag)
   - BCP 47 language code support
   - Language lookup by ID or ISO code
   - Display name mapping for UI rendering
-- **Type-Safe Registration**: 
+- **Type-Safe Registration**:
   - Compile-time guarantees for translation completeness
   - Strict type helpers for enforcing complete translations
   - Partial registration support with fallback generation
@@ -72,24 +72,24 @@ A comprehensive, production-ready TypeScript internationalization (i18n) library
 
 ### Advanced Features
 
-- **Translatable Errors**: 
+- **Translatable Errors**:
   - Generic translatable error class for any component
   - Automatic translation with fallback support
   - Error retranslation for dynamic language switching
   - Metadata attachment for debugging
-- **Translation Adapters**: 
+- **Translation Adapters**:
   - Generic adapter creation for PluginI18nEngine
   - Seamless integration with error classes
   - Zero-overhead delegation pattern
-- **Context Change Monitoring**: 
+- **Context Change Monitoring**:
   - Reactive context proxies with change listeners
   - Property-level change notifications
   - Error-safe listener execution
-- **Strict Type Enforcement**: 
+- **Strict Type Enforcement**:
   - Compile-time completeness checking
   - Helper functions for strict translation maps
   - Type utilities for extracting string keys and languages
-- **Testing Utilities**: 
+- **Testing Utilities**:
   - Instance cleanup methods
   - Component registry reset
   - Global engine reset for test isolation
@@ -219,6 +219,7 @@ const registration: ComponentRegistration<MyStringKeys, Languages> = {
 ```
 
 **Key Features:**
+
 - Component isolation with independent string key namespaces
 - Automatic validation of translation completeness
 - Dynamic component registration and updates
@@ -261,6 +262,7 @@ const defaultCode = registry.getMatchingLanguageCode();
 ```
 
 **Key Features:**
+
 - BCP 47 language code support
 - Language lookup by ID or ISO code
 - Display name mapping for UI rendering
@@ -299,12 +301,14 @@ registry.getMatchingLanguageCode('', '');          // Returns: 'en-US' (empty st
 ```
 
 **Use Cases:**
+
 - HTTP Accept-Language header processing
 - User preference resolution
 - Browser language detection with fallback
 - Multi-tenant applications with per-user defaults
 
 **Error Handling:**
+
 ```typescript
 try {
   const emptyRegistry = new LanguageRegistry();
@@ -347,6 +351,7 @@ const translated = enumRegistry.translate(Status, Status.Active, 'fr'); // 'Acti
 ```
 
 **Key Features:**
+
 - Complete enum coverage validation
 - Numeric and string enum support
 - Automatic key resolution for numeric enums
@@ -377,6 +382,7 @@ console.log(context.adminLanguage); // 'en-US'
 ```
 
 **Key Features:**
+
 - Per-instance context isolation
 - User and admin language separation
 - Currency code management
@@ -411,6 +417,7 @@ reactiveContext.language = 'fr'; // Logs: "language changed from en to fr"
 ```
 
 **Key Features:**
+
 - Property-level change notifications
 - Multiple listener support
 - Error-safe listener execution
@@ -524,6 +531,7 @@ Provides essential system strings in 8 languages:
 - English (US/UK), French, Spanish, German, Chinese (Simplified), Japanese, Ukrainian
 
 **Language Codes**: Use `LanguageCodes` constants or define your own:
+
 ```typescript
 import { LanguageCodes } from '@digitaldefiance/i18n-lib';
 
@@ -617,6 +625,7 @@ const error = new MyError(ErrorType.NotFound, adapter);
 ```
 
 **Key Features:**
+
 - Zero-overhead delegation to PluginI18nEngine
 - Maintains full type safety
 - Graceful error handling with fallback to key strings
@@ -666,6 +675,7 @@ try {
 ```
 
 **Key Features:**
+
 - Works with any registered component
 - Uses safeTranslate for consistent fallback behavior
 - Stores error context for retranslation
@@ -714,6 +724,7 @@ class DatabaseError extends BaseTypedError<typeof DatabaseErrorType, DatabaseErr
 ```
 
 **Key Features:**
+
 - Complete enum coverage enforcement
 - Translation engine integration
 - Simple and translated error creation
@@ -754,6 +765,7 @@ const message3 = engine.t(
 ```
 
 **Pattern Types:**
+
 - `{{componentId.stringKey}}`: Component-based translation
 - `{variableName}`: Variable replacement
 - Template strings automatically use first variable object
@@ -792,6 +804,7 @@ console.log(CurrencyCode.values); // Array of all valid ISO 4217 codes
 ```
 
 **Key Features:**
+
 - ISO 4217 currency code validation
 - Locale-aware symbol positioning
 - Group and decimal separator detection
@@ -822,6 +835,7 @@ try {
 ```
 
 **Key Features:**
+
 - Moment-timezone validation
 - Immutable timezone values
 - Validation utilities
@@ -1162,6 +1176,7 @@ throw new TranslatableGenericError(
 ```
 
 **Key Features:**
+
 - Works with any registered component and string keys
 - Uses `safeTranslate` for consistent fallback behavior (`[componentId.stringKey]`)
 - Stores error context: stringKey, componentId, language, variables, metadata
@@ -1432,18 +1447,21 @@ const displayNames = LanguageRegistry.getLanguageDisplayNames();
 The core component provides 40+ system strings organized by category:
 
 ### Common Strings
+
 - `Common_Yes`, `Common_No`, `Common_Cancel`, `Common_OK`
 - `Common_Save`, `Common_Delete`, `Common_Edit`, `Common_Create`, `Common_Update`
 - `Common_Loading`, `Common_Error`, `Common_Success`, `Common_Warning`, `Common_Info`
 - `Common_Disposed`
 
 ### Error Messages
+
 - `Error_InvalidInput`, `Error_NetworkError`, `Error_NotFound`
 - `Error_AccessDenied`, `Error_InternalServer`, `Error_ValidationFailed`
 - `Error_RequiredField`, `Error_InvalidContextTemplate`
 - `Error_MissingTranslationKeyTemplate`
 
 ### Registry Error Templates
+
 - `Error_ComponentNotFoundTemplate`
 - `Error_LanguageNotFoundTemplate`
 - `Error_StringKeyNotFoundTemplate`
@@ -1453,6 +1471,7 @@ The core component provides 40+ system strings organized by category:
 - `Error_ValidationFailedTemplate`
 
 ### System Messages
+
 - `System_Welcome`, `System_Goodbye`, `System_PleaseWait`
 - `System_ProcessingRequest`, `System_OperationComplete`
 - `System_NoDataAvailable`
@@ -1831,6 +1850,7 @@ try {
 ```
 
 **Error Types:**
+
 - `ComponentNotFound`: Component ID not registered
 - `LanguageNotFound`: Language not registered
 - `StringKeyNotFound`: Translation key not found
@@ -2232,6 +2252,7 @@ export default i18nPlugin;
 ### Common Issues
 
 **Issue: "Instance with key 'X' not found"**
+
 ```typescript
 // Solution: Create instance before using
 const engine = PluginI18nEngine.createInstance('myapp', languages);
@@ -2240,6 +2261,7 @@ const engine = PluginI18nEngine.getInstance(); // Uses 'default' key
 ```
 
 **Issue: "Component 'X' not found"**
+
 ```typescript
 // Solution: Register component before translating
 engine.registerComponent(myComponentRegistration);
@@ -2247,6 +2269,7 @@ const text = engine.translate('my-component', 'key');
 ```
 
 **Issue: "Language 'X' not found"**
+
 ```typescript
 // Solution: Register language before using
 engine.registerLanguage(createLanguageDefinition('fr', 'Français', 'fr'));
@@ -2254,6 +2277,7 @@ engine.setLanguage('fr');
 ```
 
 **Issue: Missing translations in production**
+
 ```typescript
 // Solution: Use validation to catch missing translations
 const validation = engine.validateAllComponents();
@@ -2264,6 +2288,7 @@ if (!validation.isValid) {
 ```
 
 **Issue: Type errors with string keys**
+
 ```typescript
 // Solution: Use enum values, not strings
 enum MyKeys {
@@ -2315,11 +2340,18 @@ yarn build
 ## Support
 
 For issues, questions, or contributions:
-- GitHub Issues: https://github.com/Digital-Defiance/DigitalBurnbag/issues
+
+- GitHub Issues: <https://github.com/Digital-Defiance/DigitalBurnbag/issues>
 - Documentation: See README.md and inline code documentation
 - Examples: See `examples/` directory in repository
 
 ## ChangeLog
+
+### Version 1.3.17
+
+- Skip 1.3.16 for homogenization
+- Add component registration aliases for t() func
+- Update readme
 
 ### Version 1.3.15
 
@@ -2396,6 +2428,7 @@ For issues, questions, or contributions:
 - Sat Oct 25 2025 15:0100 GMT-0700 (Pacific Daylight Time)
 
 #### Added
+
 - **`createTranslationAdapter`** - Generic utility function to adapt `PluginI18nEngine` instances to the `TranslationEngine` interface, enabling seamless integration with error classes and other components expecting the simpler interface
   - Maintains full type safety with generic string key and language types
   - Provides graceful error handling with fallback to key strings
@@ -2403,12 +2436,15 @@ For issues, questions, or contributions:
   - Comprehensive test coverage (19 tests)
 
 #### Benefits
+
 - Eliminates need for custom adapter implementations in consuming packages
 - Standardizes translation engine integration across the monorepo
 - Simplifies error class constructors that require translation engines
 
 #### Migration
+
 Packages using custom translation adapters can now replace them with:
+
 ```typescript
 import { createTranslationAdapter } from '@digitaldefiance/i18n-lib';
 const adapter = createTranslationAdapter(pluginEngine, 'component-id');
@@ -2503,10 +2539,12 @@ const myEngine = PluginI18nEngine.createInstance<MyLanguageCodes>('custom', lang
 
 - Wed Oct 15 2025 16:13:00 GMT-0700 (Pacific Daylight Time)
   **Fixed:**
-  - Corrected safeCoreTranslation fallback format to use 
+  - Corrected safeCoreTranslation fallback format to use
+
     ```plaintext
     [CoreStringKey.${stringKey}]
     ```
+
   - Fixed import issues with DefaultInstanceKey
   **Added:**
     - New TranslatableGenericError class for generic translatable errors across any component
@@ -2514,10 +2552,12 @@ const myEngine = PluginI18nEngine.createInstance<MyLanguageCodes>('custom', lang
     - 130+ new tests for comprehensive coverage
     - Complete usage documentation
   **Changed:**
-    - Standardized all fallback formats to use square brackets 
+    - Standardized all fallback formats to use square brackets
+
     ```plaintext
     [componentId.stringKey]
     ```
+
     - Refactored to use CoreI18nComponentId constant
   All tests pass and backward compatibility is maintained.
 

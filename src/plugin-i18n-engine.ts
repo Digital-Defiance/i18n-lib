@@ -27,6 +27,8 @@ export class PluginI18nEngine<TLanguages extends string> {
   private readonly enumRegistry: EnumTranslationRegistry<string, TLanguages>;
   private readonly config: RegistryConfig<TLanguages>;
   private contextKey: string;
+  private readonly aliasToComponent = new Map<string, string>();
+  private readonly componentKeyLookup = new Map<string, Map<string, string>>();
 
   /**
    * Default template processor instance
@@ -117,11 +119,14 @@ export class PluginI18nEngine<TLanguages extends string> {
       let result = str.replace(/\{\{([^}]+)\}\}/g, (match, pattern) => {
         const parts = pattern.split('.');
         if (parts.length === 2) {
-          const [componentId, stringKey] = parts;
+          const [rawPrefix, rawKey] = parts;
+          const prefix = rawPrefix.trim();
+          const key = rawKey.trim();
           // For template strings, use the first variable object if available
-          const isTemplate = stringKey.toLowerCase().endsWith('template');
+          const isTemplate = key.toLowerCase().endsWith('template');
           const vars = isTemplate && otherVars.length > 0 ? otherVars[0] : {};
-          return this.safeTranslate(componentId.trim(), stringKey.trim(), vars, language);
+          const { componentId, stringKey } = this.resolveComponentAndKey(prefix, key);
+          return this.safeTranslate(componentId, stringKey, vars, language);
         }
         return match; // Return original if pattern doesn't match expected format
       });
@@ -149,6 +154,94 @@ export class PluginI18nEngine<TLanguages extends string> {
         PluginI18nEngine._defaultKey = this.contextKey;
       }
     }
+  }
+
+  private resolveComponentAndKey(
+    prefix: string,
+    rawKey: string,
+  ): { componentId: string; stringKey: string } {
+    const componentId = this.aliasToComponent.get(prefix) ?? prefix;
+    const keyLookup = this.componentKeyLookup.get(componentId);
+
+    if (!keyLookup) {
+      return { componentId, stringKey: rawKey };
+    }
+
+    const directMatch = keyLookup.get(rawKey);
+    if (directMatch) {
+      return { componentId, stringKey: directMatch };
+    }
+
+    const normalized = this.normalizeLegacyKey(rawKey);
+    if (normalized) {
+      const normalizedMatch = keyLookup.get(normalized);
+      if (normalizedMatch) {
+        return { componentId, stringKey: normalizedMatch };
+      }
+    }
+
+    return { componentId, stringKey: rawKey };
+  }
+
+  private registerComponentMetadata<TStringKeys extends string>(
+    registration: ComponentRegistration<TStringKeys, TLanguages>,
+  ): void {
+    const { component, enumName, enumObject, aliases } = registration;
+    const componentId = component.id;
+
+    const aliasSet = new Set<string>();
+    if (componentId) {
+      aliasSet.add(componentId);
+    }
+    if (enumName) {
+      aliasSet.add(enumName);
+    }
+    aliases?.forEach((alias) => {
+      if (alias) aliasSet.add(alias);
+    });
+
+    aliasSet.forEach((alias) => {
+      const trimmed = alias.trim();
+      if (trimmed.length > 0) {
+        this.aliasToComponent.set(trimmed, componentId);
+      }
+    });
+
+    if (!this.componentKeyLookup.has(componentId)) {
+      this.componentKeyLookup.set(componentId, new Map<string, string>());
+    }
+    const keyMap = this.componentKeyLookup.get(componentId)!;
+
+    const addKeyVariant = (aliasKey: string, canonicalKey: string) => {
+      if (!aliasKey || !canonicalKey) return;
+      keyMap.set(aliasKey, canonicalKey);
+      const normalized = this.normalizeLegacyKey(aliasKey);
+      if (normalized && normalized !== aliasKey) {
+        keyMap.set(normalized, canonicalKey);
+      }
+    };
+
+    component.stringKeys.forEach((key) => {
+      addKeyVariant(key, key);
+    });
+
+    if (enumObject) {
+      Object.entries(enumObject).forEach(([enumKey, enumValue]) => {
+        if (typeof enumValue === 'string') {
+          addKeyVariant(enumKey, enumValue);
+        }
+      });
+    }
+  }
+
+  private normalizeLegacyKey(rawKey: string): string | null {
+    if (!rawKey) return null;
+    const normalized = rawKey
+      .replace(/[-\s]+/g, '_')
+      .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+      .replace(/__+/g, '_')
+      .toLowerCase();
+    return normalized.length > 0 ? normalized : null;
   }
 
   /**
@@ -245,7 +338,9 @@ export class PluginI18nEngine<TLanguages extends string> {
   public registerComponent<TStringKeys extends string>(
     registration: ComponentRegistration<TStringKeys, TLanguages>,
   ) {
-    return this.componentRegistry.registerComponent(registration);
+    const validationResult = this.componentRegistry.registerComponent(registration);
+    this.registerComponentMetadata(registration);
+    return validationResult;
   }
 
   /**
@@ -493,6 +588,8 @@ export class PluginI18nEngine<TLanguages extends string> {
    */
   public clearAllComponents(): void {
     this.componentRegistry.clearAllComponents();
+    this.aliasToComponent.clear();
+    this.componentKeyLookup.clear();
   }
 
   /**
