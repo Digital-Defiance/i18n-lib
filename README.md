@@ -2274,6 +2274,10 @@ For issues, questions, or contributions:
 
 ## ChangeLog
 
+### Version 1.3.13
+
+- Migrate to es2022/nx monorepo
+
 ### Version 1.3.12
 
 - Update typed-handleable to plugin i18n

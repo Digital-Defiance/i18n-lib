@@ -1,16 +1,19 @@
-import { HandleableErrorOptions } from './i-handleable-error-options';
-import { IHandleable } from './i-handleable';
-import { HandleableError } from './handleable';
-import { CompleteReasonMap, TranslationEngine } from './typed-error';
-import { PluginI18nEngine } from './plugin-i18n-engine';
-import { CoreStringKey } from './core-string-key';
 import { CoreLanguageCode } from './core-i18n';
+import { CoreStringKey } from './core-string-key';
+import { HandleableError } from './handleable';
+import { IHandleable } from './i-handleable';
+import { HandleableErrorOptions } from './i-handleable-error-options';
+import { PluginI18nEngine } from './plugin-i18n-engine';
+import { CompleteReasonMap, TranslationEngine } from './typed-error';
 
 export class TypedHandleableError<
-  TEnum extends Record<string, string>,
-  TStringKey extends string,
-  TLanguage extends CoreLanguageCode = CoreLanguageCode,
-> extends HandleableError implements IHandleable {
+    TEnum extends Record<string, string>,
+    TStringKey extends string,
+    TLanguage extends CoreLanguageCode = CoreLanguageCode,
+  >
+  extends HandleableError
+  implements IHandleable
+{
   public readonly type: TEnum[keyof TEnum];
   public readonly reasonMap: CompleteReasonMap<TEnum, TStringKey>;
   public readonly engine: TranslationEngine<TStringKey>;
@@ -28,11 +31,17 @@ export class TypedHandleableError<
     const key = reasonMap[type];
     if (!key) {
       const coreEngine = PluginI18nEngine.getInstance<TLanguage>();
-      throw new Error(coreEngine.translate('core', CoreStringKey.Error_MissingTranslationKeyTemplate, {
-        stringKey: key as string,
-      }));
+      throw new Error(
+        coreEngine.translate(
+          'core',
+          CoreStringKey.Error_MissingTranslationKeyTemplate,
+          {
+            stringKey: key as string,
+          },
+        ),
+      );
     }
-    
+
     let message: string = String(type);
     try {
       const keyString = key as TStringKey;
@@ -41,9 +50,9 @@ export class TypedHandleableError<
     } catch (error) {
       message = String(type);
     }
-    
+
     super(new Error(message), options);
-    
+
     this.type = type;
     this.reasonMap = reasonMap;
     this.language = language;
@@ -51,7 +60,7 @@ export class TypedHandleableError<
     this.engine = engine;
   }
 
-  public toJSON(): Record<string, unknown> {
+  public override toJSON(): Record<string, unknown> {
     const baseJson = super.toJSON();
     return {
       ...baseJson,

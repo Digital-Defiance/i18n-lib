@@ -5,11 +5,14 @@ import { PluginTranslatableGenericError } from './plugin-translatable-generic-er
  * Generic translatable error that works with any plugin engine and component
  */
 export class PluginTranslatableHandleableGenericError<
-  TStringKey extends string = string,
-  TLanguage extends string = string,
-> extends PluginTranslatableGenericError<TStringKey, TLanguage> implements IHandleable {
+    TStringKey extends string = string,
+    TLanguage extends string = string,
+  >
+  extends PluginTranslatableGenericError<TStringKey, TLanguage>
+  implements IHandleable
+{
   private _handled = false;
-  public readonly cause?: Error;
+  public override readonly cause?: Error;
   public readonly statusCode: number;
   public readonly sourceData?: unknown;
 
@@ -29,7 +32,11 @@ export class PluginTranslatableHandleableGenericError<
     language?: TLanguage,
     metadata?: Record<string, any>,
     instanceKey?: string,
-    handleableOptions?: { statusCode?: number; cause?: Error; sourceData?: unknown },
+    handleableOptions?: {
+      statusCode?: number;
+      cause?: Error;
+      sourceData?: unknown;
+    },
   ) {
     super(componentId, stringKey, variables, language, metadata, instanceKey);
     this.statusCode = handleableOptions?.statusCode ?? 500;
