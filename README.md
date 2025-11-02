@@ -125,57 +125,70 @@ yarn add @digitaldefiance/i18n-lib
 ## Quick Start
 
 ```typescript
-import { I18nEngine, I18nConfig, createContext, CurrencyCode, Timezone } from '@digitaldefiance/i18n-lib';
+import {
+  PluginI18nEngine,
+  ComponentDefinition,
+  ComponentRegistration,
+  LanguageDefinition,
+  CurrencyCode,
+  Timezone,
+} from '@digitaldefiance/i18n-lib';
 
-// Define your string keys
-enum MyStrings {
+enum MyStringKey {
   Welcome = 'welcome',
-  UserGreetingTemplate = 'userGreetingTemplate'
+  UserGreetingTemplate = 'userGreetingTemplate',
 }
 
-// Define your language codes (or use string literals)
 type MyLanguages = 'en-US' | 'es';
 
-// Configure the engine
-const config: I18nConfig<MyStrings, MyLanguages> = {
-  stringNames: Object.values(MyStrings),
-  strings: {
-    'en-US': {
-      [MyStrings.Welcome]: 'Welcome!',
-      [MyStrings.UserGreetingTemplate]: 'Hello, {name}!'
-    },
-    'es': {
-      [MyStrings.Welcome]: '¡Bienvenido!',
-      [MyStrings.UserGreetingTemplate]: '¡Hola, {name}!'
-    }
-  },
-  defaultLanguage: 'en-US',
-  defaultTranslationContext: 'user',
+const languages: ReadonlyArray<LanguageDefinition> = [
+  { id: 'en-US', name: 'English (US)', code: 'en-US', isDefault: true },
+  { id: 'es', name: 'Español', code: 'es' },
+];
+
+const engine = new PluginI18nEngine<MyLanguages>(languages, {
   defaultCurrencyCode: new CurrencyCode('USD'),
-  languageCodes: {
-    'en-US': 'en-US',
-    'es': 'es'
-  },
-  languages: ['en-US', 'es'],
   timezone: new Timezone('UTC'),
-  adminTimezone: new Timezone('UTC')
+  adminTimezone: new Timezone('UTC'),
+});
+
+const MyComponent: ComponentDefinition<MyStringKey> = {
+  id: 'my-component',
+  name: 'My Component',
+  stringKeys: Object.values(MyStringKey),
 };
 
-// Create engine
-const i18n = new I18nEngine(config);
+const registration: ComponentRegistration<MyStringKey, MyLanguages> = {
+  component: MyComponent,
+  strings: {
+    'en-US': {
+      [MyStringKey.Welcome]: 'Welcome!',
+      [MyStringKey.UserGreetingTemplate]: 'Hello, {name}!'
+    },
+    'es': {
+      [MyStringKey.Welcome]: '¡Bienvenido!',
+      [MyStringKey.UserGreetingTemplate]: '¡Hola, {name}!'
+    }
+  }
+};
 
-// Translate strings
-const welcome = i18n.translate(MyStrings.Welcome);
+engine.registerComponent(registration);
+
+const welcome = engine.translate('my-component', MyStringKey.Welcome);
 // "Welcome!"
 
-const greeting = i18n.translate(MyStrings.UserGreetingTemplate, { name: 'John' });
+const greeting = engine.translate('my-component', MyStringKey.UserGreetingTemplate, { name: 'John' });
 // "Hello, John!"
 
-// Change language
-i18n.context = { language: 'es' };
-const spanishGreeting = i18n.translate(MyStrings.UserGreetingTemplate, { name: 'Juan' });
+engine.setLanguage('es');
+const spanishGreeting = engine.translate('my-component', MyStringKey.UserGreetingTemplate, { name: 'Juan' });
 // "¡Hola, Juan!"
+
+const templated = engine.t('User: {name} → {{my-component.UserGreetingTemplate}}', 'es', { name: 'Laura' });
+// "User: Laura → ¡Hola, Laura!"
 ```
+
+The constructor automatically registers the provided languages, seeds the global context (language, currency, timezone), and makes the instance discoverable through `PluginI18nEngine.getInstance()`. Prefer `setLanguage` or `updateContext({ language: 'es' })` instead of mutating context objects directly.
 
 ## Core Components
 
@@ -427,7 +440,7 @@ const i18n = createCoreI18nEngine('myapp');
 const lang: CoreLanguageCode = LanguageCodes.FR; // Type-checked!
 
 // Get supported language codes from registry (runtime)
-const supportedLanguages = i18n.getLanguageRegistry().getLanguageIds();
+const supportedLanguages = i18n.getLanguages().map((lang) => lang.id);
 // ['en-US', 'en-GB', 'fr', 'es', 'de', 'zh-CN', 'ja', 'uk']
 
 // Use core translations with type safety
@@ -1040,6 +1053,13 @@ const strictEngine = new PluginI18nEngine(languages, {
     fallbackLanguageId: 'en-US'
   }
 });
+
+// Optional instance registration overrides (third constructor argument)
+const reportingEngine = new PluginI18nEngine(languages, {}, {
+  instanceKey: 'reporting',
+  registerInstance: false,
+  setAsDefault: false
+});
 ```
 
 #### Multi-Instance Support
@@ -1052,6 +1072,10 @@ const userI18n = PluginI18nEngine.createInstance('user', languages);
 // Register different components for each
 adminI18n.registerComponent(adminComponentRegistration);
 userI18n.registerComponent(userComponentRegistration);
+
+// Create an isolated instance without touching the global registry (handy for tests)
+const detachedI18n = new PluginI18nEngine(languages, {}, { registerInstance: false });
+detachedI18n.registerComponent(myTestRegistration);
 ```
 
 For complete documentation on the plugin architecture, see [PLUGIN_ARCHITECTURE.md](./PLUGIN_ARCHITECTURE.md).
@@ -1178,51 +1202,60 @@ const statusText = i18n.translateEnum(Status, Status.Active, MyLanguages.Spanish
 ### Template Processing
 
 ```typescript
-enum AppStrings {
-  WelcomeMessage = 'welcomeMessage',
-  UserGreetingTemplate = 'userGreetingTemplate'
-}
+import { PluginI18nEngine } from '@digitaldefiance/i18n-lib';
 
-const config: I18nConfig<AppStrings, MyLanguages> = {
-  // ... other config
-  enumName: 'AppStrings',
-  enumObj: AppStrings,
-  strings: {
-    [MyLanguages.English]: {
-      [AppStrings.WelcomeMessage]: 'Welcome to our app!',
-      [AppStrings.UserGreetingTemplate]: 'Hello, {name}!'
-    }
-  }
-};
+const engine = PluginI18nEngine.getInstance<'en-US' | 'es'>();
 
-const i18n = new I18nEngine(config);
-
-// Use template processor
-const message = i18n.t('{{AppStrings.WelcomeMessage}} {{AppStrings.UserGreetingTemplate}}', 
-  MyLanguages.English, 
+// Component placeholders are resolved before variable replacement
+const message = engine.t(
+  '{{core.System_Welcome}} {name}! {{core.System_PleaseWait}}',
+  'en-US',
   { name: 'John' }
 );
-// "Welcome to our app! Hello, John!"
+// "Welcome John! Please wait..."
+
+// Templates ending with "Template" automatically receive the first var map
+const greeting = engine.t(
+  '{{my-component.UserGreetingTemplate}}',
+  'es',
+  { name: 'Laura' },
+  { fallbackName: 'Usuario' }
+);
+// "¡Hola, Laura!"
+
+// Additional variable objects are merged left→right
+const merged = engine.t(
+  'User {username} has {count} notifications',
+  'en-US',
+  { username: 'alice' },
+  { count: 5 }
+);
+// "User alice has 5 notifications"
 ```
 
 ### Context Management
 
 ```typescript
-import { createContext, setLanguage, setAdminLanguage, setContext } from '@digitaldefiance/i18n-lib';
+import { PluginI18nEngine, CurrencyCode, Timezone } from '@digitaldefiance/i18n-lib';
 
-// Create and manage context
-const context = createContext(MyLanguages.English, 'user');
+const engine = PluginI18nEngine.getInstance<'en-US' | 'es'>();
 
-// Set different languages for user and admin contexts
-setLanguage(context, MyLanguages.Spanish);
-setAdminLanguage(context, MyLanguages.English);
+engine.updateContext({
+  language: 'es',
+  adminLanguage: 'en-US',
+  currencyCode: new CurrencyCode('EUR'),
+  timezone: new Timezone('Europe/Madrid'),
+  adminTimezone: new Timezone('UTC'),
+});
 
-// Switch between contexts
-setContext(context, 'admin'); // Uses admin language
-setContext(context, 'user');  // Uses user language
+engine.updateContext({ currentContext: 'admin' });
 
-// Apply context to engine
-i18n.context = context;
+const context = engine.getContext();
+console.log(context.currentContext); // 'admin'
+console.log(context.language);       // 'es'
+
+engine.updateContext({ currentContext: 'user' });
+engine.setLanguage('en-US');
 ```
 
 ### Context Change Monitoring
@@ -1266,16 +1299,23 @@ const eurFormat = getCurrencyFormat('de-DE', 'EUR');
 ### Instance Management
 
 ```typescript
+import { PluginI18nEngine, LanguageDefinition } from '@digitaldefiance/i18n-lib';
+
+const languages: ReadonlyArray<LanguageDefinition> = [
+  { id: 'en-US', name: 'English (US)', code: 'en-US', isDefault: true },
+  { id: 'fr', name: 'Français', code: 'fr' },
+];
+
 // Create named instances
-const mainI18n = new I18nEngine(config, 'main');
-const adminI18n = new I18nEngine(adminConfig, 'admin');
+const mainI18n = PluginI18nEngine.createInstance('main', languages);
+const adminI18n = PluginI18nEngine.createInstance('admin', languages);
 
 // Get instances by key
-const instance = I18nEngine.getInstance('main');
+const instance = PluginI18nEngine.getInstance('main');
 
 // Clean up instances (useful for testing)
-I18nEngine.clearInstances();
-I18nEngine.removeInstance('main');
+PluginI18nEngine.removeInstance('main');
+PluginI18nEngine.resetAll();
 ```
 
 ## Supported Languages
@@ -1355,7 +1395,7 @@ const lang3: MyLanguageCode = 'invalid'; // ✗ Type error!
 Extract language codes from the registry (single source of truth):
 
 ```typescript
-import { PluginI18nEngine, getCoreLanguageCodes, LanguageCodes } from '@digitaldefiance/i18n-lib';
+import { PluginI18nEngine, LanguageRegistry, getCoreLanguageCodes, LanguageCodes } from '@digitaldefiance/i18n-lib';
 import { Schema } from 'mongoose';
 
 // Static approach: Get core language codes as array
@@ -1364,8 +1404,9 @@ const coreLanguageCodes = getCoreLanguageCodes();
 
 // Dynamic approach: Get from engine instance (includes custom languages)
 const engine = PluginI18nEngine.getInstance<string>();
-const languageIds = engine.getLanguageRegistry().getLanguageIds();
-const isoCodes = engine.getLanguageRegistry().getLanguageCodes();
+const languageDefinitions = engine.getLanguages();
+const languageIds = languageDefinitions.map((lang) => lang.id);
+const isoCodes = languageDefinitions.map((lang) => lang.code);
 
 // Use in Mongoose schema
 const userSchema = new Schema({
@@ -1382,7 +1423,7 @@ const userSchema = new Schema({
 });
 
 // Get display names for validation messages
-const displayNames = engine.getLanguageRegistry().getLanguageDisplayNames();
+const displayNames = LanguageRegistry.getLanguageDisplayNames();
 // { 'en-US': 'English (US)', 'fr': 'Français', ... }
 ```
 
@@ -1424,9 +1465,15 @@ The core component provides 40+ system strings organized by category:
 
 **Constructor**
 
-- `new PluginI18nEngine<TLanguages>(languages, config?)` - Create new plugin engine
+- `new PluginI18nEngine<TLanguages>(languages, config?, options?)` - Create new plugin engine
 - `PluginI18nEngine.createInstance<TLanguages>(key, languages, config?)` - Create named instance
 - `PluginI18nEngine.getInstance<TLanguages>(key?)` - Get existing instance (throws error if not found)
+
+`options` enables fine-grained control over how the engine participates in the static registry:
+
+- `instanceKey` – Override the implicit registry key when instantiating directly (defaults to `'default'`).
+- `registerInstance` – Set to `false` to keep the engine out of the shared instance map (useful for tests or short-lived contexts).
+- `setAsDefault` – Force this instance to become the default lookup target even if another default exists.
 
 **Component Management**
 
@@ -1451,11 +1498,14 @@ The core component provides 40+ system strings organized by category:
 - `getLanguageByCode(code)` - Get language by ISO code
 - `getMatchingLanguageCode(requestedCode?, userDefaultCode?)` - Get matching language code with fallback logic
 
-**Validation**
+**Context & Validation**
 
+- `getContext()` - Read the active context (language, adminLanguage, currency, timezone)
+- `updateContext(updates)` - Apply partial context updates
 - `validateAllComponents()` - Validate all registered components
-- `getLanguageRegistry()` - Access language registry directly
 - `getComponentRegistry()` - Access component registry directly
+- `getEnumRegistry()` - Access enum registry directly
+- Use `LanguageRegistry` statics (e.g. `LanguageRegistry.getLanguageIds()`) for low-level language metadata
 
 #### Core I18n Functions
 
@@ -2021,15 +2071,13 @@ export const User = model('User', userSchema);
 ### Dynamic Language Enum from Engine
 
 ```typescript
-import { PluginI18nEngine } from '@digitaldefiance/i18n-lib';
+import { PluginI18nEngine, LanguageRegistry } from '@digitaldefiance/i18n-lib';
 
-// Get languages from engine instance
+// Ensure the engine has registered its languages
 const engine = PluginI18nEngine.getInstance();
-const registry = engine.getLanguageRegistry();
-
-// Extract for Mongoose
-const languageEnum = registry.getLanguageIds();
-const defaultLanguage = registry.getDefaultLanguageId();
+const languageEnum = LanguageRegistry.getLanguageIds();
+const defaultLanguage =
+  LanguageRegistry.getDefaultLanguageId() ?? engine.getContext().language;
 
 const contentSchema = new Schema({
   language: {
@@ -2043,10 +2091,9 @@ const contentSchema = new Schema({
 ### Validation with Display Names
 
 ```typescript
-import { PluginI18nEngine } from '@digitaldefiance/i18n-lib';
+import { LanguageRegistry } from '@digitaldefiance/i18n-lib';
 
-const engine = PluginI18nEngine.getInstance();
-const displayNames = engine.getLanguageRegistry().getLanguageDisplayNames();
+const displayNames = LanguageRegistry.getLanguageDisplayNames();
 
 const settingsSchema = new Schema({
   language: {
@@ -2274,6 +2321,11 @@ For issues, questions, or contributions:
 
 ## ChangeLog
 
+### Version 1.3.15
+
+- Improve constructor for default instances
+- Update README
+
 ### Version 1.3.14
 
 - Re-export with js again
@@ -2331,7 +2383,7 @@ For issues, questions, or contributions:
 ### Version 1.3.1
 
 - **Changed**: `CoreLanguageCode` is now `string` - Language Registry is single source of truth
-  - Use `engine.getLanguageRegistry().getLanguageIds()` for runtime validation
+  - Use `LanguageRegistry.getLanguageIds()` for runtime validation
   - Use `getCoreLanguageCodes()` for static arrays (Mongoose schemas, etc.)
   - Runtime validation via registry, not compile-time types
 - **Added**: `getCoreLanguageCodes()` - Get core language codes as runtime array

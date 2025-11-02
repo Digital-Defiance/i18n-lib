@@ -49,6 +49,11 @@ export class PluginI18nEngine<TLanguages extends string> {
   constructor(
     initialLanguages: readonly LanguageDefinition[],
     config: Partial<RegistryConfig<TLanguages>> = {},
+    options?: {
+      instanceKey?: string;
+      registerInstance?: boolean;
+      setAsDefault?: boolean;
+    },
   ) {
     // Find default language from initialLanguages or use the first one
     const defaultLang =
@@ -91,16 +96,16 @@ export class PluginI18nEngine<TLanguages extends string> {
     );
 
     // Initialize context key for this engine instance
-    this.contextKey = PluginI18nEngine.DefaultInstanceKey;
-    
+    this.contextKey = options?.instanceKey ?? PluginI18nEngine.DefaultInstanceKey;
+
     // Create or get the global context for this engine
     const globalContext = GlobalActiveContext.getInstance<TLanguages, IActiveContext<TLanguages>>();
-    
+
     // Always create/update the context for this engine
     globalContext.createContext(
       this.config.defaultLanguage,
       this.config.defaultLanguage,
-      this.contextKey
+      this.contextKey,
     );
     globalContext.setCurrencyCode(this.config.defaultCurrencyCode, this.contextKey);
     globalContext.setUserTimezone(this.config.timezone, this.contextKey);
@@ -131,12 +136,18 @@ export class PluginI18nEngine<TLanguages extends string> {
     };
 
     // Auto-register as default instance if none exists
-    if (!PluginI18nEngine._defaultKey) {
-      PluginI18nEngine._instances.set(
-        PluginI18nEngine.DefaultInstanceKey,
-        this,
-      );
-      PluginI18nEngine._defaultKey = PluginI18nEngine.DefaultInstanceKey;
+    const shouldRegisterInstance = options?.registerInstance ?? true;
+    if (shouldRegisterInstance) {
+      if (!PluginI18nEngine._instances.has(this.contextKey)) {
+        PluginI18nEngine._instances.set(this.contextKey, this);
+      }
+
+      const shouldSetDefault = options?.setAsDefault ??
+        (!PluginI18nEngine._defaultKey || this.contextKey === PluginI18nEngine.DefaultInstanceKey);
+
+      if (shouldSetDefault) {
+        PluginI18nEngine._defaultKey = this.contextKey;
+      }
     }
   }
 
@@ -156,20 +167,24 @@ export class PluginI18nEngine<TLanguages extends string> {
       );
     }
 
-    const instance = new PluginI18nEngine<TLangs>(initialLanguages, config);
+    const instance = new PluginI18nEngine<TLangs>(initialLanguages, config, {
+      instanceKey: key,
+      registerInstance: false,
+    });
     instance.contextKey = key;
-    
-    // Create context for this specific instance
+
+    // Create context for this specific instance (constructor already did this,
+    // but we ensure the latest configuration is applied for explicit instances)
     const globalContext = GlobalActiveContext.getInstance();
     globalContext.createContext(
       instance.config.defaultLanguage,
       instance.config.defaultLanguage,
-      key
+      key,
     );
     globalContext.setCurrencyCode(instance.config.defaultCurrencyCode, key);
     globalContext.setUserTimezone(instance.config.timezone, key);
     globalContext.setAdminTimezone(instance.config.adminTimezone, key);
-    
+
     PluginI18nEngine._instances.set(key, instance);
 
     if (!PluginI18nEngine._defaultKey) {
