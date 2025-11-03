@@ -209,6 +209,60 @@ describe('PluginI18nEngine', () => {
     });
   });
 
+  describe('constants support', () => {
+    it('should replace constants in templates', () => {
+      PluginI18nEngine.resetAll();
+      const constants = { Site: 'TestSite.com', Version: '1.0' };
+      const engineWithConstants = new PluginI18nEngine(
+        [englishLang],
+        { constants }
+      );
+
+      const component: ComponentDefinition<'siteTemplate'> = {
+        id: 'test',
+        name: 'Test',
+        stringKeys: ['siteTemplate'],
+      };
+
+      const registration: ComponentRegistration<'siteTemplate', 'en'> = {
+        component,
+        strings: {
+          en: { siteTemplate: 'Welcome to {Site} v{Version}' },
+        },
+      };
+
+      engineWithConstants.registerComponent(registration);
+      const result = engineWithConstants.translate('test', 'siteTemplate');
+      expect(result).toBe('Welcome to TestSite.com v1.0');
+    });
+
+    it('should prioritize variables over constants', () => {
+      PluginI18nEngine.resetAll();
+      const constants = { name: 'ConstantName' };
+      const engineWithConstants = new PluginI18nEngine(
+        [englishLang],
+        { constants }
+      );
+
+      const component: ComponentDefinition<'greetingTemplate'> = {
+        id: 'test',
+        name: 'Test',
+        stringKeys: ['greetingTemplate'],
+      };
+
+      const registration: ComponentRegistration<'greetingTemplate', 'en'> = {
+        component,
+        strings: {
+          en: { greetingTemplate: 'Hello {name}' },
+        },
+      };
+
+      engineWithConstants.registerComponent(registration);
+      const result = engineWithConstants.translate('test', 'greetingTemplate', { name: 'VariableName' });
+      expect(result).toBe('Hello VariableName');
+    });
+  });
+
   describe('t function (template processor)', () => {
     beforeEach(() => {
       // Register core component for t function testing

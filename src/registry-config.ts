@@ -12,4 +12,5 @@ export interface RegistryConfig<TLanguages extends string> {
   readonly timezone: Timezone;
   readonly adminTimezone: Timezone;
   readonly validation: ValidationConfig;
+  readonly constants?: Record<string, any>;
 }

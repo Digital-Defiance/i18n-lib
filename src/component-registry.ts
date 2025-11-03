@@ -29,13 +29,16 @@ export class ComponentRegistry<TLanguages extends string> {
   >();
   private readonly validationConfig: ValidationConfig;
   private readonly registeredLanguages: Set<TLanguages>;
+  private readonly constants?: Record<string, any>;
 
   constructor(
     languages: readonly TLanguages[],
     validationConfig: ValidationConfig,
+    constants?: Record<string, any>,
   ) {
     this.registeredLanguages = new Set(languages);
     this.validationConfig = validationConfig;
+    this.constants = constants;
   }
 
   /**
@@ -204,8 +207,8 @@ export class ComponentRegistry<TLanguages extends string> {
 
     // Process variables if the string key indicates it's a template
     let processedTranslation: string = translation;
-    if (variables && isTemplate(stringKey)) {
-      processedTranslation = replaceVariables(translation, variables);
+    if (isTemplate(stringKey)) {
+      processedTranslation = replaceVariables(translation, variables, this.constants);
     }
 
     return {

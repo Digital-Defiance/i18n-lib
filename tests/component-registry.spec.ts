@@ -122,6 +122,53 @@ describe('ComponentRegistry', () => {
     expect(response.translation).toBe('Hello World');
   });
 
+  it('should replace constants in template', () => {
+    const constants = { Site: 'MyApp.com' };
+    const registryWithConstants = new ComponentRegistry(['en'], validationConfig, constants);
+    
+    const registration: ComponentRegistration<TestStringKey, 'en'> = {
+      component: {
+        id: 'test',
+        name: 'Test',
+        stringKeys: [TestStringKey.Template],
+      },
+      strings: { en: { [TestStringKey.Template]: 'Welcome to {Site}' } },
+    };
+
+    registryWithConstants.registerComponent(registration);
+    const response = registryWithConstants.getTranslation({
+      componentId: 'test',
+      stringKey: TestStringKey.Template,
+      language: 'en',
+    });
+
+    expect(response.translation).toBe('Welcome to MyApp.com');
+  });
+
+  it('should prioritize variables over constants', () => {
+    const constants = { name: 'Constant' };
+    const registryWithConstants = new ComponentRegistry(['en'], validationConfig, constants);
+    
+    const registration: ComponentRegistration<TestStringKey, 'en'> = {
+      component: {
+        id: 'test',
+        name: 'Test',
+        stringKeys: [TestStringKey.Template],
+      },
+      strings: { en: { [TestStringKey.Template]: 'Hello {name}' } },
+    };
+
+    registryWithConstants.registerComponent(registration);
+    const response = registryWithConstants.getTranslation({
+      componentId: 'test',
+      stringKey: TestStringKey.Template,
+      language: 'en',
+      variables: { name: 'Variable' },
+    });
+
+    expect(response.translation).toBe('Hello Variable');
+  });
+
   it('should update component strings', () => {
     const registration: ComponentRegistration<TestStringKey, 'en' | 'fr'> = {
       component: {

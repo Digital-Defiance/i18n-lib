@@ -90,6 +90,7 @@ export class PluginI18nEngine<TLanguages extends string> {
     this.componentRegistry = new ComponentRegistry<TLanguages>(
       initialLanguages.map((l) => l.id as TLanguages),
       this.config.validation,
+      this.config.constants,
     );
     this.enumRegistry = new EnumTranslationRegistry<string, TLanguages>(
       initialLanguages.map((l) => l.id as TLanguages),

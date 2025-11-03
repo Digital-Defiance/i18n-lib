@@ -771,6 +771,50 @@ const message3 = engine.t(
 - Template strings automatically use first variable object
 - Multiple variable objects merged for replacement
 
+### Constants Support
+
+Automatically replace constants in template strings:
+
+```typescript
+import { PluginI18nEngine } from '@digitaldefiance/i18n-lib';
+
+const constants = {
+  Site: 'MyApp.com',
+  Version: '2.0',
+  SupportEmail: 'support@myapp.com'
+};
+
+const engine = new PluginI18nEngine(languages, { constants });
+
+const component: ComponentDefinition<'welcomeTemplate'> = {
+  id: 'app',
+  name: 'Application',
+  stringKeys: ['welcomeTemplate'],
+};
+
+const registration: ComponentRegistration<'welcomeTemplate', 'en'> = {
+  component,
+  strings: {
+    en: { welcomeTemplate: 'Welcome to {Site} v{Version}' },
+  },
+};
+
+engine.registerComponent(registration);
+const message = engine.translate('app', 'welcomeTemplate');
+// "Welcome to MyApp.com v2.0"
+
+// Variables override constants
+const custom = engine.translate('app', 'welcomeTemplate', { Site: 'CustomSite.com' });
+// "Welcome to CustomSite.com v2.0"
+```
+
+**Key Features:**
+
+- Automatic constant replacement in template strings
+- Variables take precedence over constants
+- Shared constants across all components
+- No need to pass constants on every translate call
+
 ### Currency Formatting
 
 Locale-aware currency formatting:
@@ -2346,6 +2390,15 @@ For issues, questions, or contributions:
 - Examples: See `examples/` directory in repository
 
 ## ChangeLog
+
+### Version 1.3.27
+
+- Version bump
+- Fix plugin engine to pass constants to templates as legacy engine did
+
+### Version 1.3.20
+
+- Version bump
 
 ### Version 1.3.17
 
