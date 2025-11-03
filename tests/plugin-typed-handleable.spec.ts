@@ -1,8 +1,8 @@
-import { PluginTypedHandleableError } from '../src/plugin-typed-handleable';
-import { PluginI18nEngine } from '../src/plugin-i18n-engine';
-import { CompleteReasonMap } from '../src/typed-error';
 import { HandleableErrorOptions } from '../src/i-handleable-error-options';
 import { LanguageDefinition } from '../src/language-definition';
+import { PluginI18nEngine } from '../src/plugin-i18n-engine';
+import { PluginTypedHandleableError } from '../src/plugin-typed-handleable';
+import { CompleteReasonMap } from '../src/typed-error';
 
 enum TestErrorType {
   Simple = 'simple',
@@ -34,7 +34,10 @@ describe('PluginTypedHandleableError', () => {
       component: {
         id: 'test-component',
         name: 'Test Component',
-        stringKeys: [TestStringKey.SimpleError, TestStringKey.TemplatedErrorTemplate],
+        stringKeys: [
+          TestStringKey.SimpleError,
+          TestStringKey.TemplatedErrorTemplate,
+        ],
       },
       strings: {
         en: {
@@ -60,7 +63,7 @@ describe('PluginTypedHandleableError', () => {
       'test-component',
       TestErrorType.Simple,
       testReasonMap,
-      source
+      source,
     );
 
     expect(error.type).toBe(TestErrorType.Simple);
@@ -79,7 +82,7 @@ describe('PluginTypedHandleableError', () => {
       TestErrorType.Simple,
       testReasonMap,
       source,
-      options
+      options,
     );
 
     expect(error.statusCode).toBe(404);
@@ -94,7 +97,7 @@ describe('PluginTypedHandleableError', () => {
       TestErrorType.Simple,
       testReasonMap,
       source,
-      options
+      options,
     );
 
     expect(error.handled).toBe(true);
@@ -107,7 +110,7 @@ describe('PluginTypedHandleableError', () => {
       'test-component',
       TestErrorType.Simple,
       testReasonMap,
-      source
+      source,
     );
 
     expect(error.handled).toBe(false);
@@ -125,7 +128,7 @@ describe('PluginTypedHandleableError', () => {
       TestErrorType.Simple,
       testReasonMap,
       source,
-      options
+      options,
     );
 
     expect(error.sourceData).toEqual(sourceData);
@@ -141,7 +144,7 @@ describe('PluginTypedHandleableError', () => {
       source,
       undefined,
       undefined,
-      { key: 'value' }
+      { key: 'value' },
     );
 
     expect(error.message).toBe('Error with value');
@@ -156,7 +159,7 @@ describe('PluginTypedHandleableError', () => {
       testReasonMap,
       source,
       undefined,
-      'fr'
+      'fr',
     );
 
     expect(error.message).toBe('Erreur simple');
@@ -169,7 +172,7 @@ describe('PluginTypedHandleableError', () => {
       'test-component',
       TestErrorType.Simple,
       testReasonMap,
-      source
+      source,
     );
 
     expect(error.stack).toBe(source.stack);
@@ -188,7 +191,7 @@ describe('PluginTypedHandleableError', () => {
       TestErrorType.Simple,
       testReasonMap,
       source,
-      options
+      options,
     );
 
     const json = error.toJSON();
@@ -208,7 +211,7 @@ describe('PluginTypedHandleableError', () => {
       'test-component',
       TestErrorType.Simple,
       testReasonMap,
-      innerSource
+      innerSource,
     );
 
     const outerSource = new Error('Outer error');
@@ -218,7 +221,7 @@ describe('PluginTypedHandleableError', () => {
       TestErrorType.Templated,
       testReasonMap,
       outerSource,
-      { cause: innerError }
+      { cause: innerError },
     );
 
     const json = outerError.toJSON();
@@ -233,7 +236,7 @@ describe('PluginTypedHandleableError', () => {
       'test-component',
       TestErrorType.Simple,
       testReasonMap,
-      source
+      source,
     );
 
     const json = error.toJSON();

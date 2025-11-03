@@ -1,9 +1,9 @@
+import { LanguageCodes } from '../src';
 import {
   DefaultLanguageCode,
   DefaultStringKey,
   getDefaultI18nEngine,
 } from '../src/default-config';
-import { LanguageCodes } from '../src';
 import { I18nEngine } from '../src/i18n-engine';
 import {
   BaseTypedError,
@@ -53,11 +53,10 @@ describe('TypedError', () => {
   });
 
   it('should create error with templated translation', () => {
-    const error = new TestError(
-      TestErrorType.Template,
-      LanguageCodes.EN_US,
-      { key: 'testKey', language: 'English' },
-    );
+    const error = new TestError(TestErrorType.Template, LanguageCodes.EN_US, {
+      key: 'testKey',
+      language: 'English',
+    });
     expect(error.message).toBe(
       "Missing translation for key 'testKey' in language 'English'",
     );
@@ -69,11 +68,10 @@ describe('TypedError', () => {
   });
 
   it('should create templated error in different language', () => {
-    const error = new TestError(
-      TestErrorType.Template,
-      LanguageCodes.FR,
-      { key: 'testKey', language: 'Français' },
-    );
+    const error = new TestError(TestErrorType.Template, LanguageCodes.FR, {
+      key: 'testKey',
+      language: 'Français',
+    });
     expect(error.message).toBe(
       "Traduction manquante pour la clé 'testKey' dans la langue 'Français'",
     );
@@ -239,7 +237,7 @@ describe('TypedError', () => {
       Advanced = 'Advanced',
     }
 
-    class SimpleError extends BaseTypedError<typeof SimpleErrorType, string> {
+    class SimpleError extends BaseTypedError<typeof SimpleErrorType> {
       constructor(
         type: SimpleErrorType,
         message: string,

@@ -1,11 +1,11 @@
 import {
-  PluginTranslatableGenericError as TranslatableGenericError,
-  PluginI18nEngine,
   ComponentDefinition,
   ComponentRegistration,
-  LanguageDefinition,
   CoreStringKey,
   LanguageCodes,
+  LanguageDefinition,
+  PluginI18nEngine,
+  PluginTranslatableGenericError as TranslatableGenericError,
   createCoreI18nEngine,
 } from '../src';
 
@@ -55,7 +55,8 @@ describe('TranslatableGenericError', () => {
         fr: {
           [TestStringKey.UserNotFound]: 'Utilisateur "{username}" introuvable',
           [TestStringKey.InvalidCredentials]: 'Identifiants invalides fournis',
-          [TestStringKey.AccountLocked]: 'Compte verrouillé jusqu\'à {unlockTime}',
+          [TestStringKey.AccountLocked]:
+            "Compte verrouillé jusqu'à {unlockTime}",
         },
       },
     };

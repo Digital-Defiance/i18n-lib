@@ -22,7 +22,8 @@ export type LanguageCode = string;
 /**
  * Type representing the common language codes provided by this library
  */
-export type CommonLanguageCode = typeof LanguageCodes[keyof typeof LanguageCodes];
+export type CommonLanguageCode =
+  (typeof LanguageCodes)[keyof typeof LanguageCodes];
 
 /**
  * Helper to get display names for common language codes

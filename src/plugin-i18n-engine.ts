@@ -2,13 +2,13 @@
  * Plugin-based internationalization engine with component and language registration
  */
 
+import { IActiveContext } from './active-context';
 import { ComponentDefinition } from './component-definition';
 import { ComponentRegistration } from './component-registration';
 import { ComponentRegistry } from './component-registry';
 import { CurrencyCode } from './currency-code';
 import { EnumTranslationRegistry } from './enum-registry';
 import { GlobalActiveContext } from './global-active-context';
-import { IActiveContext } from './active-context';
 import { LanguageDefinition } from './language-definition';
 import { LanguageRegistry } from './language-registry';
 import { RegistryConfig } from './registry-config';
@@ -38,8 +38,6 @@ export class PluginI18nEngine<TLanguages extends string> {
     language?: TLanguages,
     ...otherVars: Record<string, string | number>[]
   ) => string;
-
-
 
   /**
    * Static instances for semi-singleton pattern
@@ -99,10 +97,14 @@ export class PluginI18nEngine<TLanguages extends string> {
     );
 
     // Initialize context key for this engine instance
-    this.contextKey = options?.instanceKey ?? PluginI18nEngine.DefaultInstanceKey;
+    this.contextKey =
+      options?.instanceKey ?? PluginI18nEngine.DefaultInstanceKey;
 
     // Create or get the global context for this engine
-    const globalContext = GlobalActiveContext.getInstance<TLanguages, IActiveContext<TLanguages>>();
+    const globalContext = GlobalActiveContext.getInstance<
+      TLanguages,
+      IActiveContext<TLanguages>
+    >();
 
     // Always create/update the context for this engine
     globalContext.createContext(
@@ -110,12 +112,19 @@ export class PluginI18nEngine<TLanguages extends string> {
       this.config.defaultLanguage,
       this.contextKey,
     );
-    globalContext.setCurrencyCode(this.config.defaultCurrencyCode, this.contextKey);
+    globalContext.setCurrencyCode(
+      this.config.defaultCurrencyCode,
+      this.contextKey,
+    );
     globalContext.setUserTimezone(this.config.timezone, this.contextKey);
     globalContext.setAdminTimezone(this.config.adminTimezone, this.contextKey);
 
     // Initialize the default template processor for component-based patterns
-    this.t = (str: string, language?: TLanguages, ...otherVars: Record<string, string | number>[]) => {
+    this.t = (
+      str: string,
+      language?: TLanguages,
+      ...otherVars: Record<string, string | number>[]
+    ) => {
       // Step 1: Replace component-based patterns like {{componentId.stringKey}}
       let result = str.replace(/\{\{([^}]+)\}\}/g, (match, pattern) => {
         const parts = pattern.split('.');
@@ -126,18 +135,26 @@ export class PluginI18nEngine<TLanguages extends string> {
           // For template strings, use the first variable object if available
           const isTemplate = key.toLowerCase().endsWith('template');
           const vars = isTemplate && otherVars.length > 0 ? otherVars[0] : {};
-          const { componentId, stringKey } = this.resolveComponentAndKey(prefix, key);
+          const { componentId, stringKey } = this.resolveComponentAndKey(
+            prefix,
+            key,
+          );
           return this.safeTranslate(componentId, stringKey, vars, language);
         }
         return match; // Return original if pattern doesn't match expected format
       });
-      
+
       // Step 2: Replace remaining variable patterns like {varName} with merged variables
-      const allVars = otherVars.reduce((acc, vars) => ({ ...acc, ...vars }), {});
+      const allVars = otherVars.reduce(
+        (acc, vars) => ({ ...acc, ...vars }),
+        {},
+      );
       result = result.replace(/\{(\w+)\}/g, (match, varName) => {
-        return allVars[varName] !== undefined ? String(allVars[varName]) : match;
+        return allVars[varName] !== undefined
+          ? String(allVars[varName])
+          : match;
       });
-      
+
       return result;
     };
 
@@ -148,8 +165,10 @@ export class PluginI18nEngine<TLanguages extends string> {
         PluginI18nEngine._instances.set(this.contextKey, this);
       }
 
-      const shouldSetDefault = options?.setAsDefault ??
-        (!PluginI18nEngine._defaultKey || this.contextKey === PluginI18nEngine.DefaultInstanceKey);
+      const shouldSetDefault =
+        options?.setAsDefault ??
+        (!PluginI18nEngine._defaultKey ||
+          this.contextKey === PluginI18nEngine.DefaultInstanceKey);
 
       if (shouldSetDefault) {
         PluginI18nEngine._defaultKey = this.contextKey;
@@ -339,7 +358,8 @@ export class PluginI18nEngine<TLanguages extends string> {
   public registerComponent<TStringKeys extends string>(
     registration: ComponentRegistration<TStringKeys, TLanguages>,
   ) {
-    const validationResult = this.componentRegistry.registerComponent(registration);
+    const validationResult =
+      this.componentRegistry.registerComponent(registration);
     this.registerComponentMetadata(registration);
     return validationResult;
   }
@@ -442,7 +462,10 @@ export class PluginI18nEngine<TLanguages extends string> {
    * Get current context
    */
   public getContext(): IActiveContext<TLanguages> {
-    const globalContext = GlobalActiveContext.getInstance<TLanguages, IActiveContext<TLanguages>>();
+    const globalContext = GlobalActiveContext.getInstance<
+      TLanguages,
+      IActiveContext<TLanguages>
+    >();
     return globalContext.getContext(this.contextKey);
   }
 
@@ -450,14 +473,26 @@ export class PluginI18nEngine<TLanguages extends string> {
    * Update context
    */
   public updateContext(updates: Partial<IActiveContext<TLanguages>>): void {
-    const globalContext = GlobalActiveContext.getInstance<TLanguages, IActiveContext<TLanguages>>();
-    
-    if (updates.language) globalContext.setUserLanguage(updates.language, this.contextKey);
-    if (updates.adminLanguage) globalContext.setAdminLanguage(updates.adminLanguage, this.contextKey);
-    if (updates.currencyCode) globalContext.setCurrencyCode(updates.currencyCode, this.contextKey);
-    if (updates.currentContext) globalContext.setLanguageContextSpace(updates.currentContext, this.contextKey);
-    if (updates.timezone) globalContext.setUserTimezone(updates.timezone, this.contextKey);
-    if (updates.adminTimezone) globalContext.setAdminTimezone(updates.adminTimezone, this.contextKey);
+    const globalContext = GlobalActiveContext.getInstance<
+      TLanguages,
+      IActiveContext<TLanguages>
+    >();
+
+    if (updates.language)
+      globalContext.setUserLanguage(updates.language, this.contextKey);
+    if (updates.adminLanguage)
+      globalContext.setAdminLanguage(updates.adminLanguage, this.contextKey);
+    if (updates.currencyCode)
+      globalContext.setCurrencyCode(updates.currencyCode, this.contextKey);
+    if (updates.currentContext)
+      globalContext.setLanguageContextSpace(
+        updates.currentContext,
+        this.contextKey,
+      );
+    if (updates.timezone)
+      globalContext.setUserTimezone(updates.timezone, this.contextKey);
+    if (updates.adminTimezone)
+      globalContext.setAdminTimezone(updates.adminTimezone, this.contextKey);
   }
 
   /**
@@ -465,9 +500,14 @@ export class PluginI18nEngine<TLanguages extends string> {
    * Respects language context space (admin vs user)
    */
   private getCurrentLanguage(): TLanguages {
-    const globalContext = GlobalActiveContext.getInstance<TLanguages, IActiveContext<TLanguages>>();
+    const globalContext = GlobalActiveContext.getInstance<
+      TLanguages,
+      IActiveContext<TLanguages>
+    >();
     const context = globalContext.getContext(this.contextKey);
-    return context.currentContext === 'admin' ? context.adminLanguage : context.language;
+    return context.currentContext === 'admin'
+      ? context.adminLanguage
+      : context.language;
   }
 
   /**
@@ -481,7 +521,10 @@ export class PluginI18nEngine<TLanguages extends string> {
         { language },
       );
     }
-    const globalContext = GlobalActiveContext.getInstance<TLanguages, IActiveContext<TLanguages>>();
+    const globalContext = GlobalActiveContext.getInstance<
+      TLanguages,
+      IActiveContext<TLanguages>
+    >();
     globalContext.setUserLanguage(language, this.contextKey);
   }
 

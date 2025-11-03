@@ -11,7 +11,11 @@ import {
   LanguageContextSpace,
 } from './types';
 
-export class GlobalActiveContext<TLanguage extends string, TActiveContext extends IActiveContext<TLanguage>> implements IGlobalActiveContext<TLanguage, TActiveContext> {
+export class GlobalActiveContext<
+  TLanguage extends string,
+  TActiveContext extends IActiveContext<TLanguage>,
+> implements IGlobalActiveContext<TLanguage, TActiveContext>
+{
   protected static _contextMap: Map<string, IActiveContext<any>> = new Map();
   public static readonly defaultContextKey = 'default';
   public static readonly defaultLanguage: DefaultLanguageCode = 'en-US';
@@ -24,14 +28,19 @@ export class GlobalActiveContext<TLanguage extends string, TActiveContext extend
     }
     return this._instance;
   }
-  public static getInstance<TLanguage extends string, TActiveContext extends IActiveContext<TLanguage>>(): GlobalActiveContext<TLanguage, TActiveContext> {
+  public static getInstance<
+    TLanguage extends string,
+    TActiveContext extends IActiveContext<TLanguage>,
+  >(): GlobalActiveContext<TLanguage, TActiveContext> {
     if (!this._instance) {
       this._instance = new GlobalActiveContext<TLanguage, TActiveContext>();
       this._instance.createContext(this.defaultLanguage);
     }
     return this._instance as GlobalActiveContext<TLanguage, TActiveContext>;
   }
-  public static overrideInstance(instance: GlobalActiveContext<any, any>): void {
+  public static overrideInstance(
+    instance: GlobalActiveContext<any, any>,
+  ): void {
     this._instance = instance;
   }
 
@@ -71,9 +80,7 @@ export class GlobalActiveContext<TLanguage extends string, TActiveContext extend
   public getContext(
     key: string = GlobalActiveContext.defaultContextKey,
   ): TActiveContext {
-    const context = GlobalActiveContext._contextMap.get(
-      key,
-    ) as TActiveContext;
+    const context = GlobalActiveContext._contextMap.get(key) as TActiveContext;
     if (context) {
       return context;
     }
@@ -81,9 +88,7 @@ export class GlobalActiveContext<TLanguage extends string, TActiveContext extend
   }
 
   public get context(): TActiveContext {
-    return this.getContext(
-      GlobalActiveContext.defaultContextKey,
-    );
+    return this.getContext(GlobalActiveContext.defaultContextKey);
   }
 
   public set context(ctx: TActiveContext) {

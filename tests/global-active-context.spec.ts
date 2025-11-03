@@ -1,12 +1,8 @@
-import { GlobalActiveContext } from '../src/global-active-context';
+import { LanguageCodes } from '../src';
 import { IActiveContext } from '../src/active-context';
-import { ContextError } from '../src/context-error';
-import { ContextErrorType } from '../src/context-error-type';
-import { RegistryError } from '../src/registry-error';
 import { CurrencyCode } from '../src/currency-code';
+import { GlobalActiveContext } from '../src/global-active-context';
 import { Timezone } from '../src/timezone';
-import { DefaultLanguageCode, LanguageCodes } from "../src";
-import { LanguageContextSpace } from '../src/types';
 
 interface TestActiveContext extends IActiveContext<string> {}
 
@@ -43,7 +39,7 @@ describe('GlobalActiveContext', () => {
   describe('createContext', () => {
     it('should create context with default parameters', () => {
       const context = globalContext.createContext('en');
-      
+
       expect(context.language).toBe('en');
       expect(context.adminLanguage).toBe('en');
       expect(context.currencyCode.value).toBe('USD');
@@ -54,7 +50,7 @@ describe('GlobalActiveContext', () => {
 
     it('should create context with custom admin language', () => {
       const context = globalContext.createContext('en', 'fr');
-      
+
       expect(context.language).toBe('en');
       expect(context.adminLanguage).toBe('fr');
     });
@@ -62,7 +58,7 @@ describe('GlobalActiveContext', () => {
     it('should create context with custom key', () => {
       const context = globalContext.createContext('en', 'en', 'custom');
       const retrieved = globalContext.getContext('custom');
-      
+
       expect(retrieved).toBe(context);
     });
   });
@@ -71,7 +67,7 @@ describe('GlobalActiveContext', () => {
     it('should return existing context', () => {
       const created = globalContext.createContext('en');
       const retrieved = globalContext.getContext();
-      
+
       expect(retrieved).toBe(created);
     });
 
@@ -82,7 +78,7 @@ describe('GlobalActiveContext', () => {
     it('should return context by custom key', () => {
       const created = globalContext.createContext('en', 'en', 'test');
       const retrieved = globalContext.getContext('test');
-      
+
       expect(retrieved).toBe(created);
     });
   });
@@ -96,7 +92,7 @@ describe('GlobalActiveContext', () => {
     it('should set default context', () => {
       const newContext = globalContext.createContext('fr', 'fr', 'temp');
       globalContext.context = newContext;
-      
+
       expect(globalContext.context).toBe(newContext);
     });
   });
@@ -114,7 +110,7 @@ describe('GlobalActiveContext', () => {
     it('should set user language for custom context', () => {
       globalContext.createContext('en', 'en', 'custom');
       globalContext.setUserLanguage('es', 'custom');
-      
+
       expect(globalContext.getContext('custom').language).toBe('es');
     });
 
@@ -146,7 +142,7 @@ describe('GlobalActiveContext', () => {
     it('should set currency code for default context', () => {
       const eurCode = new CurrencyCode('EUR');
       globalContext.setCurrencyCode(eurCode);
-      
+
       expect(globalContext.context.currencyCode).toBe(eurCode);
     });
 
@@ -154,7 +150,7 @@ describe('GlobalActiveContext', () => {
       globalContext.createContext('en', 'en', 'custom');
       const gbpCode = new CurrencyCode('GBP');
       globalContext.setCurrencyCode(gbpCode, 'custom');
-      
+
       expect(globalContext.getContext('custom').currencyCode).toBe(gbpCode);
     });
 
@@ -176,7 +172,7 @@ describe('GlobalActiveContext', () => {
     it('should set currency code', () => {
       const eurCode = new CurrencyCode('EUR');
       globalContext.currencyCode = eurCode;
-      
+
       expect(globalContext.context.currencyCode).toBe(eurCode);
     });
   });
@@ -194,7 +190,7 @@ describe('GlobalActiveContext', () => {
     it('should set admin language for custom context', () => {
       globalContext.createContext('en', 'en', 'custom');
       globalContext.setAdminLanguage('es', 'custom');
-      
+
       expect(globalContext.getContext('custom').adminLanguage).toBe('es');
     });
 
@@ -229,7 +225,9 @@ describe('GlobalActiveContext', () => {
     });
 
     it('should throw error for invalid context key', () => {
-      expect(() => globalContext.setLanguageContextSpace('admin', 'invalid')).toThrow();
+      expect(() =>
+        globalContext.setLanguageContextSpace('admin', 'invalid'),
+      ).toThrow();
     });
   });
 
@@ -270,7 +268,7 @@ describe('GlobalActiveContext', () => {
     it('should set user timezone for default context', () => {
       const timezone = new Timezone('America/New_York');
       globalContext.setUserTimezone(timezone);
-      
+
       expect(globalContext.context.timezone).toBe(timezone);
     });
 
@@ -278,13 +276,15 @@ describe('GlobalActiveContext', () => {
       globalContext.createContext('en', 'en', 'custom');
       const timezone = new Timezone('Europe/London');
       globalContext.setUserTimezone(timezone, 'custom');
-      
+
       expect(globalContext.getContext('custom').timezone).toBe(timezone);
     });
 
     it('should throw error for invalid context key', () => {
       const timezone = new Timezone('UTC');
-      expect(() => globalContext.setUserTimezone(timezone, 'invalid')).toThrow();
+      expect(() =>
+        globalContext.setUserTimezone(timezone, 'invalid'),
+      ).toThrow();
     });
   });
 
@@ -300,7 +300,7 @@ describe('GlobalActiveContext', () => {
     it('should set user timezone', () => {
       const timezone = new Timezone('America/New_York');
       globalContext.userTimezone = timezone;
-      
+
       expect(globalContext.context.timezone).toBe(timezone);
     });
   });
@@ -313,7 +313,7 @@ describe('GlobalActiveContext', () => {
     it('should set admin timezone for default context', () => {
       const timezone = new Timezone('America/New_York');
       globalContext.setAdminTimezone(timezone);
-      
+
       expect(globalContext.context.adminTimezone).toBe(timezone);
     });
 
@@ -321,13 +321,15 @@ describe('GlobalActiveContext', () => {
       globalContext.createContext('en', 'en', 'custom');
       const timezone = new Timezone('Europe/London');
       globalContext.setAdminTimezone(timezone, 'custom');
-      
+
       expect(globalContext.getContext('custom').adminTimezone).toBe(timezone);
     });
 
     it('should throw error for invalid context key', () => {
       const timezone = new Timezone('UTC');
-      expect(() => globalContext.setAdminTimezone(timezone, 'invalid')).toThrow();
+      expect(() =>
+        globalContext.setAdminTimezone(timezone, 'invalid'),
+      ).toThrow();
     });
   });
 
@@ -343,7 +345,7 @@ describe('GlobalActiveContext', () => {
     it('should set admin timezone', () => {
       const timezone = new Timezone('America/New_York');
       globalContext.adminTimezone = timezone;
-      
+
       expect(globalContext.context.adminTimezone).toBe(timezone);
     });
   });
@@ -358,10 +360,10 @@ describe('GlobalActiveContext', () => {
     it('should manage multiple contexts independently', () => {
       const ctx1 = globalContext.createContext('en', 'en', 'ctx1');
       const ctx2 = globalContext.createContext('fr', 'es', 'ctx2');
-      
+
       globalContext.setUserLanguage('de', 'ctx1');
       globalContext.setCurrencyCode(new CurrencyCode('EUR'), 'ctx2');
-      
+
       expect(globalContext.getContext('ctx1').language).toBe('de');
       expect(globalContext.getContext('ctx1').currencyCode.value).toBe('USD');
       expect(globalContext.getContext('ctx2').language).toBe('fr');

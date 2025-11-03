@@ -1,10 +1,10 @@
 import {
+  CoreStringKey,
   createCoreI18nEngine,
   getCoreTranslation,
-  safeCoreTranslation,
-  CoreStringKey,
   LanguageCodes,
   PluginI18nEngine,
+  safeCoreTranslation,
 } from '../src';
 
 describe('core-i18n', () => {
@@ -25,7 +25,7 @@ describe('core-i18n', () => {
         CoreStringKey.Common_Yes,
         undefined,
         LanguageCodes.EN_US,
-        'test-core'
+        'test-core',
       );
       expect(result).toBe('Yes');
     });
@@ -35,7 +35,7 @@ describe('core-i18n', () => {
         CoreStringKey.Common_Yes,
         undefined,
         LanguageCodes.FR,
-        'test-core'
+        'test-core',
       );
       expect(result).toBe('Oui');
     });
@@ -45,7 +45,7 @@ describe('core-i18n', () => {
         CoreStringKey.Common_Cancel,
         undefined,
         LanguageCodes.ES,
-        'test-core'
+        'test-core',
       );
       expect(result).toBe('Cancelar');
     });
@@ -55,7 +55,7 @@ describe('core-i18n', () => {
         CoreStringKey.Error_ComponentNotFoundTemplate,
         { componentId: 'test-component' },
         LanguageCodes.EN_US,
-        'test-core'
+        'test-core',
       );
       expect(result).toBe('Component "test-component" not found');
     });
@@ -65,9 +65,11 @@ describe('core-i18n', () => {
         CoreStringKey.Error_StringKeyNotFoundTemplate,
         { componentId: 'my-component', stringKey: 'my-key' },
         LanguageCodes.EN_US,
-        'test-core'
+        'test-core',
       );
-      expect(result).toBe('String key "my-key" not found for component "my-component"');
+      expect(result).toBe(
+        'String key "my-key" not found for component "my-component"',
+      );
     });
 
     it('should throw error for invalid string key', () => {
@@ -76,7 +78,7 @@ describe('core-i18n', () => {
           'InvalidKey' as CoreStringKey,
           undefined,
           LanguageCodes.EN_US,
-          'test-core'
+          'test-core',
         );
       }).toThrow();
     });
@@ -89,7 +91,7 @@ describe('core-i18n', () => {
           'NonExistentKey' as CoreStringKey,
           undefined,
           LanguageCodes.EN_US,
-          'test-core'
+          'test-core',
         );
         expect(result).toBe('[CoreStringKey.NonExistentKey]');
       });
@@ -99,7 +101,7 @@ describe('core-i18n', () => {
           'InvalidKey' as CoreStringKey,
           undefined,
           LanguageCodes.EN_US,
-          'test-core'
+          'test-core',
         );
         expect(result).not.toContain('{{');
         expect(result).not.toContain('}}');
@@ -111,7 +113,7 @@ describe('core-i18n', () => {
           'MissingKey' as CoreStringKey,
           undefined,
           LanguageCodes.EN_US,
-          'test-core'
+          'test-core',
         );
         expect(result).toContain('CoreStringKey.');
         expect(result).toBe('[CoreStringKey.MissingKey]');
@@ -123,7 +125,7 @@ describe('core-i18n', () => {
           testKey,
           undefined,
           LanguageCodes.EN_US,
-          'test-core'
+          'test-core',
         );
         expect(result).toBe(`[CoreStringKey.${testKey}]`);
       });
@@ -135,7 +137,7 @@ describe('core-i18n', () => {
           CoreStringKey.Common_Yes,
           undefined,
           LanguageCodes.EN_US,
-          'test-core'
+          'test-core',
         );
         expect(result).toBe('Yes');
       });
@@ -145,7 +147,7 @@ describe('core-i18n', () => {
           CoreStringKey.Error_ComponentNotFoundTemplate,
           { componentId: 'test' },
           LanguageCodes.EN_US,
-          'test-core'
+          'test-core',
         );
         expect(result).toBe('Component "test" not found');
       });
@@ -164,7 +166,7 @@ describe('core-i18n', () => {
             CoreStringKey.Common_Yes,
             undefined,
             lang,
-            'test-core'
+            'test-core',
           );
           expect(result).toBeTruthy();
           expect(result).not.toContain('[');
@@ -180,7 +182,7 @@ describe('core-i18n', () => {
             'CompletelyInvalid' as CoreStringKey,
             undefined,
             LanguageCodes.EN_US,
-            'test-core'
+            'test-core',
           );
         }).not.toThrow();
       });
@@ -190,7 +192,7 @@ describe('core-i18n', () => {
           CoreStringKey.Error_ComponentNotFoundTemplate,
           undefined,
           LanguageCodes.EN_US,
-          'test-core'
+          'test-core',
         );
         // Should still work, just with {componentId} placeholder
         expect(result).toContain('Component');
@@ -202,7 +204,7 @@ describe('core-i18n', () => {
           CoreStringKey.Common_Yes,
           undefined,
           LanguageCodes.EN_US,
-          'nonexistent-instance'
+          'nonexistent-instance',
         );
         expect(result).toBe('[CoreStringKey.common_yes]');
       });
@@ -214,7 +216,7 @@ describe('core-i18n', () => {
           CoreStringKey.Common_Yes,
           undefined,
           undefined,
-          'test-core'
+          'test-core',
         );
         expect(result).toBeTruthy();
       });
@@ -224,7 +226,7 @@ describe('core-i18n', () => {
           CoreStringKey.Common_Cancel,
           undefined,
           LanguageCodes.EN_US,
-          'test-core'
+          'test-core',
         );
         expect(result).toBe('Cancel');
       });
@@ -234,7 +236,7 @@ describe('core-i18n', () => {
           CoreStringKey.Common_OK,
           undefined,
           undefined,
-          'test-core'
+          'test-core',
         );
         expect(result).toBeTruthy();
       });
@@ -248,7 +250,7 @@ describe('core-i18n', () => {
         'NonExistent' as CoreStringKey,
         undefined,
         LanguageCodes.EN_US,
-        'test-core'
+        'test-core',
       );
 
       // Both should use square brackets
@@ -261,25 +263,20 @@ describe('core-i18n', () => {
         'TestKey' as CoreStringKey,
         undefined,
         LanguageCodes.EN_US,
-        'test-core'
+        'test-core',
       );
       expect(result).toMatch(/^\[CoreStringKey\..+\]$/);
     });
 
     it('should not use double curly braces anywhere', () => {
-      const testKeys = [
-        'Invalid1',
-        'Invalid2',
-        'NonExistent',
-        'MissingKey',
-      ];
+      const testKeys = ['Invalid1', 'Invalid2', 'NonExistent', 'MissingKey'];
 
       testKeys.forEach((key) => {
         const result = safeCoreTranslation(
           key as CoreStringKey,
           undefined,
           LanguageCodes.EN_US,
-          'test-core'
+          'test-core',
         );
         expect(result).not.toContain('{{');
         expect(result).not.toContain('}}');
@@ -293,7 +290,7 @@ describe('core-i18n', () => {
         CoreStringKey.Error_InvalidContextTemplate,
         { contextKey: 'myContext' },
         LanguageCodes.EN_US,
-        'test-core'
+        'test-core',
       );
       expect(result).toContain('myContext');
       expect(result).not.toContain('{contextKey}');
@@ -304,7 +301,7 @@ describe('core-i18n', () => {
         CoreStringKey.Error_IncompleteRegistrationTemplate,
         { componentId: 'test-comp', missingCount: 5 },
         LanguageCodes.EN_US,
-        'test-core'
+        'test-core',
       );
       expect(result).toContain('test-comp');
       expect(result).toContain('5');
@@ -315,7 +312,7 @@ describe('core-i18n', () => {
         CoreStringKey.Error_ValidationFailedTemplate,
         { componentId: 'validator', errorCount: 42 },
         LanguageCodes.EN_US,
-        'test-core'
+        'test-core',
       );
       expect(result).toContain('validator');
       expect(result).toContain('42');
@@ -325,7 +322,7 @@ describe('core-i18n', () => {
   describe('all core string keys', () => {
     it('should translate all Common_ keys', () => {
       const commonKeys = Object.values(CoreStringKey).filter((key) =>
-        key.startsWith('Common_')
+        key.startsWith('Common_'),
       );
 
       commonKeys.forEach((key) => {
@@ -333,7 +330,7 @@ describe('core-i18n', () => {
           key,
           undefined,
           LanguageCodes.EN_US,
-          'test-core'
+          'test-core',
         );
         expect(result).toBeTruthy();
         expect(result).not.toContain('[CoreStringKey.');
@@ -342,19 +339,27 @@ describe('core-i18n', () => {
 
     it('should translate all Error_ keys', () => {
       const errorKeys = Object.values(CoreStringKey).filter((key) =>
-        key.startsWith('Error_')
+        key.startsWith('Error_'),
       );
 
       errorKeys.forEach((key) => {
         const variables = key.includes('Template')
-          ? { componentId: 'test', stringKey: 'key', language: 'en', missingCount: 1, errorCount: 1, contextKey: 'ctx', languageId: 'en' }
+          ? {
+              componentId: 'test',
+              stringKey: 'key',
+              language: 'en',
+              missingCount: 1,
+              errorCount: 1,
+              contextKey: 'ctx',
+              languageId: 'en',
+            }
           : undefined;
 
         const result = safeCoreTranslation(
           key,
           variables,
           LanguageCodes.EN_US,
-          'test-core'
+          'test-core',
         );
         expect(result).toBeTruthy();
         expect(result).not.toContain('[CoreStringKey.');
@@ -363,7 +368,7 @@ describe('core-i18n', () => {
 
     it('should translate all System_ keys', () => {
       const systemKeys = Object.values(CoreStringKey).filter((key) =>
-        key.startsWith('System_')
+        key.startsWith('System_'),
       );
 
       systemKeys.forEach((key) => {
@@ -371,7 +376,7 @@ describe('core-i18n', () => {
           key,
           undefined,
           LanguageCodes.EN_US,
-          'test-core'
+          'test-core',
         );
         expect(result).toBeTruthy();
         expect(result).not.toContain('[CoreStringKey.');

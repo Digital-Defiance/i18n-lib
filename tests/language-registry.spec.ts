@@ -3,9 +3,7 @@ import {
   createLanguageDefinition,
   createLanguageDefinitions,
 } from '../src/language-registry';
-import { LanguageDefinition } from '../src/language-definition';
 import { RegistryError } from '../src/registry-error';
-import { RegistryErrorType } from '../src/registry-error-type';
 
 describe('LanguageRegistry', () => {
   beforeEach(() => {
@@ -33,31 +31,47 @@ describe('LanguageRegistry', () => {
     });
 
     it('should set language with isDefault flag as default', () => {
-      LanguageRegistry.registerLanguage(createLanguageDefinition('en', 'English', 'en-US'));
-      LanguageRegistry.registerLanguage(createLanguageDefinition('es', 'Spanish', 'es-ES', true));
+      LanguageRegistry.registerLanguage(
+        createLanguageDefinition('en', 'English', 'en-US'),
+      );
+      LanguageRegistry.registerLanguage(
+        createLanguageDefinition('es', 'Spanish', 'es-ES', true),
+      );
 
       expect(LanguageRegistry.getDefaultLanguageId()).toBe('es');
     });
 
     it('should throw error for duplicate language ID', () => {
-      LanguageRegistry.registerLanguage(createLanguageDefinition('en', 'English', 'en-US'));
+      LanguageRegistry.registerLanguage(
+        createLanguageDefinition('en', 'English', 'en-US'),
+      );
 
       expect(() => {
-        LanguageRegistry.registerLanguage(createLanguageDefinition('en', 'English UK', 'en-GB'));
+        LanguageRegistry.registerLanguage(
+          createLanguageDefinition('en', 'English UK', 'en-GB'),
+        );
       }).toThrow(RegistryError);
       expect(() => {
-        LanguageRegistry.registerLanguage(createLanguageDefinition('en', 'English UK', 'en-GB'));
+        LanguageRegistry.registerLanguage(
+          createLanguageDefinition('en', 'English UK', 'en-GB'),
+        );
       }).toThrow("Language 'en' is already registered");
     });
 
     it('should throw error for duplicate language code', () => {
-      LanguageRegistry.registerLanguage(createLanguageDefinition('en', 'English', 'en-US'));
+      LanguageRegistry.registerLanguage(
+        createLanguageDefinition('en', 'English', 'en-US'),
+      );
 
       expect(() => {
-        LanguageRegistry.registerLanguage(createLanguageDefinition('en-uk', 'English UK', 'en-US'));
+        LanguageRegistry.registerLanguage(
+          createLanguageDefinition('en-uk', 'English UK', 'en-US'),
+        );
       }).toThrow(RegistryError);
       expect(() => {
-        LanguageRegistry.registerLanguage(createLanguageDefinition('en-uk', 'English UK', 'en-US'));
+        LanguageRegistry.registerLanguage(
+          createLanguageDefinition('en-uk', 'English UK', 'en-US'),
+        );
       }).toThrow("Language code 'en-US' is already used by language 'en'");
     });
   });
@@ -81,7 +95,9 @@ describe('LanguageRegistry', () => {
 
   describe('getLanguage', () => {
     beforeEach(() => {
-      LanguageRegistry.registerLanguage(createLanguageDefinition('en', 'English', 'en-US'));
+      LanguageRegistry.registerLanguage(
+        createLanguageDefinition('en', 'English', 'en-US'),
+      );
     });
 
     it('should return language by ID', () => {
@@ -99,7 +115,9 @@ describe('LanguageRegistry', () => {
 
   describe('getLanguageByCode', () => {
     beforeEach(() => {
-      LanguageRegistry.registerLanguage(createLanguageDefinition('en', 'English', 'en-US'));
+      LanguageRegistry.registerLanguage(
+        createLanguageDefinition('en', 'English', 'en-US'),
+      );
     });
 
     it('should return language by code', () => {
@@ -162,7 +180,9 @@ describe('LanguageRegistry', () => {
 
   describe('hasLanguage', () => {
     beforeEach(() => {
-      LanguageRegistry.registerLanguage(createLanguageDefinition('en', 'English', 'en-US'));
+      LanguageRegistry.registerLanguage(
+        createLanguageDefinition('en', 'English', 'en-US'),
+      );
     });
 
     it('should return true for registered language', () => {
@@ -176,7 +196,9 @@ describe('LanguageRegistry', () => {
 
   describe('hasLanguageCode', () => {
     beforeEach(() => {
-      LanguageRegistry.registerLanguage(createLanguageDefinition('en', 'English', 'en-US'));
+      LanguageRegistry.registerLanguage(
+        createLanguageDefinition('en', 'English', 'en-US'),
+      );
     });
 
     it('should return true for registered code', () => {
@@ -194,7 +216,9 @@ describe('LanguageRegistry', () => {
     });
 
     it('should return default language', () => {
-      LanguageRegistry.registerLanguage(createLanguageDefinition('en', 'English', 'en-US', true));
+      LanguageRegistry.registerLanguage(
+        createLanguageDefinition('en', 'English', 'en-US', true),
+      );
       const defaultLang = LanguageRegistry.getDefaultLanguage();
 
       expect(defaultLang).toBeDefined();
@@ -208,7 +232,9 @@ describe('LanguageRegistry', () => {
     });
 
     it('should return default language ID', () => {
-      LanguageRegistry.registerLanguage(createLanguageDefinition('en', 'English', 'en-US'));
+      LanguageRegistry.registerLanguage(
+        createLanguageDefinition('en', 'English', 'en-US'),
+      );
       expect(LanguageRegistry.getDefaultLanguageId()).toBe('en');
     });
   });
@@ -269,7 +295,11 @@ describe('LanguageRegistry', () => {
     });
 
     it('should detect missing languages', () => {
-      const result = LanguageRegistry.validateRequiredLanguages(['en', 'fr', 'de']);
+      const result = LanguageRegistry.validateRequiredLanguages([
+        'en',
+        'fr',
+        'de',
+      ]);
 
       expect(result.isValid).toBe(false);
       expect(result.missingLanguages).toHaveLength(2);
@@ -395,13 +425,18 @@ describe('LanguageRegistry', () => {
     });
 
     it('should return site default when only invalid user default provided', () => {
-      const result = LanguageRegistry.getMatchingLanguageCode(undefined, 'invalid');
+      const result = LanguageRegistry.getMatchingLanguageCode(
+        undefined,
+        'invalid',
+      );
       expect(result).toBe('en-US');
     });
 
     it('should throw error when no default language configured', () => {
       LanguageRegistry.clear();
-      expect(() => LanguageRegistry.getMatchingLanguageCode('en-US')).toThrow(RegistryError);
+      expect(() => LanguageRegistry.getMatchingLanguageCode('en-US')).toThrow(
+        RegistryError,
+      );
       expect(() => LanguageRegistry.getMatchingLanguageCode('en-US')).toThrow(
         'No default language configured',
       );
@@ -413,7 +448,10 @@ describe('LanguageRegistry', () => {
     });
 
     it('should prioritize user default over site default', () => {
-      const result = LanguageRegistry.getMatchingLanguageCode(undefined, 'fr-FR');
+      const result = LanguageRegistry.getMatchingLanguageCode(
+        undefined,
+        'fr-FR',
+      );
       expect(result).toBe('fr-FR');
     });
 

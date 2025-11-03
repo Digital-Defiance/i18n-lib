@@ -1,10 +1,10 @@
-import { TranslatableError } from '../src/translatable';
-import { I18nEngine } from '../src/i18n-engine';
+import { CurrencyCode } from '../src/currency-code';
 import { Language } from '../src/default-config';
+import { I18nConfig } from '../src/i18n-config';
+import { I18nEngine } from '../src/i18n-engine';
 import { LanguageCodes } from '../src/language-codes';
 import { Timezone } from '../src/timezone';
-import { CurrencyCode } from '../src/currency-code';
-import { I18nConfig } from '../src/i18n-config';
+import { TranslatableError } from '../src/translatable';
 
 enum TestStringKey {
   ErrorKey = 'ErrorKey',
@@ -68,7 +68,7 @@ describe('TranslatableError', () => {
       engine,
       TestStringKey.ErrorKey,
       undefined,
-      LanguageCodes.FR
+      LanguageCodes.FR,
     );
 
     expect(error.message).toBe('Une erreur est survenue');
@@ -79,7 +79,7 @@ describe('TranslatableError', () => {
       engine,
       TestStringKey.ErrorTemplate,
       { message: 'test' },
-      LanguageCodes.FR
+      LanguageCodes.FR,
     );
 
     expect(error.message).toBe('Erreur: test');

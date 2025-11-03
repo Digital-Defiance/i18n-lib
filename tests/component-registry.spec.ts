@@ -1,5 +1,5 @@
-import { ComponentRegistry } from '../src/component-registry';
 import { ComponentRegistration } from '../src/component-registration';
+import { ComponentRegistry } from '../src/component-registry';
 import { RegistryError } from '../src/registry-error';
 import { ValidationConfig } from '../src/validation-config';
 
@@ -51,7 +51,9 @@ describe('ComponentRegistry', () => {
     };
 
     registry.registerComponent(registration);
-    expect(() => registry.registerComponent(registration)).toThrow(RegistryError);
+    expect(() => registry.registerComponent(registration)).toThrow(
+      RegistryError,
+    );
   });
 
   it('should get translation', () => {
@@ -199,7 +201,7 @@ describe('ComponentRegistry', () => {
         componentId: 'nonexistent',
         stringKey: TestStringKey.Hello,
         language: 'en',
-      })
+      }),
     ).toThrow(RegistryError);
   });
 

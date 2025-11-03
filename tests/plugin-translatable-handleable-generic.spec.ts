@@ -1,6 +1,6 @@
-import { PluginTranslatableHandleableGenericError as TranslatableHandleableGenericError } from '../src/plugin-translatable-handleable-generic';
-import { PluginI18nEngine } from '../src/plugin-i18n-engine';
 import { LanguageDefinition } from '../src/language-definition';
+import { PluginI18nEngine } from '../src/plugin-i18n-engine';
+import { PluginTranslatableHandleableGenericError as TranslatableHandleableGenericError } from '../src/plugin-translatable-handleable-generic';
 
 const testLanguages: LanguageDefinition[] = [
   { id: 'en', name: 'English', code: 'en', isDefault: true },
@@ -47,7 +47,7 @@ describe('TranslatableHandleableGenericError', () => {
       undefined,
       undefined,
       undefined,
-      { statusCode: 404 }
+      { statusCode: 404 },
     );
 
     expect(error.statusCode).toBe(404);
@@ -62,7 +62,7 @@ describe('TranslatableHandleableGenericError', () => {
       undefined,
       undefined,
       undefined,
-      { cause }
+      { cause },
     );
 
     expect(error.cause).toBe(cause);
@@ -77,7 +77,7 @@ describe('TranslatableHandleableGenericError', () => {
       undefined,
       undefined,
       undefined,
-      { sourceData }
+      { sourceData },
     );
 
     expect(error.sourceData).toEqual(sourceData);
@@ -95,7 +95,7 @@ describe('TranslatableHandleableGenericError', () => {
     const error = new TranslatableHandleableGenericError(
       'test',
       'errorTemplate',
-      { message: 'test message' }
+      { message: 'test message' },
     );
 
     expect(error.message).toBe('Error: test message');
@@ -110,7 +110,7 @@ describe('TranslatableHandleableGenericError', () => {
       undefined,
       undefined,
       undefined,
-      { statusCode: 400, cause, sourceData: { key: 'value' } }
+      { statusCode: 400, cause, sourceData: { key: 'value' } },
     );
 
     const json = error.toJSON();

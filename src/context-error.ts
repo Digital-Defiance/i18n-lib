@@ -5,7 +5,7 @@ export class ContextError extends Error {
   public readonly contextKey?: string;
 
   constructor(type: ContextErrorType, contextKey?: string) {
-    const message = contextKey 
+    const message = contextKey
       ? `Invalid context: ${contextKey}`
       : 'Invalid context';
     super(message);

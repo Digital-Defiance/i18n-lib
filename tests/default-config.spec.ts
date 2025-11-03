@@ -1,5 +1,5 @@
+import { LanguageCodes } from '../src';
 import {
-  DefaultLanguageCode,
   DefaultLanguageCodes,
   DefaultStringKey,
   Language,
@@ -7,7 +7,6 @@ import {
   getDefaultI18nEngine,
   getI18nEngine,
 } from '../src/default-config';
-import { LanguageCodes } from '../src';
 import { I18nEngine } from '../src/i18n-engine';
 
 describe('DefaultConfig', () => {

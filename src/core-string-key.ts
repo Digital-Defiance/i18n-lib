@@ -18,7 +18,6 @@ export enum CoreStringKey {
   Common_Warning = 'common_warning',
   Common_Info = 'common_info',
   Common_Disposed = 'common_disposed',
-
   // Error Messages
   Error_InvalidInput = 'error_invalidInput',
   Error_NetworkError = 'error_networkError',

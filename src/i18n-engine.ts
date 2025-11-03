@@ -3,7 +3,7 @@ import { EnumTranslationRegistry } from './enum-registry';
 import { I18nConfig } from './i18n-config';
 import { I18nContext } from './i18n-context';
 import { createTemplateProcessor } from './template';
-import { EnumLanguageTranslation, LanguageContextSpace } from './types';
+import { EnumLanguageTranslation } from './types';
 import { isTemplate, replaceVariables } from './utils';
 
 /**
@@ -13,9 +13,7 @@ export class I18nEngine<
   TStringKey extends string,
   TLanguage extends string,
   TConstants extends Record<string, any> = Record<string, any>,
-  TContext extends I18nContext<TLanguage> = I18nContext<
-    TLanguage
-  >,
+  TContext extends I18nContext<TLanguage> = I18nContext<TLanguage>,
 > {
   /**
    * Registry for enum translations
@@ -24,11 +22,7 @@ export class I18nEngine<
   /**
    * Configuration for the i18n engine
    */
-  public readonly config: I18nConfig<
-    TStringKey,
-    TLanguage,
-    TConstants
-  >;
+  public readonly config: I18nConfig<TStringKey, TLanguage, TConstants>;
 
   /**
    * Static instances for semi-singleton pattern
@@ -483,8 +477,8 @@ export class I18nEngine<
     const template = key.includes('MissingStringCollection')
       ? I18nEngine.ErrorTemplates.MissingStringCollection
       : key.includes('MissingTranslation')
-      ? I18nEngine.ErrorTemplates.MissingTranslation
-      : I18nEngine.ErrorTemplates.DefaultLanguageNoCollection;
+        ? I18nEngine.ErrorTemplates.MissingTranslation
+        : I18nEngine.ErrorTemplates.DefaultLanguageNoCollection;
 
     return replaceVariables(template, vars);
   }

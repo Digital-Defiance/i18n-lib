@@ -35,7 +35,9 @@ export class LanguageRegistry {
 
     // Check for duplicate language code
     if (LanguageRegistry.languagesByCodes.has(language.code)) {
-      const existingLanguageId = LanguageRegistry.languagesByCodes.get(language.code)!;
+      const existingLanguageId = LanguageRegistry.languagesByCodes.get(
+        language.code,
+      )!;
       throw RegistryError.createSimple(
         RegistryErrorType.DuplicateLanguage,
         `Language code '${language.code}' is already used by language '${existingLanguageId}'`,
@@ -56,7 +58,9 @@ export class LanguageRegistry {
   /**
    * Register multiple languages at once
    */
-  public static registerLanguages(languages: readonly LanguageDefinition[]): void {
+  public static registerLanguages(
+    languages: readonly LanguageDefinition[],
+  ): void {
     for (const language of languages) {
       LanguageRegistry.registerLanguage(language);
     }
@@ -65,14 +69,18 @@ export class LanguageRegistry {
   /**
    * Get a language by its ID
    */
-  public static getLanguage(languageId: string): LanguageDefinition | undefined {
+  public static getLanguage(
+    languageId: string,
+  ): LanguageDefinition | undefined {
     return LanguageRegistry.languages.get(languageId);
   }
 
   /**
    * Get a language by its code
    */
-  public static getLanguageByCode(code: string): LanguageDefinition | undefined {
+  public static getLanguageByCode(
+    code: string,
+  ): LanguageDefinition | undefined {
     const languageId = LanguageRegistry.languagesByCodes.get(code);
     return languageId ? LanguageRegistry.languages.get(languageId) : undefined;
   }
@@ -117,7 +125,8 @@ export class LanguageRegistry {
    */
   public static getDefaultLanguage(): LanguageDefinition | null {
     return LanguageRegistry.defaultLanguageId
-      ? LanguageRegistry.languages.get(LanguageRegistry.defaultLanguageId) || null
+      ? LanguageRegistry.languages.get(LanguageRegistry.defaultLanguageId) ||
+          null
       : null;
   }
 

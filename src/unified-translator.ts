@@ -1,5 +1,5 @@
-import { PluginI18nEngine } from './plugin-i18n-engine';
 import { I18nEngine } from './i18n-engine';
+import { PluginI18nEngine } from './plugin-i18n-engine';
 
 interface PluginSource {
   type: 'plugin';
@@ -65,17 +65,22 @@ export class UnifiedTranslator<TLanguage extends string = string> {
     language?: TLanguage,
   ): string {
     const lang = language || this.defaultLanguage;
-    const [sourceName, actualKey] = key.includes(':') 
-      ? key.split(':', 2) 
+    const [sourceName, actualKey] = key.includes(':')
+      ? key.split(':', 2)
       : [this.defaultSource, key];
 
     if (!sourceName) return `[${key}]`;
-    
+
     const source = this.sources.get(sourceName);
     if (!source) return `[${key}]`;
 
     if (source.type === 'plugin') {
-      return source.engine.safeTranslate(source.componentId, actualKey, vars, lang);
+      return source.engine.safeTranslate(
+        source.componentId,
+        actualKey,
+        vars,
+        lang,
+      );
     } else {
       return source.engine.safeTranslate(actualKey as any, vars, lang);
     }

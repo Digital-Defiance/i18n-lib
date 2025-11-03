@@ -1,10 +1,12 @@
 import { IActiveContext } from './active-context';
 import { CurrencyCode } from './currency-code';
-import { DefaultLanguageCode } from './default-config';
 import { Timezone } from './timezone';
 import { LanguageContextSpace } from './types';
 
-export interface IGlobalActiveContext<TLanguage extends string, TActiveContext extends IActiveContext<TLanguage>> {
+export interface IGlobalActiveContext<
+  TLanguage extends string,
+  TActiveContext extends IActiveContext<TLanguage>,
+> {
   context: TActiveContext;
   userLanguage: TLanguage;
   currencyCode: CurrencyCode;
@@ -19,41 +21,19 @@ export interface IGlobalActiveContext<TLanguage extends string, TActiveContext e
     key?: string,
   ): TActiveContext;
 
-  getContext(
-    key?: string,
-  ): TActiveContext;
+  getContext(key?: string): TActiveContext;
 
-  setUserLanguage(
-    language: TLanguage,
-    key?: string,
-  ): void;
+  setUserLanguage(language: TLanguage, key?: string): void;
 
-  setCurrencyCode(
-    code: CurrencyCode,
-    key?: string,
-  ): void;
+  setCurrencyCode(code: CurrencyCode, key?: string): void;
 
-  setAdminLanguage(
-    language: TLanguage,
-    key?: string,
-  ): void;
+  setAdminLanguage(language: TLanguage, key?: string): void;
 
-  setLanguageContextSpace(
-    context: LanguageContextSpace,
-    key?: string,
-  ): void;
+  setLanguageContextSpace(context: LanguageContextSpace, key?: string): void;
 
-  getLanguageContextSpace(
-    key?: string,
-  ): LanguageContextSpace;
+  getLanguageContextSpace(key?: string): LanguageContextSpace;
 
-  setUserTimezone(
-    tz: Timezone,
-    key?: string,
-  ): void;
+  setUserTimezone(tz: Timezone, key?: string): void;
 
-  setAdminTimezone(
-    tz: Timezone,
-    key?: string,
-  ): void;
+  setAdminTimezone(tz: Timezone, key?: string): void;
 }

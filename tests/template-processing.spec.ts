@@ -1,10 +1,4 @@
-import {
-  DefaultLanguageCode,
-  I18nEngine,
-  buildReasonMap,
-  isTemplate,
-  LanguageCodes,
-} from '../src';
+import { buildReasonMap, I18nEngine, isTemplate, LanguageCodes } from '../src';
 
 describe('Template Processing with buildReasonMap', () => {
   enum TestErrorType {

@@ -426,7 +426,10 @@ describe('Component Registration Validation', () => {
         stringKeys: ['error', 'success'],
       };
 
-      const coreRegistration: ComponentRegistration<'error' | 'success', 'en' | 'fr' | 'es'> = {
+      const coreRegistration: ComponentRegistration<
+        'error' | 'success',
+        'en' | 'fr' | 'es'
+      > = {
         component: coreComponent,
         strings: {
           en: {
@@ -501,7 +504,7 @@ describe('Component Registration Validation', () => {
         'en',
         { salutation: 'Hello' },
         { name: 'John' },
-        { day: 'Monday' }
+        { day: 'Monday' },
       );
       expect(result).toBe('Hello, John! Today is Monday.');
     });

@@ -1,11 +1,10 @@
 import {
   ComponentDefinition,
   ComponentRegistration,
+  CurrencyCode,
   LanguageDefinition,
   LanguageRegistry,
   PluginI18nEngine,
-  RegistryError,
-  CurrencyCode,
   Timezone,
 } from '../src';
 
@@ -81,7 +80,7 @@ describe('PluginI18nEngine', () => {
         { id: 'en', name: 'English', code: 'en' },
       ];
       const testEngine = new PluginI18nEngine(langs);
-      
+
       const context = testEngine.getContext();
       expect(context.language).toBe('fr');
     });
@@ -95,7 +94,10 @@ describe('PluginI18nEngine', () => {
         stringKeys: Object.values(TestStrings),
       };
 
-      const registration: ComponentRegistration<TestStrings, 'en' | 'fr' | 'es'> = {
+      const registration: ComponentRegistration<
+        TestStrings,
+        'en' | 'fr' | 'es'
+      > = {
         component: testComponent,
         strings: {
           en: {
@@ -134,7 +136,12 @@ describe('PluginI18nEngine', () => {
     });
 
     it('should translate with specified language', () => {
-      const result = engine.translate('test-component', TestStrings.Welcome, undefined, 'fr');
+      const result = engine.translate(
+        'test-component',
+        TestStrings.Welcome,
+        undefined,
+        'fr',
+      );
       expect(result).toBe('Bienvenue');
     });
 
@@ -144,7 +151,10 @@ describe('PluginI18nEngine', () => {
     });
 
     it('should get detailed translation response', () => {
-      const response = engine.getTranslationDetails('test-component', TestStrings.Welcome);
+      const response = engine.getTranslationDetails(
+        'test-component',
+        TestStrings.Welcome,
+      );
       expect(response.translation).toBe('Welcome');
       expect(response.actualLanguage).toBe('en');
       expect(response.wasFallback).toBe(false);
@@ -164,20 +174,23 @@ describe('PluginI18nEngine', () => {
         stringKeys: Object.values(AliasStrings),
       };
 
-      const aliasRegistration: ComponentRegistration<AliasStrings, 'en' | 'fr' | 'es'> = {
+      const aliasRegistration: ComponentRegistration<
+        AliasStrings,
+        'en' | 'fr' | 'es'
+      > = {
         component: aliasComponent,
         strings: {
           en: {
             [AliasStrings.WelcomeMessage]: 'Alias welcome',
-            [AliasStrings.FarewellTemplate]: 'Goodbye, {name}!'
+            [AliasStrings.FarewellTemplate]: 'Goodbye, {name}!',
           },
           fr: {
             [AliasStrings.WelcomeMessage]: 'Alias bienvenue',
-            [AliasStrings.FarewellTemplate]: 'Au revoir, {name}!'
+            [AliasStrings.FarewellTemplate]: 'Au revoir, {name}!',
           },
           es: {
             [AliasStrings.WelcomeMessage]: 'Alias bienvenido',
-            [AliasStrings.FarewellTemplate]: '¡Adiós, {name}!'
+            [AliasStrings.FarewellTemplate]: '¡Adiós, {name}!',
           },
         },
         enumName: 'AliasStrings',
@@ -199,12 +212,16 @@ describe('PluginI18nEngine', () => {
     });
 
     it('should translate using component id with canonical keys', () => {
-      const result = engine.t('{{alias-component.farewellTemplate}}', 'es', { name: 'Carlos' });
+      const result = engine.t('{{alias-component.farewellTemplate}}', 'es', {
+        name: 'Carlos',
+      });
       expect(result).toBe('¡Adiós, Carlos!');
     });
 
     it('should translate template strings using enum keys', () => {
-      const result = engine.t('{{AliasStrings.FarewellTemplate}}', 'en', { name: 'Jamie' });
+      const result = engine.t('{{AliasStrings.FarewellTemplate}}', 'en', {
+        name: 'Jamie',
+      });
       expect(result).toBe('Goodbye, Jamie!');
     });
   });
@@ -272,7 +289,10 @@ describe('PluginI18nEngine', () => {
         stringKeys: Object.values(CoreStrings),
       };
 
-      const coreRegistration: ComponentRegistration<CoreStrings, 'en' | 'fr' | 'es'> = {
+      const coreRegistration: ComponentRegistration<
+        CoreStrings,
+        'en' | 'fr' | 'es'
+      > = {
         component: coreComponent,
         strings: {
           en: {
@@ -316,7 +336,10 @@ describe('PluginI18nEngine', () => {
         stringKeys: ['greeting'],
       };
 
-      const templateRegistration: ComponentRegistration<'greeting', 'en' | 'fr' | 'es'> = {
+      const templateRegistration: ComponentRegistration<
+        'greeting',
+        'en' | 'fr' | 'es'
+      > = {
         component: templateComponent,
         strings: {
           en: {
@@ -333,7 +356,9 @@ describe('PluginI18nEngine', () => {
 
       engine.registerComponent(templateRegistration);
 
-      const result = engine.t('{{template-test.greeting}}', 'en', { name: 'World' });
+      const result = engine.t('{{template-test.greeting}}', 'en', {
+        name: 'World',
+      });
       expect(result).toBe('Hello, World!');
     });
 
@@ -371,18 +396,16 @@ describe('PluginI18nEngine', () => {
         'en',
         { greeting: 'Hello' },
         { name: 'John' },
-        { day: 'Monday' }
+        { day: 'Monday' },
       );
       expect(result).toBe('Hello, John! Today is Monday.');
     });
 
     it('should handle mixed component patterns and direct variables', () => {
       // Test that both {{component.key}} and {variable} work together
-      const result = engine.t(
-        'Status: {{core.success}} for {user}',
-        'en',
-        { user: 'Alice' }
-      );
+      const result = engine.t('Status: {{core.success}} for {user}', 'en', {
+        user: 'Alice',
+      });
       expect(result).toBe('Status: Operation successful for Alice');
     });
 
@@ -394,7 +417,10 @@ describe('PluginI18nEngine', () => {
         stringKeys: ['greetingTemplate'],
       };
 
-      const greetingRegistration: ComponentRegistration<'greetingTemplate', 'en'> = {
+      const greetingRegistration: ComponentRegistration<
+        'greetingTemplate',
+        'en'
+      > = {
         component: greetingComponent,
         strings: {
           en: {
@@ -406,11 +432,9 @@ describe('PluginI18nEngine', () => {
       engine.registerComponent(greetingRegistration);
 
       // The 'template' suffix should trigger using the first variable object
-      const result = engine.t(
-        '{{greeting.greetingTemplate}}',
-        'en',
-        { name: 'Bob' }
-      );
+      const result = engine.t('{{greeting.greetingTemplate}}', 'en', {
+        name: 'Bob',
+      });
       expect(result).toBe('Welcome, Bob!');
     });
 
@@ -514,7 +538,7 @@ describe('PluginI18nEngine', () => {
             [TestEnum.Inactive]: 'Inactivo',
           },
         },
-        'TestEnum'
+        'TestEnum',
       );
     });
 
@@ -533,7 +557,7 @@ describe('PluginI18nEngine', () => {
   describe('component management', () => {
     it('should check if component exists', () => {
       expect(engine.hasComponent('nonexistent')).toBe(false);
-      
+
       const component: ComponentDefinition<TestStrings> = {
         id: 'test-exists',
         name: 'Test Exists',
@@ -588,7 +612,10 @@ describe('PluginI18nEngine', () => {
         },
       };
 
-      const result = engine.updateComponentStrings('update-test', updatedStrings);
+      const result = engine.updateComponentStrings(
+        'update-test',
+        updatedStrings,
+      );
       expect(result.isValid).toBe(false); // Still missing fr and es
 
       const translation = engine.translate('update-test', TestStrings.Welcome);
@@ -629,7 +656,10 @@ describe('PluginI18nEngine', () => {
         stringKeys: Object.values(TestStrings),
       };
 
-      const completeRegistration: ComponentRegistration<TestStrings, 'en' | 'fr' | 'es'> = {
+      const completeRegistration: ComponentRegistration<
+        TestStrings,
+        'en' | 'fr' | 'es'
+      > = {
         component,
         strings: {
           en: {
@@ -664,7 +694,10 @@ describe('PluginI18nEngine', () => {
         stringKeys: Object.values(TestStrings),
       };
 
-      const incompleteRegistration: ComponentRegistration<TestStrings, 'en' | 'fr' | 'es'> = {
+      const incompleteRegistration: ComponentRegistration<
+        TestStrings,
+        'en' | 'fr' | 'es'
+      > = {
         component,
         strings: {
           en: {
@@ -690,7 +723,7 @@ describe('PluginI18nEngine', () => {
       // were filled with fallbacks during registration
       const validation = engine.validateAllComponents();
       expect(validation.isValid).toBe(true); // Fallbacks were added
-      
+
       // But we can verify the component was registered
       expect(engine.hasComponent('incomplete-test')).toBe(true);
     });
@@ -717,7 +750,9 @@ describe('PluginI18nEngine', () => {
 
   describe('static instance management', () => {
     it('should create named instances', () => {
-      const adminEngine = PluginI18nEngine.createInstance('admin', [englishLang]);
+      const adminEngine = PluginI18nEngine.createInstance('admin', [
+        englishLang,
+      ]);
       const userEngine = PluginI18nEngine.createInstance('user', [frenchLang]);
 
       expect(PluginI18nEngine.getInstance('admin')).toBe(adminEngine);
@@ -726,7 +761,7 @@ describe('PluginI18nEngine', () => {
 
     it('should throw error for duplicate instance keys', () => {
       PluginI18nEngine.createInstance('duplicate', [englishLang]);
-      
+
       expect(() => {
         PluginI18nEngine.createInstance('duplicate', [frenchLang]);
       }).toThrow("I18n instance with key 'duplicate' already exists");
@@ -734,7 +769,7 @@ describe('PluginI18nEngine', () => {
 
     it('should check instance existence', () => {
       expect(PluginI18nEngine.hasInstance('test')).toBe(false);
-      
+
       PluginI18nEngine.createInstance('test', [englishLang]);
       expect(PluginI18nEngine.hasInstance('test')).toBe(true);
     });
@@ -761,7 +796,10 @@ describe('PluginI18nEngine', () => {
 
   describe('safeTranslate bracket formatting', () => {
     it('should return square bracket format for missing translations', () => {
-      const result = engine.safeTranslate('nonexistent-component', 'missing-key');
+      const result = engine.safeTranslate(
+        'nonexistent-component',
+        'missing-key',
+      );
       expect(result).toBe('[nonexistent-component.missing-key]');
     });
 
@@ -782,7 +820,11 @@ describe('PluginI18nEngine', () => {
     it('should handle various component and key combinations', () => {
       const testCases = [
         { component: 'comp1', key: 'key1', expected: '[comp1.key1]' },
-        { component: 'my-component', key: 'my-key', expected: '[my-component.my-key]' },
+        {
+          component: 'my-component',
+          key: 'my-key',
+          expected: '[my-component.my-key]',
+        },
         { component: 'core', key: 'error', expected: '[core.error]' },
       ];
 
@@ -795,7 +837,9 @@ describe('PluginI18nEngine', () => {
     it('should not throw errors for any input', () => {
       expect(() => engine.safeTranslate('', '')).not.toThrow();
       expect(() => engine.safeTranslate('a', 'b')).not.toThrow();
-      expect(() => engine.safeTranslate('test', 'key', { var: 'value' })).not.toThrow();
+      expect(() =>
+        engine.safeTranslate('test', 'key', { var: 'value' }),
+      ).not.toThrow();
     });
 
     it('should return actual translation when component exists', () => {
@@ -840,7 +884,9 @@ describe('PluginI18nEngine', () => {
 
       engine.registerComponent(registration);
 
-      const result = engine.safeTranslate('var-test', 'template', { name: 'World' });
+      const result = engine.safeTranslate('var-test', 'template', {
+        name: 'World',
+      });
       expect(result).toBe('Hello, World!');
     });
 
@@ -854,7 +900,7 @@ describe('PluginI18nEngine', () => {
       // When t function encounters a missing component.key, it should use safeTranslate
       const tResult = engine.t('{{missing.key}}');
       const safeResult = engine.safeTranslate('missing', 'key');
-      
+
       expect(tResult).toBe(safeResult);
       expect(tResult).toBe('[missing.key]');
     });

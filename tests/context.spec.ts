@@ -93,8 +93,6 @@ describe('context utilities', () => {
       expect(context.language).toBe(TestLanguages.English); // Should remain unchanged
       expect(context.adminLanguage).toBe(TestLanguages.English); // Should remain unchanged
     });
-
-
   });
 
   describe('setTimezone', () => {

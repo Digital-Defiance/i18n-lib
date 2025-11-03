@@ -1,5 +1,5 @@
-import { I18nEngine } from './i18n-engine';
 import { Language } from './default-config';
+import { I18nEngine } from './i18n-engine';
 
 export class TranslatableError<TStringKey extends string> extends Error {
   constructor(

@@ -22,22 +22,27 @@ export enum DefaultStringKey {
 }
 
 // Default language codes used by the library
-export type DefaultLanguageCode = 
+export type DefaultLanguageCode =
   | typeof LanguageCodes.EN_US
   | typeof LanguageCodes.EN_GB
   | typeof LanguageCodes.FR
   | typeof LanguageCodes.ES
+  | typeof LanguageCodes.DE
+  | typeof LanguageCodes.JA
   | typeof LanguageCodes.ZH_CN
   | typeof LanguageCodes.UK;
 
-export const DefaultLanguageCodes: LanguageCodeCollection<DefaultLanguageCode> = {
-  [LanguageCodes.EN_US]: 'en-US',
-  [LanguageCodes.EN_GB]: 'en-GB',
-  [LanguageCodes.FR]: 'fr',
-  [LanguageCodes.ES]: 'es',
-  [LanguageCodes.ZH_CN]: 'zh-CN',
-  [LanguageCodes.UK]: 'uk',
-};
+export const DefaultLanguageCodes: LanguageCodeCollection<DefaultLanguageCode> =
+  {
+    [LanguageCodes.EN_US]: 'en-US',
+    [LanguageCodes.EN_GB]: 'en-GB',
+    [LanguageCodes.FR]: 'fr',
+    [LanguageCodes.ES]: 'es',
+    [LanguageCodes.DE]: 'de',
+    [LanguageCodes.JA]: 'ja',
+    [LanguageCodes.ZH_CN]: 'zh-CN',
+    [LanguageCodes.UK]: 'uk',
+  };
 
 // Global interface that can be augmented by consumers
 declare global {
@@ -64,9 +69,7 @@ export type DefaultLanguageCodesType = I18n.Config['LanguageCodes'];
 // Singleton instance that uses the augmented types
 export const getI18nEngine = (): Engine => I18nEngine.getInstance() as Engine;
 
-const getConfig = <
-  TConstants extends Record<string, any>,
->(
+const getConfig = <TConstants extends Record<string, any>>(
   constants: TConstants,
   timezone?: Timezone,
   adminTimezone?: Timezone,
@@ -147,6 +150,36 @@ const getConfig = <
       [DefaultStringKey.Error_MissingTranslationKeyTemplate]:
         'Falta clave de traducción para el tipo: {type}',
     },
+    [LanguageCodes.DE]: {
+      [DefaultStringKey.Common_Test]: 'Test',
+      [DefaultStringKey.Error_InstanceAlreadyExistsTemplate]:
+        "Instanz mit Schlüssel '{key}' existiert bereits",
+      [DefaultStringKey.Error_InstanceNotFoundTemplate]:
+        "Instanz mit Schlüssel '{key}' nicht gefunden",
+      [DefaultStringKey.Error_MissingStringCollectionTemplate]:
+        'Fehlende String-Sammlung für Sprache: {language}',
+      [DefaultStringKey.Error_MissingTranslationTemplate]:
+        "Fehlende Übersetzung für Schlüssel '{key}' in Sprache '{language}'",
+      [DefaultStringKey.Error_DefaultLanguageNoCollectionTemplate]:
+        "Standardsprache '{language}' hat keine String-Sammlung",
+      [DefaultStringKey.Error_MissingTranslationKeyTemplate]:
+        'Fehlender Übersetzungsschlüssel für Typ: {type}',
+    },
+    [LanguageCodes.JA]: {
+      [DefaultStringKey.Common_Test]: 'テスト',
+      [DefaultStringKey.Error_InstanceAlreadyExistsTemplate]:
+        "キー'{key}'のインスタンスは既に存在します",
+      [DefaultStringKey.Error_InstanceNotFoundTemplate]:
+        "キー'{key}'のインスタンスが見つかりません",
+      [DefaultStringKey.Error_MissingStringCollectionTemplate]:
+        '言語の文字列コレクションがありません: {language}',
+      [DefaultStringKey.Error_MissingTranslationTemplate]:
+        "言語'{language}'でキー'{key}'の翻訳がありません",
+      [DefaultStringKey.Error_DefaultLanguageNoCollectionTemplate]:
+        "デフォルト言語'{language}'に文字列コレクションがありません",
+      [DefaultStringKey.Error_MissingTranslationKeyTemplate]:
+        'タイプの翻訳キーがありません: {type}',
+    },
     [LanguageCodes.UK]: {
       [DefaultStringKey.Common_Test]: 'Тест',
       [DefaultStringKey.Error_InstanceAlreadyExistsTemplate]:
@@ -168,7 +201,16 @@ const getConfig = <
   defaultTranslationContext: 'user' as LanguageContextSpace,
   defaultCurrencyCode: new CurrencyCode(DefaultCurrencyCode),
   languageCodes: DefaultLanguageCodes,
-  languages: [LanguageCodes.EN_US, LanguageCodes.EN_GB, LanguageCodes.FR, LanguageCodes.ES, LanguageCodes.ZH_CN, LanguageCodes.UK],
+  languages: [
+    LanguageCodes.EN_US,
+    LanguageCodes.EN_GB,
+    LanguageCodes.FR,
+    LanguageCodes.ES,
+    LanguageCodes.DE,
+    LanguageCodes.JA,
+    LanguageCodes.ZH_CN,
+    LanguageCodes.UK,
+  ],
   constants: constants,
   enumName: 'DefaultStringKey',
   enumObj: DefaultStringKey as Record<string, DefaultStringKey>,
@@ -184,16 +226,7 @@ export const getDefaultI18nEngine = <
   timezone?: Timezone,
   adminTimezone?: Timezone,
 ) =>
-  new I18nEngine<
-    DefaultStringKey,
-    DefaultLanguageCode,
-    TConstants,
-    TContext
-  >(
-    getConfig<TConstants>(
-      constants,
-      timezone,
-      adminTimezone,
-    ),
+  new I18nEngine<DefaultStringKey, DefaultLanguageCode, TConstants, TContext>(
+    getConfig<TConstants>(constants, timezone, adminTimezone),
     'user' as LanguageContextSpace,
   );
