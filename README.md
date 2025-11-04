@@ -405,6 +405,10 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 2.0.3
+
+- Export error classes
+
 ### Version 2.0.2
 
 - Version bump
