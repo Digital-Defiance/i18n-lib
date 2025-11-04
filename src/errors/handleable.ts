@@ -18,6 +18,7 @@ export class HandleableError extends Error implements IHandleable {
     this.statusCode = options?.statusCode ?? 500;
     this._handled = options?.handled ?? false;
     this.sourceData = options?.sourceData;
+    this.name = 'HandleableError';
 
     // Capture stack trace - prioritize source stack, then capture new one
     if (source.stack) {

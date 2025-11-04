@@ -68,6 +68,7 @@ export class TypedHandleableError<
     this.reasonMap = reasonMap;
     this.language = language;
     this.otherVars = otherVars;
+    this.name = 'TypedHandleableError';
   }
 
   public override toJSON(): Record<string, unknown> {

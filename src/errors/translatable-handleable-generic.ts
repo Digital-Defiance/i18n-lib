@@ -41,6 +41,7 @@ export class TranslatableHandleableGenericError<
     this.statusCode = handleableOptions?.statusCode ?? 500;
     this.cause = handleableOptions?.cause;
     this.sourceData = handleableOptions?.sourceData;
+    this.name = 'TranslatableHandleableGenericError';
   }
   public get handled(): boolean {
     return this._handled;

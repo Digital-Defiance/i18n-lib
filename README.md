@@ -482,9 +482,13 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
-### Version 2.1.0 (December 2024)
+### Version 2.1.1
 
-**Major Feature Release** - Enhanced I18nEngine with context variables, comprehensive testing, and improved architecture
+- Minor fix, set this.name in errors
+
+### Version 2.1.0 (December 2025)
+
+**Moderate Feature Release** - Enhanced I18nEngine with context variables, comprehensive testing, and improved architecture
 
 **New Features:**
 
