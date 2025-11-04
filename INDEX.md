@@ -4,10 +4,11 @@
 
 ### Primary Documentation
 - **[README.md](./README.md)** - Complete library documentation with examples and API reference
-- **[MIGRATION_GUIDE.md](./docs/MIGRATION_GUIDE.md)** - Migration guide from v1.x to v2.x
 
-### Historical Documentation (Reference Only)
-The `docs/` directory contains historical planning and architecture documents from the v2.0 refactor. These are kept for reference but may not reflect the current implementation.
+### Additional Documentation
+- **[MIGRATION_GUIDE.md](./docs/MIGRATION_GUIDE.md)** - Migration guide from legacy to plugin-based architecture
+- **[EXTENSION_EXAMPLE.md](./docs/EXTENSION_EXAMPLE.md)** - Type-safe extension with custom languages
+- **[TRANSLATION_ADAPTER_FEATURE.md](./docs/TRANSLATION_ADAPTER_FEATURE.md)** - Using createTranslationAdapter utility
 
 ## 🚀 Quick Start
 
