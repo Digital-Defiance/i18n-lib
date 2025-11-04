@@ -1,13 +1,13 @@
 import { IHandleable } from '../interfaces/handleable';
-import { PluginTranslatableGenericError } from './plugin-translatable-generic';
+import { TranslatableGenericError } from './translatable-generic';
 
 /**
  * Generic translatable error that works with any plugin engine and component
  */
-export class PluginTranslatableHandleableGenericError<
+export class TranslatableHandleableGenericError<
     TStringKey extends string = string,
   >
-  extends PluginTranslatableGenericError<TStringKey>
+  extends TranslatableGenericError<TStringKey>
   implements IHandleable
 {
   private _handled = false;

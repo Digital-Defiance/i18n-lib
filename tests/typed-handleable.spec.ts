@@ -1,9 +1,10 @@
 import { HandleableError } from '../src/errors/handleable';
 import { HandleableErrorOptions } from '../src/interfaces/handleable-error-options';
-import { PluginI18nEngine } from '../src/plugin-i18n-engine';
 import { LanguageCodes } from '../src/language-codes';
 import { CompleteReasonMap } from '../src/errors/typed';
 import { TypedHandleableError } from '../src/errors/typed-handleable';
+import { I18nEngine } from '../src/core/i18n-engine';
+import { CoreI18nComponentId, CoreStringKey } from '../src';
 
 type TestLanguageCode =
   | typeof LanguageCodes.EN_US
@@ -40,71 +41,44 @@ class TestTypedError extends TypedHandleableError<
     otherVars?: Record<string, string | number>,
     options?: HandleableErrorOptions,
   ) {
-    let engine: PluginI18nEngine<string>;
-    try {
-      engine = PluginI18nEngine.getInstance<string>('testEngine');
-    } catch {
-      const languages = [
-        { id: LanguageCodes.EN_US, name: 'English (US)', code: 'en-US', isDefault: true },
-        { id: LanguageCodes.EN_GB, name: 'English (UK)', code: 'en-GB' },
-        { id: LanguageCodes.FR, name: 'French', code: 'fr' },
-        { id: LanguageCodes.ES, name: 'Spanish', code: 'es' },
-        { id: LanguageCodes.DE, name: 'German', code: 'de' },
-        { id: LanguageCodes.JA, name: 'Japanese', code: 'ja' },
-        { id: LanguageCodes.ZH_CN, name: 'Chinese', code: 'zh-CN' },
-        { id: LanguageCodes.UK, name: 'Ukrainian', code: 'uk' },
-      ];
-      engine = PluginI18nEngine.createInstance<string>('testEngine', languages);
-      engine.registerComponent({
-        component: {
-          id: 'test-component',
-          name: 'Test Component',
-          stringKeys: [TestStringKeys.Common_Test, TestStringKeys.Error_MissingTranslationTemplate],
-        },
-        strings: {
-          [LanguageCodes.EN_US]: {
-            [TestStringKeys.Common_Test]: 'This is a test error message.',
-            [TestStringKeys.Error_MissingTranslationTemplate]: 'Missing template variable: {key} in language {language}.',
-          },
-          [LanguageCodes.EN_GB]: {
-            [TestStringKeys.Common_Test]: 'This is a test error message (UK).',
-            [TestStringKeys.Error_MissingTranslationTemplate]: 'Missing template variable: {key} in language {language} (UK).',
-          },
-          [LanguageCodes.FR]: {
-            [TestStringKeys.Common_Test]: "Ceci est un message d'erreur de test.",
-            [TestStringKeys.Error_MissingTranslationTemplate]: 'Variable de modèle manquante : {key} dans la langue {language}.',
-          },
-          [LanguageCodes.ES]: {
-            [TestStringKeys.Common_Test]: 'Este es un mensaje de error de prueba.',
-            [TestStringKeys.Error_MissingTranslationTemplate]: 'Falta la variable de plantilla: {key} en el idioma {language}.',
-          },
-          [LanguageCodes.ZH_CN]: {
-            [TestStringKeys.Common_Test]: '这是一个测试错误消息。',
-            [TestStringKeys.Error_MissingTranslationTemplate]: '缺少模板变量：{key} 在语言 {language} 中。',
-          },
-          [LanguageCodes.JA]: {
-            [TestStringKeys.Common_Test]: 'これはテストエラーメッセージです。',
-            [TestStringKeys.Error_MissingTranslationTemplate]: 'テンプレート変数がありません: {key} 言語 {language} で。',
-          },
-          [LanguageCodes.DE]: {
-            [TestStringKeys.Common_Test]: 'Dies ist eine Testfehlermeldung.',
-            [TestStringKeys.Error_MissingTranslationTemplate]: 'Fehlender Vorlagenvariable: {key} in Sprache {language}.',
-          },
-          [LanguageCodes.UK]: {
-            [TestStringKeys.Common_Test]: 'Це тестове повідомлення про помилку.',
-            [TestStringKeys.Error_MissingTranslationTemplate]: 'Відсутня змінна шаблону: {key} мовою {language}.',
-          },
-        },
-      });
-    }
-    super(type, testReasonMap, 'test-component', language, otherVars, options);
+    super('test-component', type, testReasonMap, new Error(), options, language, otherVars);
     this.name = 'TestTypedError';
   }
 }
 
 describe('TypedError', () => {
   beforeEach(() => {
-    PluginI18nEngine.resetAll();
+    I18nEngine.resetAll();
+    const engine = new I18nEngine([
+      { id: LanguageCodes.EN_US, name: 'English (US)', code: 'en-US', isDefault: true },
+      { id: LanguageCodes.FR, name: 'French', code: 'fr' },
+    ]);
+    
+    engine.register({
+      id: CoreI18nComponentId,
+      strings: {
+        [LanguageCodes.EN_US]: {
+          [CoreStringKey.Error_MissingTranslationKeyTemplate]: "Missing translation key: {stringKey}",
+        },
+        [LanguageCodes.FR]: {
+          [CoreStringKey.Error_MissingTranslationKeyTemplate]: "Clé de traduction manquante: {stringKey}",
+        },
+      },
+    });
+    
+    engine.register({
+      id: 'test-component',
+      strings: {
+        [LanguageCodes.EN_US]: {
+          [TestStringKeys.Common_Test]: 'This is a test error message.',
+          [TestStringKeys.Error_MissingTranslationTemplate]: 'Missing template variable: {key} in language {language}.',
+        },
+        [LanguageCodes.FR]: {
+          [TestStringKeys.Common_Test]: "Ceci est un message d'erreur de test.",
+          [TestStringKeys.Error_MissingTranslationTemplate]: 'Variable de modèle manquante : {key} dans la langue {language}.',
+        },
+      },
+    });
   });
   it('should create typed error with simple translation', () => {
     const error = new TestTypedError(TestErrorType.Simple);
@@ -209,4 +183,47 @@ describe('TypedError', () => {
     expect(error.stack).toBeDefined();
     expect(error.cause).toBe(cause);
   });
+
+  it('should create error with custom status code', () => {
+    const error = new TestTypedError(
+      TestErrorType.Simple,
+      undefined,
+      undefined,
+      { statusCode: 404 },
+    );
+
+    expect(error.statusCode).toBe(404);
+  });
+
+  it('should create error with source data', () => {
+    const sourceData = { userId: 123, action: 'login' };
+    const error = new TestTypedError(
+      TestErrorType.Simple,
+      undefined,
+      undefined,
+      { sourceData },
+    );
+
+    expect(error.sourceData).toEqual(sourceData);
+  });
+
+  it('should preserve source stack trace', () => {
+    const source = new Error('Source error');
+    const error = new TypedHandleableError(
+      'test-component',
+      TestErrorType.Simple,
+      testReasonMap,
+      source,
+    );
+
+    expect(error.stack).toBe(source.stack);
+  });
+
+  it('should omit sourceData from JSON when undefined', () => {
+    const error = new TestTypedError(TestErrorType.Simple);
+
+    const json = error.toJSON();
+    expect(json.sourceData).toBeUndefined();
+  });
 });
+

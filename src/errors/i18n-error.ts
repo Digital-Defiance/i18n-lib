@@ -4,6 +4,7 @@
 
 export const I18nErrorCode = {
   COMPONENT_NOT_FOUND: 'COMPONENT_NOT_FOUND',
+  STRING_KEY_NOT_FOUND: 'STRING_KEY_NOT_FOUND',
   LANGUAGE_NOT_FOUND: 'LANGUAGE_NOT_FOUND',
   TRANSLATION_MISSING: 'TRANSLATION_MISSING',
   INVALID_CONFIG: 'INVALID_CONFIG',
@@ -33,6 +34,14 @@ export class I18nError extends Error {
       I18nErrorCode.COMPONENT_NOT_FOUND,
       `Component '${componentId}' not found`,
       { componentId },
+    );
+  }
+
+  static stringKeyNotFound(componentId: string, stringKey: string): I18nError {
+    return new I18nError(
+      I18nErrorCode.STRING_KEY_NOT_FOUND,
+      `String key '${stringKey}' not found in component '${componentId}'`,
+      { componentId, stringKey },
     );
   }
 

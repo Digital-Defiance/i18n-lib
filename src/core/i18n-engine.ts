@@ -15,6 +15,8 @@ import { ComponentStore } from './component-store';
 import { ContextManager } from './context-manager';
 import { EnumRegistry } from './enum-registry';
 import { LanguageRegistry } from './language-registry';
+import { CurrencyCode } from '../utils/currency';
+import { Timezone } from '../utils/timezone';
 
 export class I18nEngine implements II18nEngine {
   private static instances = new Map<string, I18nEngine>();
@@ -26,6 +28,8 @@ export class I18nEngine implements II18nEngine {
   private readonly enumRegistry: EnumRegistry;
   private readonly instanceKey: string;
   private readonly config: Required<EngineConfig>;
+  private readonly aliasToComponent = new Map<string, string>();
+  private readonly componentKeyLookup = new Map<string, Map<string, string>>();
 
   constructor(
     languages: readonly LanguageDefinition[],
@@ -78,7 +82,96 @@ export class I18nEngine implements II18nEngine {
 
   // Component management
   register(config: ComponentConfig): ValidationResult {
+    this.registerComponentMetadata(config);
     return this.componentStore.register(config);
+  }
+
+  private registerComponentMetadata(config: ComponentConfig): void {
+    const componentId = config.id;
+    const aliases = config.aliases || [];
+    const enumName = (config as any).enumName;
+    const enumObject = (config as any).enumObject;
+
+    const aliasSet = new Set<string>();
+    if (componentId) aliasSet.add(componentId);
+    if (enumName) aliasSet.add(enumName);
+    aliases.forEach((alias) => {
+      if (alias) aliasSet.add(alias);
+    });
+
+    aliasSet.forEach((alias) => {
+      const trimmed = alias.trim();
+      if (trimmed.length > 0) {
+        this.aliasToComponent.set(trimmed, componentId);
+      }
+    });
+
+    if (!this.componentKeyLookup.has(componentId)) {
+      this.componentKeyLookup.set(componentId, new Map<string, string>());
+    }
+    const keyMap = this.componentKeyLookup.get(componentId)!;
+
+    const addKeyVariant = (aliasKey: string, canonicalKey: string) => {
+      if (!aliasKey || !canonicalKey) return;
+      keyMap.set(aliasKey, canonicalKey);
+      const normalized = this.normalizeLegacyKey(aliasKey);
+      if (normalized && normalized !== aliasKey) {
+        keyMap.set(normalized, canonicalKey);
+      }
+    };
+
+    // Get string keys from the strings object
+    const firstLang = Object.keys(config.strings)[0];
+    if (firstLang) {
+      Object.keys(config.strings[firstLang]).forEach((key: string) => {
+        addKeyVariant(key, key);
+      });
+    }
+
+    if (enumObject) {
+      Object.entries(enumObject).forEach(([enumKey, enumValue]) => {
+        if (typeof enumValue === 'string') {
+          addKeyVariant(enumKey, enumValue);
+        }
+      });
+    }
+  }
+
+  private normalizeLegacyKey(rawKey: string): string | null {
+    if (!rawKey) return null;
+    const normalized = rawKey
+      .replace(/[-\s]+/g, '_')
+      .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+      .replace(/__+/g, '_')
+      .toLowerCase();
+    return normalized.length > 0 ? normalized : null;
+  }
+
+  private resolveComponentAndKey(
+    prefix: string,
+    rawKey: string,
+  ): { componentId: string; stringKey: string } {
+    const componentId = this.aliasToComponent.get(prefix) ?? prefix;
+    const keyLookup = this.componentKeyLookup.get(componentId);
+
+    if (!keyLookup) {
+      return { componentId, stringKey: rawKey };
+    }
+
+    const directMatch = keyLookup.get(rawKey);
+    if (directMatch) {
+      return { componentId, stringKey: directMatch };
+    }
+
+    const normalized = this.normalizeLegacyKey(rawKey);
+    if (normalized) {
+      const normalizedMatch = keyLookup.get(normalized);
+      if (normalizedMatch) {
+        return { componentId, stringKey: normalizedMatch };
+      }
+    }
+
+    return { componentId, stringKey: rawKey };
   }
 
   updateStrings(componentId: string, strings: Record<string, Record<string, string>>): ValidationResult {
@@ -101,7 +194,8 @@ export class I18nEngine implements II18nEngine {
     language?: string,
   ): string {
     const lang = language || I18nEngine.contextManager.getCurrentLanguage(this.instanceKey);
-    return this.componentStore.translate(componentId, key, variables, lang);
+    const combinedVars = this.buildCombinedVariables(variables);
+    return this.componentStore.translate(componentId, key, combinedVars, lang);
   }
 
   safeTranslate(
@@ -111,30 +205,120 @@ export class I18nEngine implements II18nEngine {
     language?: string,
   ): string {
     const lang = language || I18nEngine.contextManager.getCurrentLanguage(this.instanceKey);
-    return this.componentStore.safeTranslate(componentId, key, variables, lang);
+    const combinedVars = this.buildCombinedVariables(variables);
+    return this.componentStore.safeTranslate(componentId, key, combinedVars, lang);
   }
 
   t(template: string, variables?: Record<string, any>, language?: string): string {
     const lang = language || I18nEngine.contextManager.getCurrentLanguage(this.instanceKey);
 
-    // Replace {{component.key}} patterns
+    // Build combined variables: constants + context + provided (provided overrides all)
+    const combinedVars = this.buildCombinedVariables(variables);
+
+    // Replace {{component.key}} or {{EnumName.key}} patterns with alias support
     let result = template.replace(/\{\{([^}]+)\}\}/g, (match, pattern) => {
       const parts = pattern.split('.');
       if (parts.length === 2) {
-        const [componentId, key] = parts.map((p: string) => p.trim());
-        return this.safeTranslate(componentId, key, variables, lang);
+        const [rawPrefix, rawKey] = parts;
+        const prefix = rawPrefix.trim();
+        const key = rawKey.trim();
+        
+        // Always pass combined variables to translations
+        // The translation will use them if the string has placeholders
+        // Resolve aliases and enum names to actual component IDs
+        const { componentId, stringKey } = this.resolveComponentAndKey(prefix, key);
+        return this.safeTranslate(componentId, stringKey, combinedVars, lang);
       }
       return match;
     });
 
-    // Replace {variable} patterns
-    if (variables) {
-      result = result.replace(/\{(\w+)\}/g, (match, varName) => {
-        return variables[varName] !== undefined ? String(variables[varName]) : match;
-      });
-    }
+    // Replace {variable} patterns with combined variables
+    result = result.replace(/\{(\w+)\}/g, (match, varName) => {
+      return combinedVars[varName] !== undefined ? String(combinedVars[varName]) : match;
+    });
 
     return result;
+  }
+
+  private buildCombinedVariables(variables?: Record<string, any>): Record<string, any> {
+    const combined: Record<string, any> = {};
+
+    // 1. Start with constants from config
+    if (this.config.constants) {
+      // Extract values from any wrapper objects in constants
+      for (const [key, value] of Object.entries(this.config.constants)) {
+        combined[key] = this.extractValue(value);
+      }
+    }
+
+    // 2. Add context variables (timezone, currency, language, etc.)
+    // GlobalActiveContext is optional and may not be available in all environments
+    try {
+      // Check if GlobalActiveContext is available in global scope
+      const GlobalActiveContext = (globalThis as any).GlobalActiveContext;
+
+      if (GlobalActiveContext && typeof GlobalActiveContext.getInstance === 'function') {
+        const globalContext = GlobalActiveContext.getInstance();
+        const context = globalContext?.context;
+
+        if (context) {
+          // Add context variables
+          combined.language = context.language;
+          combined.adminLanguage = context.adminLanguage;
+          combined.currentContext = context.currentContext;
+          
+          if (context.currencyCode) {
+            // Extract value from CurrencyCode object
+            const currencyValue = this.extractValue(context.currencyCode);
+            combined.currencyCode = currencyValue;
+            combined.currency = currencyValue;
+          }
+          
+          if (context.timezone) {
+            // Extract value from Timezone object
+            const timezoneValue = this.extractValue(context.timezone);
+            combined.timezone = timezoneValue;
+            combined.userTimezone = timezoneValue;
+          }
+          
+          if (context.adminTimezone) {
+            // Extract value from Timezone object
+            combined.adminTimezone = this.extractValue(context.adminTimezone);
+          }
+        }
+      }
+    } catch (error) {
+      // GlobalActiveContext not available or not initialized - continue without context vars
+    }
+
+    // 3. Override with provided variables (highest priority)
+    // Also extract values from any CurrencyCode or Timezone objects
+    if (variables) {
+      const processedVars: Record<string, any> = {};
+      for (const [key, value] of Object.entries(variables)) {
+        processedVars[key] = this.extractValue(value);
+      }
+      Object.assign(combined, processedVars);
+    }
+
+    return combined;
+  }
+
+  private extractValue(value: any): any {
+    // Handle CurrencyCode objects
+    if (value instanceof CurrencyCode) {
+      return value.value;
+    }
+    // Handle Timezone objects
+    if (value instanceof Timezone) {
+      return value.value;
+    }
+    // Handle objects with a 'value' property (duck typing for cross-context compatibility)
+    if (value && typeof value === 'object' && 'value' in value && typeof value.value !== 'function') {
+      return value.value;
+    }
+    // Return as-is for primitives and other objects
+    return value;
   }
 
   // Language management

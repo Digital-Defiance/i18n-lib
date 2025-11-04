@@ -6,12 +6,20 @@ A production-ready TypeScript internationalization library with component-based 
 
 - **Component-Based Architecture**: Register translation components with full type safety
 - **8 Built-in Languages**: English (US/UK), French, Spanish, German, Chinese, Japanese, Ukrainian
-- **Template Processing**: Support for variable substitution and component references
+- **Advanced Template Processing**: 
+  - Component references: `{{Component.key}}`
+  - Alias resolution: `{{Alias.key}}`
+  - Enum name resolution: `{{EnumName.value}}`
+  - Variable substitution: `{variable}`
+  - Context variables: `{currency}`, `{timezone}`, `{language}`
+- **Context Integration**: Automatic injection of currency, timezone, and language from GlobalActiveContext
+- **Smart Object Handling**: CurrencyCode and Timezone objects automatically extract values
 - **Multiple Instances**: Create isolated i18n engines for different contexts
+- **Fluent Builder**: I18nBuilder for clean, chainable engine configuration
 - **Core System Strings**: Pre-built translations for common UI elements and errors
 - **Type Safety**: Full TypeScript support with generic types
 - **Error Handling**: Comprehensive error classes with translation support
-- **Zero Dependencies**: Lightweight with no external runtime dependencies
+- **91.81% Test Coverage**: 714 tests covering all features
 
 ## Installation
 
@@ -126,11 +134,80 @@ const safe = engine.safeTranslate('missing', 'key'); // Returns "[missing.key]"
 // Component references: {{componentId.stringKey}}
 engine.t('Click {{auth.login}} to continue');
 
+// Alias resolution: {{alias.stringKey}}
+engine.registerComponent({
+  component: { id: 'authentication', /* ... */ },
+  aliases: ['auth', 'AuthModule']
+});
+engine.t('{{auth.login}}'); // Resolves via alias
+
 // Variables: {variableName}
 engine.t('Hello, {username}!', { username: 'Alice' });
 
-// Mixed
-engine.t('{{auth.login}}: {username}', { username: 'admin' });
+// Context variables (automatic injection)
+engine.t('Price in {currency}'); // Uses context currency
+engine.t('Time: {timezone}'); // Uses context timezone
+engine.t('Language: {language}'); // Uses current language
+
+// CurrencyCode and Timezone objects
+const currency = new CurrencyCode('EUR');
+const timezone = new Timezone('America/New_York');
+engine.t('Price: {amount} {currency}', { amount: 100, currency });
+// Output: "Price: 100 EUR"
+
+// Variable priority: provided > context > constants
+engine.t('{AppName}'); // Uses constant
+engine.t('{currency}'); // Uses context
+engine.t('{currency}', { currency: 'GBP' }); // Uses provided (overrides context)
+
+// Mixed patterns
+engine.t('{{auth.login}}: {username} ({currency})', { username: 'admin' });
+```
+
+### Builder Pattern
+
+```typescript
+import { I18nBuilder } from '@digitaldefiance/i18n-lib';
+
+const engine = I18nBuilder.create()
+  .withLanguages([
+    { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+    { id: 'fr', name: 'French', code: 'fr' }
+  ])
+  .withDefaultLanguage('en-US')
+  .withFallbackLanguage('en-US')
+  .withConstants({
+    AppName: 'MyApp',
+    Version: '1.0.0'
+  })
+  .withValidation({
+    requireCompleteStrings: false,
+    allowPartialRegistration: true
+  })
+  .withInstanceKey('myapp')
+  .withRegisterInstance(true)
+  .withSetAsDefault(true)
+  .build();
+```
+
+### Context Integration
+
+```typescript
+import { GlobalActiveContext, CurrencyCode, Timezone } from '@digitaldefiance/i18n-lib';
+
+// Set context variables
+const context = GlobalActiveContext.getInstance();
+context.setCurrencyCode(new CurrencyCode('EUR'));
+context.setUserTimezone(new Timezone('Europe/Paris'));
+context.setUserLanguage('fr');
+
+// Context variables automatically available in translations
+engine.t('Price in {currency}'); // "Price in EUR"
+engine.t('Timezone: {timezone}'); // "Timezone: Europe/Paris"
+engine.t('Language: {language}'); // "Language: fr"
+
+// Override context with provided variables
+engine.t('Price in {currency}', { currency: 'USD' }); // "Price in USD"
 ```
 
 ### Language Management
@@ -404,6 +481,91 @@ Contributions welcome! Please:
 - **Examples**: See tests/ directory
 
 ## ChangeLog
+
+### Version 2.1.0 (December 2024)
+
+**Major Feature Release** - Enhanced I18nEngine with context variables, comprehensive testing, and improved architecture
+
+**New Features:**
+
+- **Context Variable Injection**: Automatic injection of timezone, currency, and language from GlobalActiveContext
+  - `t()` function now supports `{currency}`, `{timezone}`, `{language}`, `{adminLanguage}`, etc.
+  - CurrencyCode and Timezone objects automatically extract their values
+  - Variable priority: provided variables > context variables > constants
+- **Enhanced t() Function**: Complete template processing with multiple resolution strategies
+  - `{{Component.key}}` - Component reference resolution
+  - `{{Alias.key}}` - Alias resolution for components
+  - `{{EnumName.key}}` - Enum name resolution
+  - `{variable}` - Variable substitution with context awareness
+  - Mixed patterns supported in single template
+- **Object Value Extraction**: Smart handling of wrapper objects
+  - CurrencyCode objects: `.value` and `.code` getters
+  - Timezone objects: `.value` and `.name` getters
+  - Generic objects with `.value` property automatically extracted
+- **I18nBuilder**: Fluent builder pattern for engine creation
+  - `withLanguages()`, `withConstants()`, `withValidation()`
+  - `withInstanceKey()`, `withRegisterInstance()`, `withSetAsDefault()`
+  - Method chaining for clean configuration
+- **Renamed Classes**: Removed "Plugin" prefix for clarity
+  - `PluginTypedError` → `ComponentTypedError` (with backward compatibility alias)
+  - `createPluginTypedError()` → `createComponentTypedError()`
+  - Old names deprecated but still functional
+
+**Improved:**
+
+- **Test Coverage**: Increased from 87.81% to 91.81% overall
+  - string-utils: 0% → 100%
+  - typed.ts: 48.68% → 83.17%
+  - i18n-builder: 61.53% → 86.66%
+  - 714 total tests (all passing)
+- **Error Translation**: All error classes now properly translate messages
+  - TypedError, TypedHandleableError, TranslatableError
+  - Multi-language support with template variables
+  - Context-aware language selection
+- **Type Safety**: Enhanced generic types throughout
+  - Better inference for component IDs and string keys
+  - Stricter validation at compile time
+- **Documentation**: Comprehensive test examples for all features
+  - t() function special cases
+  - Context variable integration
+  - Error translation patterns
+  - Builder pattern usage
+
+**Fixed:**
+
+- TranslatableError now requires componentId as first parameter (breaking change)
+- I18nError.stringKeyNotFound() method added
+- CurrencyCode error now uses correct TranslatableError signature
+- Variable substitution in templates now works with all object types
+- Context variables properly override constants
+
+**Testing:**
+
+- Added comprehensive test suites:
+  - `t-function.spec.ts` - All t() function capabilities
+  - `error-translation.spec.ts` - Error class translation
+  - `context-integration.spec.ts` - Context variable injection
+  - `string-utils.spec.ts` - String utility functions
+  - `i18n-builder.spec.ts` - Builder pattern
+  - `typed-helpers.spec.ts` - Typed error helpers
+
+**Migration Notes:**
+
+```typescript
+// Old TranslatableError signature
+new TranslatableError(stringKey, variables, language);
+
+// New signature (v2.1.0)
+new TranslatableError(componentId, stringKey, variables, language);
+
+// Context variables now automatically available in t()
+engine.t('Price: {currency}'); // Uses context currency
+engine.t('Price: {currency}', { currency: 'EUR' }); // Override with provided
+
+// CurrencyCode and Timezone objects work seamlessly
+const currency = new CurrencyCode('USD');
+engine.translate('app', 'price', { currency }); // Extracts 'USD'
+```
 
 ### Version 2.0.3
 

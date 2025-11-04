@@ -21,12 +21,20 @@ export class CurrencyCode {
 
   constructor(value: string = 'USD') {
     if (!CurrencyCode.isValid(value)) {
-      throw new TranslatableError<CoreStringKey>(CoreStringKey.Error_InvalidCurrencyCodeTemplate, { value });
+      throw new TranslatableError<CoreStringKey>(
+        'core',
+        CoreStringKey.Error_InvalidCurrencyCodeTemplate,
+        { value },
+      );
     }
     this._value = value;
   }
 
   get value(): string {
+    return this._value;
+  }
+
+  get code(): string {
     return this._value;
   }
 

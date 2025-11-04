@@ -1,10 +1,9 @@
 import { I18nEngine } from '../core';
-import { PluginI18nEngine } from '../plugin-i18n-engine';
 
 /**
  * Generic translatable error that works with any plugin engine and component
  */
-export class PluginTranslatableGenericError<TStringKey extends string = string> extends Error {
+export class TranslatableGenericError<TStringKey extends string = string> extends Error {
   public readonly stringKey: TStringKey;
   public readonly componentId: string;
   public readonly language?: string;
@@ -31,7 +30,7 @@ export class PluginTranslatableGenericError<TStringKey extends string = string> 
     let translatedMessage: string;
 
     try {
-      const engine = PluginI18nEngine.getInstance(instanceKey);
+      const engine = I18nEngine.getInstance(instanceKey);
       translatedMessage = engine.safeTranslate(
         componentId,
         stringKey,
@@ -56,13 +55,13 @@ export class PluginTranslatableGenericError<TStringKey extends string = string> 
    * Create error with explicit engine instance
    */
   static withEngine<TStringKey extends string>(
-    engine: PluginI18nEngine<string>,
+    engine: I18nEngine,
     componentId: string,
     stringKey: TStringKey,
     variables?: Record<string, string | number>,
     language?: string,
     metadata?: Record<string, any>,
-  ): PluginTranslatableGenericError<TStringKey> {
+  ): TranslatableGenericError<TStringKey> {
     const translatedMessage = engine.safeTranslate(
       componentId,
       stringKey,
@@ -70,7 +69,7 @@ export class PluginTranslatableGenericError<TStringKey extends string = string> 
       language,
     );
 
-    const error = Object.create(PluginTranslatableGenericError.prototype);
+    const error = Object.create(TranslatableGenericError.prototype);
     Error.call(error, translatedMessage);
     error.name = 'TranslatableGenericError';
     error.stringKey = stringKey;
@@ -88,7 +87,7 @@ export class PluginTranslatableGenericError<TStringKey extends string = string> 
    */
   retranslate(language: string, instanceKey?: string): string {
     try {
-      const engine = PluginI18nEngine.getInstance(instanceKey);
+      const engine = I18nEngine.getInstance(instanceKey);
       return engine.safeTranslate(
         this.componentId,
         this.stringKey,

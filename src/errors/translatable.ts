@@ -1,13 +1,14 @@
-import { CoreI18nComponentId, getCoreI18nEngine } from '../core-i18n';
+import { I18nEngine } from '../core/i18n-engine';
 
-export class TranslatableError<TStringKey extends string> extends Error {
+export class TranslatableError<TStringKey extends string = string> extends Error {
   constructor(
-    string: TStringKey,
+    componentId: string,
+    stringKey: TStringKey,
     otherVars?: Record<string, string | number>,
     language?: string,
   ) {
-    const engine = getCoreI18nEngine();
-    super(engine.safeTranslate(CoreI18nComponentId, string, otherVars, language));
+    const engine = I18nEngine.getInstance('default');
+    super(engine.safeTranslate(componentId, stringKey, otherVars, language));
     this.name = 'TranslatableError';
     Object.setPrototypeOf(this, TranslatableError.prototype);
   }

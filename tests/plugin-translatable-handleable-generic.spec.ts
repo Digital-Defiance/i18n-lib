@@ -1,23 +1,16 @@
-import { LanguageDefinition } from '../src/language-definition';
-import { PluginI18nEngine } from '../src/plugin-i18n-engine';
-import { PluginTranslatableHandleableGenericError as TranslatableHandleableGenericError } from '../src/errors/plugin-translatable-handleable-generic';
-
-const testLanguages: LanguageDefinition[] = [
-  { id: 'en', name: 'English', code: 'en', isDefault: true },
-];
+import { TranslatableHandleableGenericError } from '../src/errors/translatable-handleable-generic';
+import { I18nEngine } from '../src/core/i18n-engine';
 
 describe('TranslatableHandleableGenericError', () => {
-  let engine: PluginI18nEngine<string>;
+  let engine: I18nEngine;
 
   beforeEach(() => {
-    PluginI18nEngine.resetAll();
-    engine = new PluginI18nEngine(testLanguages);
-    engine.registerComponent({
-      component: {
-        id: 'test',
-        name: 'Test',
-        stringKeys: ['error', 'errorTemplate'],
-      },
+    I18nEngine.resetAll();
+    engine = new I18nEngine([
+      { id: 'en', name: 'English', code: 'en', isDefault: true },
+    ]);
+    engine.register({
+      id: 'test',
       strings: {
         en: {
           error: 'An error occurred',
@@ -28,7 +21,7 @@ describe('TranslatableHandleableGenericError', () => {
   });
 
   afterEach(() => {
-    PluginI18nEngine.resetAll();
+    I18nEngine.resetAll();
   });
 
   it('should create error with basic properties', () => {

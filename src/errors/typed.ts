@@ -3,7 +3,7 @@
 import { CoreStringKey } from '../core-string-key';
 import { TranslationEngine } from '../translation-engine';
 import { CoreI18nComponentId } from '../core-i18n';
-import { PluginI18nEngine } from '../plugin-i18n-engine';
+import { I18nEngine } from '../core';
 
 export type { TranslationEngine };
 
@@ -102,7 +102,7 @@ export abstract class TypedError<
     public readonly otherVars?: Record<string, string | number>,
   ) {
     const key = reasonMap[type];
-    const engine = PluginI18nEngine.getInstance('default');
+    const engine = I18nEngine.getInstance('default');
     if (!key)
       throw new Error(
         engine.safeTranslate(
@@ -112,13 +112,24 @@ export abstract class TypedError<
           language,
         ),
       );
-    super(engine.safeTranslate(componentId, key, otherVars, language));
+    
+    // Use translate instead of safeTranslate to get actual translations
+    let message: string;
+    try {
+      message = engine.translate(componentId, key, otherVars, language);
+    } catch (error) {
+      // Fallback to safeTranslate if translate fails
+      message = engine.safeTranslate(componentId, key, otherVars, language);
+    }
+    
+    super(message);
     this.name = this.constructor.name;
   }
 }
 
 /**
- * Plugin-based TypedError that works with the new component registration system
+ * Component-based TypedError that works with the component registration system
+ * @deprecated Use TypedError instead - PluginTypedError is an alias for backward compatibility
  */
 export abstract class PluginTypedError<
   TEnum extends Record<string, string>,
@@ -132,7 +143,49 @@ export abstract class PluginTypedError<
     public readonly otherVars?: Record<string, string | number>,
   ) {
     const key = reasonMap[type];
-    const engine = PluginI18nEngine.getInstance('default');
+    const engine = I18nEngine.getInstance('default');
+    // If key is not found in the reason map, use core error message
+    if (!key) {
+      const errorMsg = engine.safeTranslate(
+        CoreI18nComponentId,
+        CoreStringKey.Error_StringKeyNotFoundTemplate,
+        {
+          stringKey: String(type),
+          componentId: componentId,
+        },
+        language,
+      );
+      throw new Error(errorMsg);
+    }
+
+    // Translate the error message using the component and string key
+    const translatedMessage = engine.safeTranslate(
+      componentId,
+      key,
+      otherVars,
+      language,
+    );
+    super(translatedMessage);
+    this.name = this.constructor.name;
+  }
+}
+
+/**
+ * Component-based TypedError that works with the component registration system
+ */
+export abstract class ComponentTypedError<
+  TEnum extends Record<string, string>,
+  TStringKey extends string,
+> extends Error {
+  constructor(
+    public readonly componentId: string,
+    public readonly type: TEnum[keyof TEnum],
+    public readonly reasonMap: CompleteReasonMap<TEnum, TStringKey>,
+    public readonly language?: string,
+    public readonly otherVars?: Record<string, string | number>,
+  ) {
+    const key = reasonMap[type];
+    const engine = I18nEngine.getInstance('default');
     // If key is not found in the reason map, use core error message
     if (!key) {
       const errorMsg = engine.safeTranslate(
@@ -172,7 +225,7 @@ export abstract class CoreTypedError<
     public readonly otherVars?: Record<string, string | number>,
   ) {
     const key = reasonMap[type];
-    const engine = PluginI18nEngine.getInstance('default');
+    const engine = I18nEngine.getInstance('default');
 
     // If key is not found in the reason map, use a fallback error
     if (!key) {
@@ -201,7 +254,8 @@ export abstract class CoreTypedError<
 }
 
 /**
- * Helper function to create a plugin-based TypedError with automatic engine detection
+ * Helper function to create a component-based TypedError with automatic engine detection
+ * @deprecated Use createComponentTypedError instead
  */
 export function createPluginTypedError<
   TEnum extends Record<string, string>,
@@ -214,13 +268,39 @@ export function createPluginTypedError<
   language?: string,
   instanceKey?: string,
 ): Error {
-  const engine = PluginI18nEngine.getInstance(instanceKey || 'default');
+  return createComponentTypedError(componentId, type, reasonMap, otherVars, language, instanceKey);
+}
 
-  return new (class extends PluginTypedError<TEnum, TStringKey> {
-    constructor() {
-      super(componentId, type, reasonMap, language, otherVars);
-    }
-  })();
+/**
+ * Helper function to create a component-based TypedError with automatic engine detection
+ */
+export function createComponentTypedError<
+  TEnum extends Record<string, string>,
+  TStringKey extends string,
+>(
+  componentId: string,
+  type: TEnum[keyof TEnum],
+  reasonMap: CompleteReasonMap<TEnum, TStringKey>,
+  otherVars?: Record<string, string | number>,
+  language?: string,
+  instanceKey?: string,
+): Error {
+  // Get the engine to ensure it exists, but the error class will get it again
+  const engine = I18nEngine.getInstance(instanceKey || 'default');
+  const key = reasonMap[type];
+  
+  if (!key) {
+    throw new Error(`Missing key for type ${type} in reason map`);
+  }
+  
+  const message = engine.safeTranslate(componentId, key, otherVars, language);
+  const error = new Error(message);
+  (error as any).type = type;
+  (error as any).componentId = componentId;
+  (error as any).reasonMap = reasonMap;
+  error.name = 'PluginTypedError';
+  
+  return error;
 }
 
 /**
@@ -233,13 +313,20 @@ export function createCoreTypedError<TEnum extends Record<string, string>>(
   language?: string,
   instanceKey?: string,
 ): Error {
-  const engine = PluginI18nEngine.getInstance(instanceKey || 'default');
-
-  return new (class extends CoreTypedError<TEnum> {
-    constructor() {
-      super(type, reasonMap, language, otherVars);
-    }
-  })();
+  const engine = I18nEngine.getInstance(instanceKey || 'default');
+  const key = reasonMap[type];
+  
+  if (!key) {
+    throw new Error(`Missing key for type ${type} in reason map`);
+  }
+  
+  const message = engine.safeTranslate(CoreI18nComponentId, key, otherVars, language);
+  const error = new Error(message);
+  (error as any).type = type;
+  (error as any).reasonMap = reasonMap;
+  error.name = 'CoreTypedError';
+  
+  return error;
 }
 
 /**
@@ -306,18 +393,16 @@ const coreErrorReasonMap: CompleteReasonMap<typeof DatabaseErrorType, CoreString
 
 class DatabaseError extends CoreTypedError<typeof DatabaseErrorType> {
   constructor(
-    engine: PluginI18nEngine<CoreLanguageCode>,
     type: DatabaseErrorType,
     otherVars?: Record<string, string | number>,
-    language?: CoreLanguage
+    language?: string
   ) {
-    super(engine, type, coreErrorReasonMap, language, otherVars);
+    super(type, coreErrorReasonMap, language, otherVars);
   }
 }
 
 // Usage:
-// const engine = PluginPluginI18nEngine.getInstance<string>();
-// throw new DatabaseError(engine, DatabaseErrorType.ConnectionFailed);
+// throw new DatabaseError(DatabaseErrorType.ConnectionFailed);
 */
 
 // Example 2: Custom component error with custom strings
@@ -340,20 +425,18 @@ const userErrorReasonMap: CompleteReasonMap<typeof UserErrorType, UserErrorStrin
   [UserErrorType.AccountLocked]: UserErrorStringKey.AccountLockedMessage
 };
 
-class UserError extends PluginTypedError<typeof UserErrorType, UserErrorStringKey, string> {
+class UserError extends PluginTypedError<typeof UserErrorType, UserErrorStringKey> {
   constructor(
-    engine: PluginI18nEngine<string>,
     type: UserErrorType,
     otherVars?: Record<string, string | number>,
     language?: string
   ) {
-    super(engine, 'user-system', type, userErrorReasonMap, language, otherVars);
+    super('user-system', type, userErrorReasonMap, language, otherVars);
   }
 }
 
 // Usage:
-// const engine = PluginPluginI18nEngine.getInstance<string>();
-// throw new UserError(engine, UserErrorType.UserNotFound, { username: 'john_doe' });
+// throw new UserError(UserErrorType.UserNotFound, { username: 'john_doe' });
 */
 
 // Example 3: Using helper functions for simpler error creation

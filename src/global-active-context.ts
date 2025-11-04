@@ -27,6 +27,13 @@ export class GlobalActiveContext<
     }
     return this._instance;
   }
+  
+  // Register in globalThis for cross-module access
+  static {
+    if (typeof globalThis !== 'undefined') {
+      (globalThis as any).GlobalActiveContext = GlobalActiveContext;
+    }
+  }
   public static getInstance<
     TLanguage extends string,
     TActiveContext extends IActiveContext<TLanguage>,

@@ -48,6 +48,16 @@ export class I18nBuilder {
     return this;
   }
 
+  withRegisterInstance(register: boolean): this {
+    this.registerInstance = register;
+    return this;
+  }
+
+  withSetAsDefault(setDefault: boolean): this {
+    this.setAsDefault = setDefault;
+    return this;
+  }
+
   isolated(): this {
     this.registerInstance = false;
     return this;

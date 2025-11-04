@@ -38,21 +38,20 @@ describe('TypedError', () => {
   beforeEach(() => {
     // Clear singleton instances before each test
     I18nEngine.resetAll();
-    PluginI18nEngine.resetAll();
-    const engine = PluginI18nEngine.createInstance('default', [
-      { id: 'en', name: 'English', code: 'en', isDefault: true },
-      { id: 'fr', name: 'Français', code: 'fr' }
+    const engine = new I18nEngine([
+      { id: LanguageCodes.EN_US, name: 'English (US)', code: 'en-US', isDefault: true },
+      { id: LanguageCodes.FR, name: 'Français', code: 'fr' }
     ]);
-    engine.registerComponent({
-      component: { id: CoreI18nComponentId, name: 'Core', stringKeys: Object.values(CoreStringKey) },
+    engine.register({
+      id: CoreI18nComponentId,
       strings: {
-        en: {
-          [CoreStringKey.Common_Test]: 'Test',
-          [CoreStringKey.Error_MissingTranslationTemplate]: "Missing translation for key '{key}' in language '{language}'"
+        [LanguageCodes.EN_US]: {
+          'common_test': 'Test',
+          'error_missingTranslationTemplate': "Missing translation for key '{key}' in language '{language}'"
         },
-        fr: {
-          [CoreStringKey.Common_Test]: 'Test',
-          [CoreStringKey.Error_MissingTranslationTemplate]: "Traduction manquante pour la clé '{key}' dans la langue '{language}'"
+        [LanguageCodes.FR]: {
+          'common_test': 'Test',
+          'error_missingTranslationTemplate': "Traduction manquante pour la clé '{key}' dans la langue '{language}'"
         }
       }
     });

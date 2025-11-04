@@ -1,28 +1,13 @@
 import {
-  ComponentDefinition,
-  ComponentRegistration,
   CoreI18nComponentId,
   CoreStringKey,
   LanguageCodes,
-  LanguageDefinition,
-  PluginI18nEngine,
-  PluginTranslatableGenericError as TranslatableGenericError,
-  createCoreI18nEngine,
+  TranslatableGenericError,
 } from '../src';
+import { I18nEngine } from '../src/core/i18n-engine';
 
 describe('TranslatableGenericError', () => {
-  const englishLang: LanguageDefinition = {
-    id: 'en',
-    name: 'English',
-    code: 'en',
-    isDefault: true,
-  };
 
-  const frenchLang: LanguageDefinition = {
-    id: 'fr',
-    name: 'French',
-    code: 'fr',
-  };
 
   enum TestStringKey {
     UserNotFound = 'userNotFound',
@@ -30,23 +15,19 @@ describe('TranslatableGenericError', () => {
     AccountLocked = 'accountLocked',
   }
 
-  let engine: PluginI18nEngine<'en' | 'fr'>;
+  let engine: I18nEngine;
 
   beforeEach(() => {
-    PluginI18nEngine.resetAll();
-    engine = PluginI18nEngine.createInstance('test-errors', [
-      englishLang,
-      frenchLang,
-    ]);
+    I18nEngine.resetAll();
+    engine = new I18nEngine([
+      { id: 'en', name: 'English', code: 'en', isDefault: true },
+      { id: 'fr', name: 'French', code: 'fr' },
+    ], {}, { instanceKey: 'test-errors' });
 
-    const testComponent: ComponentDefinition<TestStringKey> = {
+    engine.register({
       id: 'test-errors',
       name: 'Test Errors',
       stringKeys: Object.values(TestStringKey),
-    };
-
-    const registration: ComponentRegistration<TestStringKey, 'en' | 'fr'> = {
-      component: testComponent,
       strings: {
         en: {
           [TestStringKey.UserNotFound]: 'User "{username}" not found',
@@ -60,13 +41,11 @@ describe('TranslatableGenericError', () => {
             "Compte verrouillé jusqu'à {unlockTime}",
         },
       },
-    };
-
-    engine.registerComponent(registration);
+    });
   });
 
   afterEach(() => {
-    PluginI18nEngine.resetAll();
+    I18nEngine.resetAll();
   });
 
   describe('constructor', () => {
@@ -337,10 +316,31 @@ describe('TranslatableGenericError', () => {
   });
 
   describe('integration with core strings', () => {
-    let coreEngine: ReturnType<typeof createCoreI18nEngine>;
+    let coreEngine: I18nEngine;
 
     beforeEach(() => {
-      coreEngine = createCoreI18nEngine('core-errors');
+      coreEngine = new I18nEngine([
+        { id: LanguageCodes.EN_US, name: 'English (US)', code: 'en-US', isDefault: true },
+        { id: LanguageCodes.FR, name: 'Français', code: 'fr' },
+      ], {}, { instanceKey: 'core-errors' });
+      
+      coreEngine.register({
+        id: CoreI18nComponentId,
+        name: 'Core',
+        stringKeys: Object.values(CoreStringKey),
+        strings: {
+          [LanguageCodes.EN_US]: {
+            [CoreStringKey.Common_Yes]: 'Yes',
+            [CoreStringKey.Error_AccessDenied]: 'Access denied',
+            [CoreStringKey.Error_ComponentNotFoundTemplate]: 'Component "{componentId}" not found',
+          },
+          [LanguageCodes.FR]: {
+            [CoreStringKey.Common_Yes]: 'Oui',
+            [CoreStringKey.Error_AccessDenied]: 'Accès refusé',
+            [CoreStringKey.Error_ComponentNotFoundTemplate]: 'Composant "{componentId}" non trouvé',
+          },
+        },
+      });
     });
 
     it('should work with core component', () => {

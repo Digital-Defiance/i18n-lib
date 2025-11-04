@@ -18,6 +18,10 @@ export class Timezone {
     return this._value;
   }
 
+  get name(): string {
+    return this._value;
+  }
+
   static isValid(timezone: string): boolean {
     return moment.tz.zone(timezone) !== null;
   }
