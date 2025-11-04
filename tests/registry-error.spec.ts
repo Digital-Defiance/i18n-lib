@@ -1,7 +1,7 @@
-import { LanguageCodes } from '../src';
+import { CoreI18nComponentId, LanguageCodes } from '../src';
 import { RegistryError } from '../src/registry-error';
 import { RegistryErrorType } from '../src/registry-error-type';
-import { TranslationEngine } from '../src/typed-error';
+import { TranslationEngine } from '../src/errors/typed';
 
 describe('RegistryError', () => {
   describe('createSimple', () => {
@@ -70,6 +70,7 @@ describe('RegistryError', () => {
       expect(error.type).toBe(RegistryErrorType.ComponentNotFound);
       expect(error.metadata).toEqual({ componentId: 'test-component' });
       expect(mockEngine.safeTranslate).toHaveBeenCalledWith(
+        CoreI18nComponentId,
         'error_componentNotFoundTemplate',
         { componentId: 'test-component' },
         LanguageCodes.EN_US,
@@ -87,6 +88,7 @@ describe('RegistryError', () => {
 
       expect(error.type).toBe(RegistryErrorType.ValidationFailed);
       expect(mockEngine.safeTranslate).toHaveBeenCalledWith(
+        'core',
         'error_validationFailedTemplate',
         { errors: 'Missing required fields' },
         LanguageCodes.EN_US,

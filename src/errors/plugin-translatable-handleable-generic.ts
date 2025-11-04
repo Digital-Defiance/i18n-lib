@@ -1,0 +1,59 @@
+import { IHandleable } from '../interfaces/handleable';
+import { PluginTranslatableGenericError } from './plugin-translatable-generic';
+
+/**
+ * Generic translatable error that works with any plugin engine and component
+ */
+export class PluginTranslatableHandleableGenericError<
+    TStringKey extends string = string,
+  >
+  extends PluginTranslatableGenericError<TStringKey>
+  implements IHandleable
+{
+  private _handled = false;
+  public override readonly cause?: Error;
+  public readonly statusCode: number;
+  public readonly sourceData?: unknown;
+
+  /**
+   * Create a translatable error
+   * @param componentId - The component ID to translate from
+   * @param stringKey - The translation key
+   * @param variables - Variables for interpolation
+   * @param language - Optional language override
+   * @param metadata - Additional error metadata
+   * @param instanceKey - Optional engine instance key
+   */
+  constructor(
+    componentId: string,
+    stringKey: TStringKey,
+    variables?: Record<string, string | number>,
+    language?: string,
+    metadata?: Record<string, any>,
+    instanceKey?: string,
+    handleableOptions?: {
+      statusCode?: number;
+      cause?: Error;
+      sourceData?: unknown;
+    },
+  ) {
+    super(componentId, stringKey, variables, language, metadata, instanceKey);
+    this.statusCode = handleableOptions?.statusCode ?? 500;
+    this.cause = handleableOptions?.cause;
+    this.sourceData = handleableOptions?.sourceData;
+  }
+  public get handled(): boolean {
+    return this._handled;
+  }
+  public set handled(value: boolean) {
+    this._handled = value;
+  }
+  toJSON(): Record<string, unknown> {
+    return {
+      statusCode: this.statusCode,
+      message: this.message,
+      cause: this.cause,
+      sourceData: this.sourceData,
+    };
+  }
+}

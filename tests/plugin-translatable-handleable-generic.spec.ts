@@ -1,6 +1,6 @@
 import { LanguageDefinition } from '../src/language-definition';
 import { PluginI18nEngine } from '../src/plugin-i18n-engine';
-import { PluginTranslatableHandleableGenericError as TranslatableHandleableGenericError } from '../src/plugin-translatable-handleable-generic';
+import { PluginTranslatableHandleableGenericError as TranslatableHandleableGenericError } from '../src/errors/plugin-translatable-handleable-generic';
 
 const testLanguages: LanguageDefinition[] = [
   { id: 'en', name: 'English', code: 'en', isDefault: true },

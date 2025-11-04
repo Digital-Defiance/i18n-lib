@@ -48,6 +48,8 @@ describe('Component Registration Validation', () => {
   let engine: PluginI18nEngine<'en' | 'fr' | 'es' | 'de'>;
 
   beforeEach(() => {
+    // Reset all engines and language registry
+    PluginI18nEngine.resetAll();
     // Create engine with initial languages
     engine = new PluginI18nEngine([englishLang, frenchLang, spanishLang]);
   });

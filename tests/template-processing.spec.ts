@@ -7,7 +7,7 @@ describe('Template Processing with buildReasonMap', () => {
   }
 
   beforeEach(() => {
-    I18nEngine.clearInstances();
+    I18nEngine.resetAll();
   });
 
   it('should process template variables when Template suffix is used', () => {
@@ -20,30 +20,29 @@ describe('Template Processing with buildReasonMap', () => {
     );
 
     // Initialize engine with template translations
-    const engine = new I18nEngine({
-      stringNames: Object.values(reasonMap),
+    const langs = [{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }];
+    const engine = new I18nEngine(langs);
+    
+    engine.register({
+      id: 'test',
+      name: 'Test',
+      stringKeys: Object.values(reasonMap),
       strings: {
-        [LanguageCodes.EN_US]: {
+        'en-US': {
           [reasonMap[TestErrorType.SimpleError]]: 'Simple error occurred',
           [reasonMap[TestErrorType.TemplateError]]:
             'Template error: {message} with code {code}',
         },
       },
-      defaultLanguage: LanguageCodes.EN_US,
-      defaultTranslationContext: 'user',
-      defaultCurrencyCode: { code: 'USD' } as any,
-      languageCodes: { [LanguageCodes.EN_US]: 'en' },
-      languages: [LanguageCodes.EN_US],
-      timezone: { name: 'UTC' } as any,
-      adminTimezone: { name: 'UTC' } as any,
     });
 
     // Test simple error (no template processing)
-    const simpleResult = engine.translate(reasonMap[TestErrorType.SimpleError]);
+    const simpleResult = engine.translate('test', reasonMap[TestErrorType.SimpleError]);
     expect(simpleResult).toBe('Simple error occurred');
 
     // Test template error (with variable processing)
     const templateResult = engine.translate(
+      'test',
       reasonMap[TestErrorType.TemplateError],
       {
         message: 'Connection failed',

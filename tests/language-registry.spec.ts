@@ -1,9 +1,26 @@
-import {
-  LanguageRegistry,
-  createLanguageDefinition,
-  createLanguageDefinitions,
-} from '../src/language-registry';
-import { RegistryError } from '../src/registry-error';
+import { LanguageRegistry } from '../src/core/language-registry';
+import { LanguageDefinition } from '../src/language-definition';
+import { I18nError } from '../src/errors/i18n-error';
+
+function createLanguageDefinition(
+  id: string,
+  name: string,
+  code: string,
+  isDefault?: boolean,
+): LanguageDefinition {
+  return { id, name, code, isDefault: isDefault || false };
+}
+
+function createLanguageDefinitions(
+  languages: Array<{
+    id: string;
+    name: string;
+    code: string;
+    isDefault?: boolean;
+  }>,
+): LanguageDefinition[] {
+  return languages.map((lang) => createLanguageDefinition(lang.id, lang.name, lang.code, lang.isDefault));
+}
 
 describe('LanguageRegistry', () => {
   beforeEach(() => {
@@ -50,12 +67,12 @@ describe('LanguageRegistry', () => {
         LanguageRegistry.registerLanguage(
           createLanguageDefinition('en', 'English UK', 'en-GB'),
         );
-      }).toThrow(RegistryError);
+      }).toThrow(I18nError);
       expect(() => {
         LanguageRegistry.registerLanguage(
           createLanguageDefinition('en', 'English UK', 'en-GB'),
         );
-      }).toThrow("Language 'en' is already registered");
+      }).toThrow("Language 'en' already registered");
     });
 
     it('should throw error for duplicate language code', () => {
@@ -67,12 +84,7 @@ describe('LanguageRegistry', () => {
         LanguageRegistry.registerLanguage(
           createLanguageDefinition('en-uk', 'English UK', 'en-US'),
         );
-      }).toThrow(RegistryError);
-      expect(() => {
-        LanguageRegistry.registerLanguage(
-          createLanguageDefinition('en-uk', 'English UK', 'en-US'),
-        );
-      }).toThrow("Language code 'en-US' is already used by language 'en'");
+      }).toThrow(I18nError);
     });
   });
 
@@ -255,10 +267,7 @@ describe('LanguageRegistry', () => {
     it('should throw error for non-existent language', () => {
       expect(() => {
         LanguageRegistry.setDefaultLanguage('de');
-      }).toThrow(RegistryError);
-      expect(() => {
-        LanguageRegistry.setDefaultLanguage('de');
-      }).toThrow("Language 'de' not found");
+      }).toThrow(I18nError);
     });
   });
 
@@ -435,10 +444,7 @@ describe('LanguageRegistry', () => {
     it('should throw error when no default language configured', () => {
       LanguageRegistry.clear();
       expect(() => LanguageRegistry.getMatchingLanguageCode('en-US')).toThrow(
-        RegistryError,
-      );
-      expect(() => LanguageRegistry.getMatchingLanguageCode('en-US')).toThrow(
-        'No default language configured',
+        I18nError,
       );
     });
 

@@ -1,5 +1,5 @@
-import { CurrencyCode } from './currency-code';
-import { Timezone } from './timezone';
+import { CurrencyCode } from './utils/currency';
+import { Timezone } from './utils/timezone';
 import { LanguageContextSpace } from './types';
 
 export interface IActiveContext<TLanguage extends string> {

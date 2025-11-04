@@ -1,6 +1,6 @@
-import { HandleableError } from '../src/handleable';
-import { IHandleable } from '../src/i-handleable';
-import { HandleableErrorOptions } from '../src/i-handleable-error-options';
+import { HandleableError } from '../src/errors/handleable';
+import { IHandleable } from '../src/interfaces/handleable';
+import { HandleableErrorOptions } from '../src/interfaces/handleable-error-options';
 
 class CustomHandleable implements IHandleable {
   public statusCode = 500;

@@ -1,5 +1,4 @@
-import { CurrencyPosition } from '../src';
-import { getCurrencyFormat } from '../src/currency';
+import { CurrencyPosition, getCurrencyFormat } from '../src/utils/currency';
 
 describe('getCurrencyFormat', () => {
   it('should return correct format for USD in en-US', () => {

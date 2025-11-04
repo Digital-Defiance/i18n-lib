@@ -6,15 +6,16 @@ import { IActiveContext } from './active-context';
 import { ComponentDefinition } from './component-definition';
 import { ComponentRegistration } from './component-registration';
 import { ComponentRegistry } from './component-registry';
-import { CurrencyCode } from './currency-code';
+import { CoreI18nComponentId } from './core-i18n';
+import { CurrencyCode } from './utils/currency';
 import { EnumTranslationRegistry } from './enum-registry';
 import { GlobalActiveContext } from './global-active-context';
 import { LanguageDefinition } from './language-definition';
-import { LanguageRegistry } from './language-registry';
+import { LanguageRegistry } from './core/language-registry';
 import { RegistryConfig } from './registry-config';
 import { RegistryError } from './registry-error';
 import { RegistryErrorType } from './registry-error-type';
-import { Timezone } from './timezone';
+import { Timezone } from './utils/timezone';
 import { TranslationRequest } from './translation-request';
 import { TranslationResponse } from './translation-response';
 import { EnumLanguageTranslation } from './types';
@@ -93,7 +94,7 @@ export class PluginI18nEngine<TLanguages extends string> {
     this.enumRegistry = new EnumTranslationRegistry<string, TLanguages>(
       initialLanguages.map((l) => l.id as TLanguages),
       (key: string, vars?: Record<string, any>) =>
-        this.safeTranslate('core', key, vars),
+        this.safeTranslate(CoreI18nComponentId, key, vars),
     );
 
     // Initialize context key for this engine instance
@@ -144,10 +145,22 @@ export class PluginI18nEngine<TLanguages extends string> {
         return match; // Return original if pattern doesn't match expected format
       });
 
-      // Step 2: Replace remaining variable patterns like {varName} with merged variables
+      // Step 2: Get context variables (timezone, currency, language)
+      const context = this.getContext();
+      const contextVars: Record<string, string | number> = {
+        timezone: context.currentContext === 'admin' ? context.adminTimezone.value : context.timezone.value,
+        currencyCode: context.currencyCode.value,
+        language: context.currentContext === 'admin' ? context.adminLanguage : context.language,
+        userTimezone: context.timezone.value,
+        adminTimezone: context.adminTimezone.value,
+        userLanguage: context.language,
+        adminLanguage: context.adminLanguage,
+      };
+
+      // Step 3: Replace remaining variable patterns like {varName} with merged variables
       const allVars = otherVars.reduce(
         (acc, vars) => ({ ...acc, ...vars }),
-        {},
+        contextVars,
       );
       result = result.replace(/\{(\w+)\}/g, (match, varName) => {
         return allVars[varName] !== undefined

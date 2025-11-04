@@ -1,6 +1,7 @@
 import {
   ComponentDefinition,
   ComponentRegistration,
+  CoreI18nComponentId,
   CoreStringKey,
   LanguageCodes,
   LanguageDefinition,
@@ -127,7 +128,7 @@ describe('TranslatableGenericError', () => {
       const error = new TranslatableGenericError(
         'test-errors',
         TestStringKey.AccountLocked,
-        { unlockTime: '2024-01-01' },
+        { unlockTime: '2025-01-01' },
         'en',
         metadata,
         'test-errors',
@@ -344,7 +345,7 @@ describe('TranslatableGenericError', () => {
 
     it('should work with core component', () => {
       const error = new TranslatableGenericError(
-        'core',
+        CoreI18nComponentId,
         CoreStringKey.Error_AccessDenied,
         undefined,
         LanguageCodes.EN_US,
@@ -357,7 +358,7 @@ describe('TranslatableGenericError', () => {
 
     it('should work with core template strings', () => {
       const error = new TranslatableGenericError(
-        'core',
+        CoreI18nComponentId,
         CoreStringKey.Error_ComponentNotFoundTemplate,
         { componentId: 'my-component' },
         LanguageCodes.EN_US,
@@ -370,7 +371,7 @@ describe('TranslatableGenericError', () => {
 
     it('should translate core strings in multiple languages', () => {
       const errorEn = new TranslatableGenericError(
-        'core',
+        CoreI18nComponentId,
         CoreStringKey.Common_Yes,
         undefined,
         LanguageCodes.EN_US,
@@ -379,7 +380,7 @@ describe('TranslatableGenericError', () => {
       );
 
       const errorFr = new TranslatableGenericError(
-        'core',
+        CoreI18nComponentId,
         CoreStringKey.Common_Yes,
         undefined,
         LanguageCodes.FR,

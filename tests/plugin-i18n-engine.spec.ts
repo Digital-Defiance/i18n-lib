@@ -1,12 +1,13 @@
 import {
   ComponentDefinition,
   ComponentRegistration,
-  CurrencyCode,
+  CoreI18nComponentId,
   LanguageDefinition,
   LanguageRegistry,
   PluginI18nEngine,
-  Timezone,
 } from '../src';
+import { CurrencyCode } from '../src/utils/currency';
+import { Timezone } from '../src/utils/timezone';
 
 describe('PluginI18nEngine', () => {
   // Define test languages
@@ -284,7 +285,7 @@ describe('PluginI18nEngine', () => {
     beforeEach(() => {
       // Register core component for t function testing
       const coreComponent: ComponentDefinition<CoreStrings> = {
-        id: 'core',
+        id: CoreI18nComponentId,
         name: 'Core Component',
         stringKeys: Object.values(CoreStrings),
       };
@@ -825,7 +826,7 @@ describe('PluginI18nEngine', () => {
           key: 'my-key',
           expected: '[my-component.my-key]',
         },
-        { component: 'core', key: 'error', expected: '[core.error]' },
+        { component: CoreI18nComponentId, key: 'error', expected: '[core.error]' },
       ];
 
       testCases.forEach(({ component, key, expected }) => {

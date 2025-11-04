@@ -7,9 +7,27 @@ import { ComponentRegistration } from './component-registration';
 import { CoreStringKey } from './core-string-key';
 import { LanguageCodes } from './language-codes';
 import { LanguageDefinition } from './language-definition';
-import { createLanguageDefinitions } from './language-registry';
 import { PluginI18nEngine } from './plugin-i18n-engine';
 import { createCompleteComponentStrings } from './strict-types';
+
+/**
+ * Helper function to create multiple language definitions
+ */
+function createLanguageDefinitions(
+  languages: Array<{
+    id: string;
+    name: string;
+    code: string;
+    isDefault?: boolean;
+  }>,
+): LanguageDefinition[] {
+  return languages.map((lang) => ({
+    id: lang.id,
+    name: lang.name,
+    code: lang.code,
+    isDefault: lang.isDefault || false,
+  }));
+}
 
 /**
  * Core language code type - union of supported language codes
@@ -109,6 +127,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Warning]: 'Warning',
       [CoreStringKey.Common_Info]: 'Information',
       [CoreStringKey.Common_Disposed]: 'Object has been disposed',
+      [CoreStringKey.Common_Test]: 'Test',
 
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: 'Invalid input provided',
@@ -118,10 +137,12 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: 'Internal server error',
       [CoreStringKey.Error_ValidationFailed]: 'Validation failed',
       [CoreStringKey.Error_RequiredField]: 'This field is required',
+      [CoreStringKey.Error_InvalidContext]: 'Invalid context',
       [CoreStringKey.Error_InvalidContextTemplate]:
         'Invalid context: {contextKey}',
       [CoreStringKey.Error_MissingTranslationKeyTemplate]:
         'Missing translation key: {stringKey}',
+      [CoreStringKey.Error_InvalidCurrencyCodeTemplate]: 'Invalid currency code: {value}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -147,6 +168,19 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_OperationComplete]:
         'Operation completed successfully',
       [CoreStringKey.System_NoDataAvailable]: 'No data available',
+
+      [CoreStringKey.Error_InstanceAlreadyExistsTemplate]:
+        "Instance with key '{key}' already exists",
+      [CoreStringKey.Error_InstanceNotFoundTemplate]:
+        "Instance with key '{key}' not found",
+      [CoreStringKey.Error_MissingStringCollectionTemplate]:
+        'Missing string collection for language: {language}',
+      [CoreStringKey.Error_MissingTranslationTemplate]:
+        "Missing translation for key '{key}' in language '{language}'",
+      [CoreStringKey.Error_DefaultLanguageNoCollectionTemplate]:
+        "Default language '{language}' has no string collection",
+      [CoreStringKey.Error_MissingTranslationKeyForTypeTemplate]:
+        'Missing translation key for type: {type}',
     },
 
     [LanguageCodes.EN_GB]: {
@@ -166,6 +200,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Warning]: 'Warning',
       [CoreStringKey.Common_Info]: 'Information',
       [CoreStringKey.Common_Disposed]: 'Object has been disposed',
+      [CoreStringKey.Common_Test]: 'Test',
 
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: 'Invalid input provided',
@@ -175,10 +210,12 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: 'Internal server error',
       [CoreStringKey.Error_ValidationFailed]: 'Validation failed',
       [CoreStringKey.Error_RequiredField]: 'This field is required',
+      [CoreStringKey.Error_InvalidContext]: 'Invalid context',
       [CoreStringKey.Error_InvalidContextTemplate]:
         'Invalid context: {contextKey}',
       [CoreStringKey.Error_MissingTranslationKeyTemplate]:
         'Missing translation key: {stringKey}',
+      [CoreStringKey.Error_InvalidCurrencyCodeTemplate]: 'Invalid currency code: {value}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -204,6 +241,19 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_OperationComplete]:
         'Operation completed successfully',
       [CoreStringKey.System_NoDataAvailable]: 'No data available',
+
+      [CoreStringKey.Error_InstanceAlreadyExistsTemplate]:
+        "Instance with key '{key}' already exists",
+      [CoreStringKey.Error_InstanceNotFoundTemplate]:
+        "Instance with key '{key}' not found",
+      [CoreStringKey.Error_MissingStringCollectionTemplate]:
+        'Missing string collection for language: {language}',
+      [CoreStringKey.Error_MissingTranslationTemplate]:
+        "Missing translation for key '{key}' in language '{language}'",
+      [CoreStringKey.Error_DefaultLanguageNoCollectionTemplate]:
+        "Default language '{language}' has no string collection",
+      [CoreStringKey.Error_MissingTranslationKeyForTypeTemplate]:
+        'Missing translation key for type: {type}',
     },
 
     [LanguageCodes.FR]: {
@@ -223,6 +273,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Warning]: 'Avertissement',
       [CoreStringKey.Common_Info]: 'Information',
       [CoreStringKey.Common_Disposed]: "L'objet a été disposé",
+      [CoreStringKey.Common_Test]: 'Test',
 
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: 'Entrée invalide fournie',
@@ -232,10 +283,12 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: 'Erreur interne du serveur',
       [CoreStringKey.Error_ValidationFailed]: 'Échec de la validation',
       [CoreStringKey.Error_RequiredField]: 'Ce champ est obligatoire',
+      [CoreStringKey.Error_InvalidContext]: 'Contexte invalide',
       [CoreStringKey.Error_InvalidContextTemplate]:
         'Contexte invalide : {contextKey}',
       [CoreStringKey.Error_MissingTranslationKeyTemplate]:
         'Clé de traduction manquante : {stringKey}',
+      [CoreStringKey.Error_InvalidCurrencyCodeTemplate]: 'Code de devise invalide : {value}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -262,6 +315,19 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_OperationComplete]:
         'Opération terminée avec succès',
       [CoreStringKey.System_NoDataAvailable]: 'Aucune donnée disponible',
+
+      [CoreStringKey.Error_InstanceAlreadyExistsTemplate]:
+        "Instance avec clé '{key}' existe déjà",
+      [CoreStringKey.Error_InstanceNotFoundTemplate]:
+        "Instance avec clé '{key}' introuvable",
+      [CoreStringKey.Error_MissingStringCollectionTemplate]:
+        'Collection de chaînes manquante pour la langue: {language}',
+      [CoreStringKey.Error_MissingTranslationTemplate]:
+        "Traduction manquante pour la clé '{key}' dans la langue '{language}'",
+      [CoreStringKey.Error_DefaultLanguageNoCollectionTemplate]:
+        "La langue par défaut '{language}' n'a pas de collection de chaînes",
+      [CoreStringKey.Error_MissingTranslationKeyForTypeTemplate]:
+        'Clé de traduction manquante pour le type: {type}',
     },
 
     [LanguageCodes.ES]: {
@@ -281,6 +347,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Warning]: 'Advertencia',
       [CoreStringKey.Common_Info]: 'Información',
       [CoreStringKey.Common_Disposed]: 'El objeto ha sido eliminado',
+      [CoreStringKey.Common_Test]: 'Test',
 
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: 'Entrada inválida proporcionada',
@@ -290,10 +357,12 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: 'Error interno del servidor',
       [CoreStringKey.Error_ValidationFailed]: 'Error de validación',
       [CoreStringKey.Error_RequiredField]: 'Este campo es obligatorio',
+      [CoreStringKey.Error_InvalidContext]: 'Contexto inválido',
       [CoreStringKey.Error_InvalidContextTemplate]:
         'Contexte invalide : {contextKey}',
       [CoreStringKey.Error_MissingTranslationKeyTemplate]:
         'Clave de traducción faltante: {stringKey}',
+      [CoreStringKey.Error_InvalidCurrencyCodeTemplate]: 'Código de divisa inválido: {value}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -319,6 +388,19 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_OperationComplete]:
         'Operación completada exitosamente',
       [CoreStringKey.System_NoDataAvailable]: 'No hay datos disponibles',
+
+      [CoreStringKey.Error_InstanceAlreadyExistsTemplate]:
+        "La instancia con clave '{key}' ya existe",
+      [CoreStringKey.Error_InstanceNotFoundTemplate]:
+        "Instancia con clave '{key}' no encontrada",
+      [CoreStringKey.Error_MissingStringCollectionTemplate]:
+        'Falta colección de cadenas para el idioma: {language}',
+      [CoreStringKey.Error_MissingTranslationTemplate]:
+        "Falta traducción para la clave '{key}' en el idioma '{language}'",
+      [CoreStringKey.Error_DefaultLanguageNoCollectionTemplate]:
+        "El idioma predeterminado '{language}' no tiene colección de cadenas",
+      [CoreStringKey.Error_MissingTranslationKeyForTypeTemplate]:
+        'Falta clave de traducción para el tipo: {type}',
     },
 
     [LanguageCodes.DE]: {
@@ -338,6 +420,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Warning]: 'Warnung',
       [CoreStringKey.Common_Info]: 'Information',
       [CoreStringKey.Common_Disposed]: 'Objekt wurde freigegeben',
+      [CoreStringKey.Common_Test]: 'Test',
 
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: 'Ungültige Eingabe bereitgestellt',
@@ -347,10 +430,12 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: 'Interner Serverfehler',
       [CoreStringKey.Error_ValidationFailed]: 'Validierung fehlgeschlagen',
       [CoreStringKey.Error_RequiredField]: 'Dieses Feld ist erforderlich',
+      [CoreStringKey.Error_InvalidContext]: 'Ungültiger Kontext',
       [CoreStringKey.Error_InvalidContextTemplate]:
         'Ungültiger Kontext: {contextKey}',
       [CoreStringKey.Error_MissingTranslationKeyTemplate]:
         'Fehlender Übersetzungsschlüssel: {stringKey}',
+      [CoreStringKey.Error_InvalidCurrencyCodeTemplate]: 'Ungültiger Währungscode: {value}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -377,6 +462,19 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_OperationComplete]:
         'Vorgang erfolgreich abgeschlossen',
       [CoreStringKey.System_NoDataAvailable]: 'Keine Daten verfügbar',
+
+      [CoreStringKey.Error_InstanceAlreadyExistsTemplate]:
+        "Instanz mit Schlüssel '{key}' existiert bereits",
+      [CoreStringKey.Error_InstanceNotFoundTemplate]:
+        "Instanz mit Schlüssel '{key}' nicht gefunden",
+      [CoreStringKey.Error_MissingStringCollectionTemplate]:
+        'Fehlende String-Sammlung für Sprache: {language}',
+      [CoreStringKey.Error_MissingTranslationTemplate]:
+        "Fehlende Übersetzung für Schlüssel '{key}' in Sprache '{language}'",
+      [CoreStringKey.Error_DefaultLanguageNoCollectionTemplate]:
+        "Standardsprache '{language}' hat keine String-Sammlung",
+      [CoreStringKey.Error_MissingTranslationKeyForTypeTemplate]:
+        'Fehlender Übersetzungsschlüssel für Typ: {type}',
     },
 
     [LanguageCodes.ZH_CN]: {
@@ -396,6 +494,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Warning]: '警告',
       [CoreStringKey.Common_Info]: '信息',
       [CoreStringKey.Common_Disposed]: '对象已被释放',
+      [CoreStringKey.Common_Test]: '测试',
 
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: '提供的输入无效',
@@ -405,10 +504,12 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: '内部服务器错误',
       [CoreStringKey.Error_ValidationFailed]: '验证失败',
       [CoreStringKey.Error_RequiredField]: '此字段为必填项',
+      [CoreStringKey.Error_InvalidContext]: '无效的上下文',
       [CoreStringKey.Error_InvalidContextTemplate]:
         '无效的上下文：{contextKey}',
       [CoreStringKey.Error_MissingTranslationKeyTemplate]:
         '缺少翻译键：{stringKey}',
+      [CoreStringKey.Error_InvalidCurrencyCodeTemplate]: '无效的货币代码：{value}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -432,6 +533,19 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_ProcessingRequest]: '正在处理您的请求...',
       [CoreStringKey.System_OperationComplete]: '操作成功完成',
       [CoreStringKey.System_NoDataAvailable]: '无可用数据',
+
+      [CoreStringKey.Error_InstanceAlreadyExistsTemplate]:
+        "键为'{key}'的实例已存在",
+      [CoreStringKey.Error_InstanceNotFoundTemplate]:
+        "未找到键为'{key}'的实例",
+      [CoreStringKey.Error_MissingStringCollectionTemplate]:
+        '缺少语言的字符串集合: {language}',
+      [CoreStringKey.Error_MissingTranslationTemplate]:
+        "在语言'{language}'中缺少键'{key}'的翻译",
+      [CoreStringKey.Error_DefaultLanguageNoCollectionTemplate]:
+        "默认语言'{language}'没有字符串集合",
+      [CoreStringKey.Error_MissingTranslationKeyForTypeTemplate]:
+        '类型缺少翻译键: {type}',
     },
 
     [LanguageCodes.JA]: {
@@ -451,6 +565,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Warning]: '警告',
       [CoreStringKey.Common_Info]: '情報',
       [CoreStringKey.Common_Disposed]: 'オブジェクトは破棄されました',
+      [CoreStringKey.Common_Test]: 'テスト',
 
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: '無効な入力が提供されました',
@@ -460,10 +575,12 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: '内部サーバーエラー',
       [CoreStringKey.Error_ValidationFailed]: '検証に失敗しました',
       [CoreStringKey.Error_RequiredField]: 'このフィールドは必須です',
+      [CoreStringKey.Error_InvalidContext]: '無効なコンテキスト',
       [CoreStringKey.Error_InvalidContextTemplate]:
         '無効なコンテキスト：{contextKey}',
       [CoreStringKey.Error_MissingTranslationKeyTemplate]:
         '翻訳キーが見つかりません：{stringKey}',
+      [CoreStringKey.Error_InvalidCurrencyCodeTemplate]: '無効な通貨コード：{value}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -488,6 +605,19 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_ProcessingRequest]: 'リクエストを処理中...',
       [CoreStringKey.System_OperationComplete]: '操作が正常に完了しました',
       [CoreStringKey.System_NoDataAvailable]: '利用可能なデータがありません',
+
+      [CoreStringKey.Error_InstanceAlreadyExistsTemplate]:
+        "キー'{key}'のインスタンスは既に存在します",
+      [CoreStringKey.Error_InstanceNotFoundTemplate]:
+        "キー'{key}'のインスタンスが見つかりません",
+      [CoreStringKey.Error_MissingStringCollectionTemplate]:
+        '言語の文字列コレクションがありません: {language}',
+      [CoreStringKey.Error_MissingTranslationTemplate]:
+        "言語'{language}'でキー'{key}'の翻訳がありません",
+      [CoreStringKey.Error_DefaultLanguageNoCollectionTemplate]:
+        "デフォルト言語'{language}'に文字列コレクションがありません",
+      [CoreStringKey.Error_MissingTranslationKeyForTypeTemplate]:
+        'タイプの翻訳キーがありません: {type}',
     },
 
     [LanguageCodes.UK]: {
@@ -507,6 +637,7 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Common_Warning]: 'Попередження',
       [CoreStringKey.Common_Info]: 'Інформація',
       [CoreStringKey.Common_Disposed]: "Об'єкт було звільнено",
+      [CoreStringKey.Common_Test]: 'Тест',
 
       // Error Messages
       [CoreStringKey.Error_InvalidInput]: 'Надано неправильний ввід',
@@ -516,10 +647,12 @@ export function createCoreComponentStrings() {
       [CoreStringKey.Error_InternalServer]: 'Внутрішня помилка сервера',
       [CoreStringKey.Error_ValidationFailed]: 'Перевірка не вдалася',
       [CoreStringKey.Error_RequiredField]: "Це поле є обов'язковим",
+      [CoreStringKey.Error_InvalidContext]: 'Неправильний контекст',
       [CoreStringKey.Error_InvalidContextTemplate]:
         'Неправильний контекст: {contextKey}',
       [CoreStringKey.Error_MissingTranslationKeyTemplate]:
         'Відсутній ключ перекладу: {stringKey}',
+      [CoreStringKey.Error_InvalidCurrencyCodeTemplate]: 'Неправильний код валюти: {value}',
 
       // Registry Error Templates
       [CoreStringKey.Error_ComponentNotFoundTemplate]:
@@ -544,6 +677,19 @@ export function createCoreComponentStrings() {
       [CoreStringKey.System_ProcessingRequest]: 'Обробка вашого запиту...',
       [CoreStringKey.System_OperationComplete]: 'Операція успішно завершена',
       [CoreStringKey.System_NoDataAvailable]: 'Дані недоступні',
+
+      [CoreStringKey.Error_InstanceAlreadyExistsTemplate]:
+        "Екземпляр з ключем '{key}' вже існує",
+      [CoreStringKey.Error_InstanceNotFoundTemplate]:
+        "Екземпляр з ключем '{key}' не знайдено",
+      [CoreStringKey.Error_MissingStringCollectionTemplate]:
+        'Відсутня колекція рядків для мови: {language}',
+      [CoreStringKey.Error_MissingTranslationTemplate]:
+        "Відсутній переклад для ключа '{key}' в мові '{language}'",
+      [CoreStringKey.Error_DefaultLanguageNoCollectionTemplate]:
+        "Мова за замовчуванням '{language}' не має колекції рядків",
+      [CoreStringKey.Error_MissingTranslationKeyForTypeTemplate]:
+        'Відсутній ключ перекладу для типу: {type}',
     },
   });
 }
@@ -591,6 +737,29 @@ export function createCoreI18nEngine(
   return engine;
 }
 
+// Note: This creates the default instance at module load time
+// Tests should call PluginI18nEngine.resetAll() in beforeEach to clean up
+let _coreI18nEngine: PluginI18nEngine<string> | undefined;
+
+export function getCoreI18nEngine(): PluginI18nEngine<string> {
+  if (!_coreI18nEngine) {
+    _coreI18nEngine = createCoreI18nEngine();
+  }
+  return _coreI18nEngine;
+}
+
+// Initialize on first access to avoid circular dependency during module load
+export const coreI18nEngine = new Proxy({} as PluginI18nEngine<string>, {
+  get(target, prop) {
+    return getCoreI18nEngine()[prop as keyof PluginI18nEngine<string>];
+  }
+});
+
+// Reset function for tests
+export function resetCoreI18nEngine(): void {
+  _coreI18nEngine = undefined;
+}
+
 /**
  * Type alias for easier usage
  */
@@ -598,6 +767,7 @@ export type CoreI18nEngine = PluginI18nEngine<string>;
 
 /**
  * Helper function to get core translation
+ * Uses the core engine instance to ensure core strings are available
  */
 export function getCoreTranslation(
   stringKey: CoreStringKey,
@@ -605,7 +775,8 @@ export function getCoreTranslation(
   language?: string,
   instanceKey?: string,
 ): string {
-  const engine = PluginI18nEngine.getInstance<string>(instanceKey);
+  // Use core engine if no instance key specified, otherwise use specified instance
+  const engine = instanceKey ? PluginI18nEngine.getInstance<string>(instanceKey) : getCoreI18nEngine();
   return engine.translate(CoreI18nComponentId, stringKey, variables, language);
 }
 

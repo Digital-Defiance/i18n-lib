@@ -1,7 +1,7 @@
-import { HandleableErrorOptions } from '../src/i-handleable-error-options';
+import { HandleableErrorOptions } from '../src/interfaces/handleable-error-options';
 import { LanguageDefinition } from '../src/language-definition';
 import { PluginI18nEngine } from '../src/plugin-i18n-engine';
-import { PluginTypedHandleableError } from '../src/plugin-typed-handleable';
+import { PluginTypedHandleableError } from '../src/errors/plugin-typed-handleable';
 import { CompleteReasonMap } from '../src/typed-error';
 
 enum TestErrorType {
@@ -52,14 +52,11 @@ describe('PluginTypedHandleableError', () => {
     });
   });
 
-  afterEach(() => {
-    PluginI18nEngine.resetAll();
-  });
+
 
   it('should create error with basic properties', () => {
     const source = new Error('Source error');
     const error = new PluginTypedHandleableError(
-      engine,
       'test-component',
       TestErrorType.Simple,
       testReasonMap,
@@ -77,7 +74,6 @@ describe('PluginTypedHandleableError', () => {
     const source = new Error('Source error');
     const options: HandleableErrorOptions = { statusCode: 404 };
     const error = new PluginTypedHandleableError(
-      engine,
       'test-component',
       TestErrorType.Simple,
       testReasonMap,
@@ -92,7 +88,6 @@ describe('PluginTypedHandleableError', () => {
     const source = new Error('Source error');
     const options: HandleableErrorOptions = { handled: true };
     const error = new PluginTypedHandleableError(
-      engine,
       'test-component',
       TestErrorType.Simple,
       testReasonMap,
@@ -106,7 +101,6 @@ describe('PluginTypedHandleableError', () => {
   it('should allow setting handled property', () => {
     const source = new Error('Source error');
     const error = new PluginTypedHandleableError(
-      engine,
       'test-component',
       TestErrorType.Simple,
       testReasonMap,
@@ -123,7 +117,6 @@ describe('PluginTypedHandleableError', () => {
     const sourceData = { userId: 123, action: 'login' };
     const options: HandleableErrorOptions = { sourceData };
     const error = new PluginTypedHandleableError(
-      engine,
       'test-component',
       TestErrorType.Simple,
       testReasonMap,
@@ -137,7 +130,6 @@ describe('PluginTypedHandleableError', () => {
   it('should translate message with variables', () => {
     const source = new Error('Source error');
     const error = new PluginTypedHandleableError(
-      engine,
       'test-component',
       TestErrorType.Templated,
       testReasonMap,
@@ -153,7 +145,6 @@ describe('PluginTypedHandleableError', () => {
   it('should translate message in different language', () => {
     const source = new Error('Source error');
     const error = new PluginTypedHandleableError(
-      engine,
       'test-component',
       TestErrorType.Simple,
       testReasonMap,
@@ -168,7 +159,6 @@ describe('PluginTypedHandleableError', () => {
   it('should preserve source stack trace', () => {
     const source = new Error('Source error');
     const error = new PluginTypedHandleableError(
-      engine,
       'test-component',
       TestErrorType.Simple,
       testReasonMap,
@@ -186,7 +176,6 @@ describe('PluginTypedHandleableError', () => {
       sourceData: { test: 'data' },
     };
     const error = new PluginTypedHandleableError(
-      engine,
       'test-component',
       TestErrorType.Simple,
       testReasonMap,
@@ -207,7 +196,6 @@ describe('PluginTypedHandleableError', () => {
   it('should serialize nested PluginTypedHandleableError cause', () => {
     const innerSource = new Error('Inner error');
     const innerError = new PluginTypedHandleableError(
-      engine,
       'test-component',
       TestErrorType.Simple,
       testReasonMap,
@@ -216,7 +204,6 @@ describe('PluginTypedHandleableError', () => {
 
     const outerSource = new Error('Outer error');
     const outerError = new PluginTypedHandleableError(
-      engine,
       'test-component',
       TestErrorType.Templated,
       testReasonMap,
@@ -232,7 +219,6 @@ describe('PluginTypedHandleableError', () => {
   it('should omit sourceData from JSON when undefined', () => {
     const source = new Error('Source error');
     const error = new PluginTypedHandleableError(
-      engine,
       'test-component',
       TestErrorType.Simple,
       testReasonMap,

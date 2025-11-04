@@ -1,17 +1,13 @@
-import { LanguageCodes } from '../src';
-import {
-  DefaultLanguageCode,
-  DefaultStringKey,
-  getDefaultI18nEngine,
-} from '../src/default-config';
-import { I18nEngine } from '../src/i18n-engine';
+import { CoreI18nComponentId, LanguageCodes, PluginI18nEngine } from '../src';
+import { I18nEngine } from '../src/core/i18n-engine';
+import { CoreStringKey } from '../src/core-string-key';
 import {
   BaseTypedError,
   CompleteReasonMap,
   TranslationEngine,
   TypedError,
   createTranslatedError,
-} from '../src/typed-error';
+} from '../src/errors/typed';
 import {
   buildTypeSafeReasonMap,
   createCompleteReasonMap,
@@ -23,26 +19,43 @@ enum TestErrorType {
   Template = 'Template',
 }
 
-const reasonMap: CompleteReasonMap<typeof TestErrorType, DefaultStringKey> = {
-  [TestErrorType.Basic]: DefaultStringKey.Common_Test,
-  [TestErrorType.Template]: DefaultStringKey.Error_MissingTranslationTemplate,
+const reasonMap: CompleteReasonMap<typeof TestErrorType, CoreStringKey> = {
+  [TestErrorType.Basic]: CoreStringKey.Common_Test,
+  [TestErrorType.Template]: CoreStringKey.Error_MissingTranslationTemplate,
 };
 
-class TestError extends TypedError<typeof TestErrorType, DefaultStringKey> {
+class TestError extends TypedError<typeof TestErrorType, CoreStringKey> {
   constructor(
     type: TestErrorType,
-    language?: DefaultLanguageCode,
+    language?: string,
     otherVars?: Record<string, string | number>,
   ) {
-    const engine = getDefaultI18nEngine({}, undefined, undefined);
-    super(engine, type, reasonMap, language, otherVars);
+    super(CoreI18nComponentId, type, reasonMap, language, otherVars);
   }
 }
 
 describe('TypedError', () => {
   beforeEach(() => {
     // Clear singleton instances before each test
-    (I18nEngine as any)._instances.clear();
+    I18nEngine.resetAll();
+    PluginI18nEngine.resetAll();
+    const engine = PluginI18nEngine.createInstance('default', [
+      { id: 'en', name: 'English', code: 'en', isDefault: true },
+      { id: 'fr', name: 'Français', code: 'fr' }
+    ]);
+    engine.registerComponent({
+      component: { id: CoreI18nComponentId, name: 'Core', stringKeys: Object.values(CoreStringKey) },
+      strings: {
+        en: {
+          [CoreStringKey.Common_Test]: 'Test',
+          [CoreStringKey.Error_MissingTranslationTemplate]: "Missing translation for key '{key}' in language '{language}'"
+        },
+        fr: {
+          [CoreStringKey.Common_Test]: 'Test',
+          [CoreStringKey.Error_MissingTranslationTemplate]: "Traduction manquante pour la clé '{key}' dans la langue '{language}'"
+        }
+      }
+    });
   });
 
   it('should create error with simple translation', () => {
@@ -80,9 +93,9 @@ describe('TypedError', () => {
   describe('Type Safety Utils', () => {
     it('should validate complete reason map', () => {
       const completeMap = {
-        [TestErrorType.Basic]: DefaultStringKey.Common_Test,
+        [TestErrorType.Basic]: CoreStringKey.Common_Test,
         [TestErrorType.Template]:
-          DefaultStringKey.Error_MissingTranslationTemplate,
+          CoreStringKey.Error_MissingTranslationTemplate,
       };
 
       expect(validateReasonMap(TestErrorType, completeMap)).toBe(true);
@@ -90,7 +103,7 @@ describe('TypedError', () => {
 
     it('should detect incomplete reason map', () => {
       const incompleteMap = {
-        [TestErrorType.Basic]: DefaultStringKey.Common_Test,
+        [TestErrorType.Basic]: CoreStringKey.Common_Test,
         // Missing TestErrorType.Template
       };
 
@@ -117,7 +130,7 @@ describe('TypedError', () => {
       }
 
       const incompleteMap = {
-        [IncompleteEnum.One]: 'Error_One' as DefaultStringKey,
+        [IncompleteEnum.One]: 'Error_One' as CoreStringKey,
       };
 
       expect(() => {
@@ -159,13 +172,13 @@ describe('TypedError', () => {
 
     it('should create translated error with engine', () => {
       const mockEngine: TranslationEngine = {
-        translate: (key, variables, language) => {
+        translate: (componentId, key, variables, language) => {
           if (key === 'networkErrorKey') {
             return `Network error: ${variables?.code || 'unknown'}`;
           }
           return 'Fallback message';
         },
-        safeTranslate: (key, variables, language) => {
+        safeTranslate: (componentId, key, variables, language) => {
           if (key === 'networkErrorKey') {
             return `Network error: ${variables?.code || 'unknown'}`;
           }

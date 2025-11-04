@@ -1,4 +1,4 @@
-import { Timezone } from '../src/timezone';
+import { Timezone } from '../src/utils/timezone';
 
 describe('Timezone', () => {
   it('should create timezone with valid timezone string', () => {

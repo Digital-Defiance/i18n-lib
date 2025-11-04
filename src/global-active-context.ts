@@ -1,10 +1,9 @@
 import { IActiveContext } from './active-context';
-import { ContextError } from './context-error';
+import { ContextError } from './errors/context-error';
 import { ContextErrorType } from './context-error-type';
-import { CurrencyCode } from './currency-code';
-import { DefaultLanguageCode } from './default-config';
-import { IGlobalActiveContext } from './i-global-active-context';
-import { Timezone } from './timezone';
+import { CurrencyCode } from './utils/currency';
+import { IGlobalActiveContext } from './interfaces/global-active-context';
+import { Timezone } from './utils/timezone';
 import {
   DefaultCurrencyCode,
   DefaultTimezone,
@@ -18,7 +17,7 @@ export class GlobalActiveContext<
 {
   protected static _contextMap: Map<string, IActiveContext<any>> = new Map();
   public static readonly defaultContextKey = 'default';
-  public static readonly defaultLanguage: DefaultLanguageCode = 'en-US';
+  public static readonly defaultLanguage: string = 'en-US';
 
   private static _instance: GlobalActiveContext<any, any> | undefined;
   public static get instance(): GlobalActiveContext<any, any> {

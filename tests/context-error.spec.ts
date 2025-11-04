@@ -1,7 +1,16 @@
-import { ContextError } from '../src/context-error';
+import { ContextError } from '../src/errors/context-error';
 import { ContextErrorType } from '../src/context-error-type';
+import { I18nEngine } from '../src/core/i18n-engine';
 
 describe('ContextError', () => {
+  beforeEach(() => {
+    I18nEngine.resetAll();
+    new I18nEngine([{ id: 'en', name: 'English', code: 'en', isDefault: true }]);
+  });
+
+  afterEach(() => {
+    I18nEngine.resetAll();
+  });
   it('should create error with type and context key', () => {
     const error = new ContextError(ContextErrorType.InvalidContext, 'test-key');
 

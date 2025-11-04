@@ -18,6 +18,7 @@ export enum CoreStringKey {
   Common_Warning = 'common_warning',
   Common_Info = 'common_info',
   Common_Disposed = 'common_disposed',
+  Common_Test = 'common_test',
   // Error Messages
   Error_InvalidInput = 'error_invalidInput',
   Error_NetworkError = 'error_networkError',
@@ -26,7 +27,9 @@ export enum CoreStringKey {
   Error_InternalServer = 'error_internalServer',
   Error_ValidationFailed = 'error_validationFailed',
   Error_RequiredField = 'error_requiredField',
+  Error_InvalidContext = 'error_invalidContext',
   Error_InvalidContextTemplate = 'error_invalidContextTemplate',
+  Error_InvalidCurrencyCodeTemplate = 'error_invalidCurrencyCodeTemplate',
 
   // Registry Errors (templates support variables)
   Error_ComponentNotFoundTemplate = 'error_componentNotFoundTemplate',
@@ -45,4 +48,12 @@ export enum CoreStringKey {
   System_ProcessingRequest = 'system_processingRequest',
   System_OperationComplete = 'system_operationComplete',
   System_NoDataAvailable = 'system_noDataAvailable',
+
+  // DefaultStringKey
+  Error_InstanceAlreadyExistsTemplate = 'error_instanceAlreadyExistsTemplate',
+  Error_InstanceNotFoundTemplate = 'error_instanceNotFoundTemplate',
+  Error_MissingStringCollectionTemplate = 'error_missingStringCollectionTemplate',
+  Error_MissingTranslationTemplate = 'error_missingTranslationTemplate',
+  Error_DefaultLanguageNoCollectionTemplate = 'error_defaultLanguageNoCollectionTemplate',
+  Error_MissingTranslationKeyForTypeTemplate = 'error_missingTranslationKeyForTypeTemplate',
 }

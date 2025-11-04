@@ -1,12 +1,9 @@
-import { CurrencyCode } from '../src/currency-code';
-import { HandleableError } from '../src/handleable';
-import { HandleableErrorOptions } from '../src/i-handleable-error-options';
-import { I18nConfig } from '../src/i18n-config';
-import { I18nEngine } from '../src/i18n-engine';
+import { HandleableError } from '../src/errors/handleable';
+import { HandleableErrorOptions } from '../src/interfaces/handleable-error-options';
+import { PluginI18nEngine } from '../src/plugin-i18n-engine';
 import { LanguageCodes } from '../src/language-codes';
-import { Timezone } from '../src/timezone';
-import { CompleteReasonMap } from '../src/typed-error';
-import { TypedHandleableError } from '../src/typed-handleable';
+import { CompleteReasonMap } from '../src/errors/typed';
+import { TypedHandleableError } from '../src/errors/typed-handleable';
 
 type TestLanguageCode =
   | typeof LanguageCodes.EN_US
@@ -43,106 +40,71 @@ class TestTypedError extends TypedHandleableError<
     otherVars?: Record<string, string | number>,
     options?: HandleableErrorOptions,
   ) {
-    let engine: I18nEngine<TestStringKeys, TestLanguageCode, any, any>;
+    let engine: PluginI18nEngine<string>;
     try {
-      engine =
-        I18nEngine.getInstance<
-          I18nEngine<TestStringKeys, TestLanguageCode, any, any>
-        >('testEngine');
+      engine = PluginI18nEngine.getInstance<string>('testEngine');
     } catch {
-      const config: I18nConfig<TestStringKeys, TestLanguageCode> = {
-        stringNames: [
-          TestStringKeys.Common_Test,
-          TestStringKeys.Error_MissingTranslationTemplate,
-        ],
+      const languages = [
+        { id: LanguageCodes.EN_US, name: 'English (US)', code: 'en-US', isDefault: true },
+        { id: LanguageCodes.EN_GB, name: 'English (UK)', code: 'en-GB' },
+        { id: LanguageCodes.FR, name: 'French', code: 'fr' },
+        { id: LanguageCodes.ES, name: 'Spanish', code: 'es' },
+        { id: LanguageCodes.DE, name: 'German', code: 'de' },
+        { id: LanguageCodes.JA, name: 'Japanese', code: 'ja' },
+        { id: LanguageCodes.ZH_CN, name: 'Chinese', code: 'zh-CN' },
+        { id: LanguageCodes.UK, name: 'Ukrainian', code: 'uk' },
+      ];
+      engine = PluginI18nEngine.createInstance<string>('testEngine', languages);
+      engine.registerComponent({
+        component: {
+          id: 'test-component',
+          name: 'Test Component',
+          stringKeys: [TestStringKeys.Common_Test, TestStringKeys.Error_MissingTranslationTemplate],
+        },
         strings: {
           [LanguageCodes.EN_US]: {
             [TestStringKeys.Common_Test]: 'This is a test error message.',
-            [TestStringKeys.Error_MissingTranslationTemplate]:
-              'Missing template variable: {key} in language {language}.',
+            [TestStringKeys.Error_MissingTranslationTemplate]: 'Missing template variable: {key} in language {language}.',
           },
           [LanguageCodes.EN_GB]: {
             [TestStringKeys.Common_Test]: 'This is a test error message (UK).',
-            [TestStringKeys.Error_MissingTranslationTemplate]:
-              'Missing template variable: {key} in language {language} (UK).',
+            [TestStringKeys.Error_MissingTranslationTemplate]: 'Missing template variable: {key} in language {language} (UK).',
           },
           [LanguageCodes.FR]: {
-            [TestStringKeys.Common_Test]:
-              "Ceci est un message d'erreur de test.",
-            [TestStringKeys.Error_MissingTranslationTemplate]:
-              'Variable de modèle manquante : {key} dans la langue {language}.',
+            [TestStringKeys.Common_Test]: "Ceci est un message d'erreur de test.",
+            [TestStringKeys.Error_MissingTranslationTemplate]: 'Variable de modèle manquante : {key} dans la langue {language}.',
           },
           [LanguageCodes.ES]: {
-            [TestStringKeys.Common_Test]:
-              'Este es un mensaje de error de prueba.',
-            [TestStringKeys.Error_MissingTranslationTemplate]:
-              'Falta la variable de plantilla: {key} en el idioma {language}.',
+            [TestStringKeys.Common_Test]: 'Este es un mensaje de error de prueba.',
+            [TestStringKeys.Error_MissingTranslationTemplate]: 'Falta la variable de plantilla: {key} en el idioma {language}.',
           },
           [LanguageCodes.ZH_CN]: {
             [TestStringKeys.Common_Test]: '这是一个测试错误消息。',
-            [TestStringKeys.Error_MissingTranslationTemplate]:
-              '缺少模板变量：{key} 在语言 {language} 中。',
+            [TestStringKeys.Error_MissingTranslationTemplate]: '缺少模板变量：{key} 在语言 {language} 中。',
           },
           [LanguageCodes.JA]: {
             [TestStringKeys.Common_Test]: 'これはテストエラーメッセージです。',
-            [TestStringKeys.Error_MissingTranslationTemplate]:
-              'テンプレート変数がありません: {key} 言語 {language} で。',
+            [TestStringKeys.Error_MissingTranslationTemplate]: 'テンプレート変数がありません: {key} 言語 {language} で。',
           },
           [LanguageCodes.DE]: {
-            [TestStringKeys.Common_Test]:
-              'Dies ist eine Testfehlermeldung.',
-            [TestStringKeys.Error_MissingTranslationTemplate]:
-              'Fehlender Vorlagenvariable: {key} in Sprache {language}.',
+            [TestStringKeys.Common_Test]: 'Dies ist eine Testfehlermeldung.',
+            [TestStringKeys.Error_MissingTranslationTemplate]: 'Fehlender Vorlagenvariable: {key} in Sprache {language}.',
           },
           [LanguageCodes.UK]: {
-            [TestStringKeys.Common_Test]:
-              'Це тестове повідомлення про помилку.',
-            [TestStringKeys.Error_MissingTranslationTemplate]:
-              'Відсутня змінна шаблону: {key} мовою {language}.',
+            [TestStringKeys.Common_Test]: 'Це тестове повідомлення про помилку.',
+            [TestStringKeys.Error_MissingTranslationTemplate]: 'Відсутня змінна шаблону: {key} мовою {language}.',
           },
         },
-        defaultLanguage: LanguageCodes.EN_US,
-        adminTimezone: new Timezone('UTC'),
-        timezone: new Timezone('UTC'),
-        defaultCurrencyCode: new CurrencyCode('USD'),
-        defaultTranslationContext: 'admin',
-        languageCodes: {
-          [LanguageCodes.EN_US]: 'en-US',
-          [LanguageCodes.EN_GB]: 'en-GB',
-          [LanguageCodes.FR]: 'fr',
-          [LanguageCodes.DE]: 'de',
-          [LanguageCodes.JA]: 'ja',
-          [LanguageCodes.ZH_CN]: 'zh-CN',
-          [LanguageCodes.ES]: 'es',
-          [LanguageCodes.UK]: 'uk',
-        },
-        languages: [
-          LanguageCodes.EN_US,
-          LanguageCodes.EN_GB,
-          LanguageCodes.FR,
-          LanguageCodes.ES,
-          LanguageCodes.DE,
-          LanguageCodes.JA,
-          LanguageCodes.ZH_CN,
-          LanguageCodes.UK,
-        ],
-        enumName: 'TestStringKeys',
-        constants: {},
-      };
-      engine = new I18nEngine<TestStringKeys, TestLanguageCode, any, any>(
-        config,
-        'testEngine',
-      );
+      });
     }
-    super(type, testReasonMap, engine, language, otherVars, options);
+    super(type, testReasonMap, 'test-component', language, otherVars, options);
     this.name = 'TestTypedError';
   }
 }
 
 describe('TypedError', () => {
   beforeEach(() => {
-    // Clear singleton instances before each test
-    I18nEngine.removeInstance('testEngine');
+    PluginI18nEngine.resetAll();
   });
   it('should create typed error with simple translation', () => {
     const error = new TestTypedError(TestErrorType.Simple);

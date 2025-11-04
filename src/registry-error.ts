@@ -1,7 +1,8 @@
 // CoreLanguageCode is deprecated - using string
 import { CoreStringKey } from './core-string-key';
 import { RegistryErrorType } from './registry-error-type';
-import { TranslationEngine, createTranslatedError } from './typed-error';
+import { TranslationEngine, createTranslatedError } from './errors/typed';
+import { CoreI18nComponentId } from './core-i18n';
 
 /**
  * Reason map for registry errors
@@ -48,7 +49,7 @@ export class RegistryError extends Error {
   ): RegistryError {
     const error = createTranslatedError(
       engine,
-      'core',
+      CoreI18nComponentId,
       type,
       REGISTRY_ERROR_REASON_MAP,
       variables,

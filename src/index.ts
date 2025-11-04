@@ -1,64 +1,56 @@
-// Legacy exports (for backwards compatibility)
+// V2 Exports (primary)
+export * from './builders';
+export * from './core';
+export * from './errors';
+export * from './interfaces';
+export * from './utils';
+
+// Convenience aliases
+export { I18nEngine as I18n } from './core/i18n-engine';
+export { I18nBuilder as Builder } from './builders/i18n-builder';
+
+// Reset utility
+import { I18nEngine } from './core/i18n-engine';
+export function resetAll(): void {
+  I18nEngine.resetAll();
+}
+
+// Legacy exports (deprecated - for backwards compatibility)
 export * from './active-context';
 export * from './component-definition';
+// export * from './language-registry'; // Removed - conflicts with v2 core/language-registry
 export * from './component-registration';
 export * from './component-registry';
-export * from './context';
-export * from './context-error';
+export * from './errors/context-error';
 export * from './context-error-type';
-export * from './context-manager';
 export * from './core-i18n';
 export * from './core-string-key';
 export * from './create-translation-adapter';
-export * from './currency';
-export * from './currency-code';
-export * from './currency-format';
-export * from './default-config';
 export * from './enum-registry';
-export * from './global-active-context';
-export * from './handleable';
-export * from './i-global-active-context';
-export * from './i-handleable';
-export * from './i-handleable-error-options';
-export * from './i18n-config';
-export * from './i18n-context';
-export * from './i18n-engine';
+export * from './errors/handleable';
+export * from './interfaces/handleable';
+export * from './interfaces/handleable-error-options';
 export * from './language-codes';
-export * from './language-definition';
-export * from './language-registry';
 export * from './plugin-i18n-engine';
-export * from './plugin-translatable-generic-error';
-export * from './plugin-translatable-handleable-generic';
-export * from './plugin-typed-handleable';
+export * from './errors/plugin-translatable-generic';
+export * from './errors/plugin-translatable-handleable-generic';
+export * from './errors/plugin-typed-handleable';
 export * from './registry-config';
 export * from './registry-error';
 export * from './registry-error-type';
 export * from './template';
-export * from './timezone';
-export * from './translatable';
 export * from './translation-engine';
 export * from './translation-request';
 export * from './translation-response';
-export * from './typed-error';
-export * from './typed-handleable';
 export * from './types';
-export * from './unified-translator';
-export * from './utils';
 export * from './validation-config';
-export * from './validation-result';
 
-// Re-export for convenience
+// Legacy convenience exports
 export { createCoreI18nEngine as createCoreI18n } from './core-i18n';
-export { I18nEngine as I18n } from './i18n-engine';
 export { PluginI18nEngine as PluginI18n } from './plugin-i18n-engine';
 
-// Testing utilities
+// Legacy testing utilities
 import { PluginI18nEngine } from './plugin-i18n-engine';
-
-/**
- * Reset all I18n engines and clear component registrations
- * Useful for test cleanup
- */
 export function resetAllI18nEngines(): void {
   PluginI18nEngine.resetAll();
 }

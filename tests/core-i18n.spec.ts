@@ -1,4 +1,5 @@
 import {
+  CoreI18nComponentId,
   CoreStringKey,
   createCoreI18nEngine,
   getCoreTranslation,
@@ -245,7 +246,7 @@ describe('core-i18n', () => {
 
   describe('bracket format consistency', () => {
     it('should match engine safeTranslate format', () => {
-      const engineResult = engine.safeTranslate('core', 'NonExistent');
+      const engineResult = engine.safeTranslate(CoreI18nComponentId, 'NonExistent');
       const coreResult = safeCoreTranslation(
         'NonExistent' as CoreStringKey,
         undefined,
@@ -399,7 +400,7 @@ describe('core-i18n', () => {
 
     it('should register core component automatically', () => {
       const testEngine = createCoreI18nEngine('auto-register');
-      expect(testEngine.hasComponent('core')).toBe(true);
+      expect(testEngine.hasComponent(CoreI18nComponentId)).toBe(true);
     });
   });
 });

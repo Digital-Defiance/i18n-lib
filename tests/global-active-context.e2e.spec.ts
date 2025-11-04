@@ -1,8 +1,8 @@
 import { DefaultLanguageCode, LanguageCodes } from '../src';
 import { IActiveContext } from '../src/active-context';
-import { CurrencyCode } from '../src/currency-code';
+import { CurrencyCode } from '../src/utils/currency';
 import { GlobalActiveContext } from '../src/global-active-context';
-import { Timezone } from '../src/timezone';
+import { Timezone } from '../src/utils/timezone';
 import { LanguageContextSpace } from '../src/types';
 
 interface TestActiveContext extends IActiveContext<DefaultLanguageCode> {}
