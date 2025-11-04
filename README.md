@@ -405,6 +405,10 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 2.0.2
+
+- Version bump
+
 ### Version 2.0.1
 
 - Minor bugfix
