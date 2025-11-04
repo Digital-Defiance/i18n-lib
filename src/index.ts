@@ -18,6 +18,7 @@ export function resetAll(): void {
 // Legacy exports (deprecated - for backwards compatibility)
 export * from './active-context';
 export * from './component-definition';
+export * from './global-active-context';
 // export * from './language-registry'; // Removed - conflicts with v2 core/language-registry
 export * from './component-registration';
 export * from './component-registry';

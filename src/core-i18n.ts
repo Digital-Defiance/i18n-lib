@@ -737,27 +737,37 @@ export function createCoreI18nEngine(
   return engine;
 }
 
-// Note: This creates the default instance at module load time
-// Tests should call PluginI18nEngine.resetAll() in beforeEach to clean up
+// Note: Lazy initialization to avoid circular dependency issues
+// Tests should call resetCoreI18nEngine() after PluginI18nEngine.resetAll()
 let _coreI18nEngine: PluginI18nEngine<string> | undefined;
 
 export function getCoreI18nEngine(): PluginI18nEngine<string> {
+  // Lazy initialization on first access
   if (!_coreI18nEngine) {
     _coreI18nEngine = createCoreI18nEngine();
+    return _coreI18nEngine;
   }
-  return _coreI18nEngine;
+  
+  // Lazy re-initialization if instance was cleared
+  try {
+    PluginI18nEngine.getInstance<string>(DefaultInstanceKey);
+    return _coreI18nEngine;
+  } catch {
+    _coreI18nEngine = createCoreI18nEngine();
+    return _coreI18nEngine;
+  }
 }
 
-// Initialize on first access to avoid circular dependency during module load
+// Getter for direct reference - lazily initialized
 export const coreI18nEngine = new Proxy({} as PluginI18nEngine<string>, {
-  get(target, prop) {
-    return getCoreI18nEngine()[prop as keyof PluginI18nEngine<string>];
-  }
+  get(_target, prop) {
+    return (getCoreI18nEngine() as any)[prop];
+  },
 });
 
 // Reset function for tests
 export function resetCoreI18nEngine(): void {
-  _coreI18nEngine = undefined;
+  _coreI18nEngine = createCoreI18nEngine();
 }
 
 /**

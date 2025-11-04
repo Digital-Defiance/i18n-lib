@@ -405,6 +405,10 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 2.0.1
+
+- Minor bugfix
+
 ### Version 2.0.0
 
 **Major Release** - Architecture improvements and bug fixes
