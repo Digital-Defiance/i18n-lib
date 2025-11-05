@@ -482,6 +482,10 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 2.1.6
+
+- Minor update to expose core keys via V2 engine
+
 ### Version 2.1.5
 
 - Minor timezone/currency export fix

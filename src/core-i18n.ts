@@ -9,6 +9,8 @@ import { LanguageCodes } from './language-codes';
 import { LanguageDefinition } from './language-definition';
 import { PluginI18nEngine } from './plugin-i18n-engine';
 import { createCompleteComponentStrings } from './strict-types';
+import { ComponentConfig } from './interfaces';
+import { I18nEngine } from './core';
 
 /**
  * Helper function to create multiple language definitions
@@ -695,7 +697,7 @@ export function createCoreComponentStrings() {
 }
 
 /**
- * Create core component registration
+ * Create core component registration (for PluginI18nEngine)
  */
 export function createCoreComponentRegistration(): ComponentRegistration<
   CoreStringKey,
@@ -704,6 +706,17 @@ export function createCoreComponentRegistration(): ComponentRegistration<
   return {
     component: CoreComponentDefinition,
     strings: createCoreComponentStrings(),
+  };
+}
+
+/**
+ * Create core component config (for I18nEngine)
+ */
+export function createCoreComponentConfig(): ComponentConfig {
+  return {
+    id: CoreI18nComponentId,
+    strings: createCoreComponentStrings(),
+    aliases: ['CoreStringKey', 'core'],
   };
 }
 
@@ -721,11 +734,13 @@ export function getCoreLanguageDefinitions(): LanguageDefinition[] {
   return createDefaultLanguages();
 }
 
+// 1.x definitions
+//------------------------------------
 /**
  * Create a pre-configured I18n engine with core components
  * Returns engine with string type - use registry for language validation
  */
-export function createCoreI18nEngine(
+export function createCorePluginI18nEngine(
   instanceKey: string = DefaultInstanceKey,
 ): PluginI18nEngine<string> {
   const languages = createDefaultLanguages();
@@ -739,47 +754,47 @@ export function createCoreI18nEngine(
 
 // Note: Lazy initialization to avoid circular dependency issues
 // Tests should call resetCoreI18nEngine() after PluginI18nEngine.resetAll()
-let _coreI18nEngine: PluginI18nEngine<string> | undefined;
+let _corePluginI18nEngine: PluginI18nEngine<string> | undefined;
 
-export function getCoreI18nEngine(): PluginI18nEngine<string> {
+export function getCorePluginI18nEngine(): PluginI18nEngine<string> {
   // Lazy initialization on first access
-  if (!_coreI18nEngine) {
-    _coreI18nEngine = createCoreI18nEngine();
-    return _coreI18nEngine;
+  if (!_corePluginI18nEngine) {
+    _corePluginI18nEngine = createCorePluginI18nEngine();
+    return _corePluginI18nEngine;
   }
   
   // Lazy re-initialization if instance was cleared
   try {
     PluginI18nEngine.getInstance<string>(DefaultInstanceKey);
-    return _coreI18nEngine;
+    return _corePluginI18nEngine;
   } catch {
-    _coreI18nEngine = createCoreI18nEngine();
-    return _coreI18nEngine;
+    _corePluginI18nEngine = createCorePluginI18nEngine();
+    return _corePluginI18nEngine;
   }
 }
 
 // Getter for direct reference - lazily initialized
-export const coreI18nEngine = new Proxy({} as PluginI18nEngine<string>, {
+export const corePluginI18nEngine = new Proxy({} as PluginI18nEngine<string>, {
   get(_target, prop) {
-    return (getCoreI18nEngine() as any)[prop];
+    return (getCorePluginI18nEngine() as any)[prop];
   },
 });
 
 // Reset function for tests
-export function resetCoreI18nEngine(): void {
-  _coreI18nEngine = undefined;
+export function resetCorePluginI18nEngine(): void {
+  _corePluginI18nEngine = undefined;
 }
 
 /**
  * Type alias for easier usage
  */
-export type CoreI18nEngine = PluginI18nEngine<string>;
+export type CorePluginI18nEngine = PluginI18nEngine<string>;
 
 /**
  * Helper function to get core translation
  * Uses the core engine instance to ensure core strings are available
  */
-export function getCoreTranslation(
+export function getCorePluginTranslation(
   stringKey: CoreStringKey,
   variables?: Record<string, string | number>,
   language?: string,
@@ -793,15 +808,104 @@ export function getCoreTranslation(
 /**
  * Helper function to safely get core translation with fallback
  */
-export function safeCoreTranslation(
+export function safeCorePluginTranslation(
   stringKey: CoreStringKey,
   variables?: Record<string, string | number>,
   language?: string,
   instanceKey?: string,
 ): string {
   try {
-    return getCoreTranslation(stringKey, variables, language, instanceKey);
+    return getCorePluginTranslation(stringKey, variables, language, instanceKey);
   } catch {
     return `[CoreStringKey.${stringKey}]`;
+  }
+}
+
+// 2.x definitions
+//------------------------------
+
+/**
+ * Create Core i18n engine instance
+ * Uses i18n 2.0 pattern with runtime validation
+ * IMPORTANT: Uses 'default' as instance key so TypedHandleableError can find it
+ */
+function createInstance(): I18nEngine {
+  const engine = I18nEngine.createInstance('default', createDefaultLanguages());
+  
+  // Register core component first (required for error messages)
+  const coreReg = createCoreComponentRegistration();
+  engine.register({
+    id: coreReg.component.id,
+    strings: coreReg.strings as Record<string, Record<string, string>>,
+  });
+  
+  return engine;
+}
+
+/**
+ * Lazy initialization with Proxy (like core-i18n.ts pattern)
+ */
+let _coreEngine: I18nEngine | undefined;
+
+export function getCoreI18nEngine(): I18nEngine {
+  // Lazy initialization on first access
+  if (!_coreEngine) {
+    // Check if instance exists before creating
+    if (I18nEngine.hasInstance('default')) {
+      _coreEngine = I18nEngine.getInstance('default');
+    } else {
+      _coreEngine = createInstance();
+    }
+    return _coreEngine;
+  }
+  
+  // Lazy re-initialization if instance was cleared
+  if (I18nEngine.hasInstance('default')) {
+    return _coreEngine;
+  } else {
+    _coreEngine = createInstance();
+    return _coreEngine;
+  }
+}
+
+/**
+ * Proxy for backward compatibility
+ */
+export const coreI18nEngine = new Proxy({} as I18nEngine, {
+  get(target, prop) {
+    return getCoreI18nEngine()[prop as keyof I18nEngine];
+  }
+});
+
+/**
+ * Reset function for tests
+ */
+export function resetCoreI18nEngine(): void {
+  _coreEngine = undefined;
+}
+
+/**
+ * Helper to translate Core strings
+ */
+export function getCoreTranslation(
+  stringKey: CoreStringKey,
+  variables?: Record<string, string | number>,
+  language?: string,
+): string {
+  return getCoreI18nEngine().translate(CoreI18nComponentId, stringKey, variables, language);
+}
+
+/**
+ * Safe translation with fallback
+ */
+export function safeCoreTranslation(
+  stringKey: CoreStringKey,
+  variables?: Record<string, string | number>,
+  language?: string,
+): string {
+  try {
+    return getCoreTranslation(stringKey, variables, language);
+  } catch {
+    return `[${stringKey}]`;
   }
 }

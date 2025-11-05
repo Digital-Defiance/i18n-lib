@@ -46,7 +46,8 @@ export * from './types';
 export * from './validation-config';
 
 // Legacy convenience exports
-export { createCoreI18nEngine as createCoreI18n } from './core-i18n';
+export { createCorePluginI18nEngine as createCoreI18n, createCorePluginI18nEngine as createCoreI18nEngine } from './core-i18n';
+export { getCorePluginTranslation as getCoreTranslation, safeCorePluginTranslation as safeCoreTranslation } from './core-i18n';
 export { PluginI18nEngine as PluginI18n } from './plugin-i18n-engine';
 
 // Legacy testing utilities
