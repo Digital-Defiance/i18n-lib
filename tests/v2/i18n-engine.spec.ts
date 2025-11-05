@@ -88,6 +88,33 @@ describe('I18nEngine v2', () => {
       }).toThrow(I18nError);
     });
 
+    it('should not throw when using registerIfNotExists on duplicate', () => {
+      engine.register({
+        id: 'auth',
+        strings: { 'en-US': { login: 'Login' } },
+      });
+
+      const result = engine.registerIfNotExists({
+        id: 'auth',
+        strings: { 'en-US': { login: 'Login' } },
+      });
+
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toEqual([]);
+      expect(result.warnings).toEqual([]);
+    });
+
+    it('should register component when using registerIfNotExists on new component', () => {
+      const result = engine.registerIfNotExists({
+        id: 'auth',
+        strings: { 'en-US': { login: 'Login' } },
+      });
+
+      expect(result.isValid).toBe(true);
+      expect(engine.hasComponent('auth')).toBe(true);
+      expect(engine.translate('auth', 'login')).toBe('Login');
+    });
+
     it('should support aliases', () => {
       engine.register({
         id: 'auth',

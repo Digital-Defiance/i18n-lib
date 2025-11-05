@@ -110,6 +110,12 @@ engine.registerComponent({
   },
   aliases: ['authentication'] // Optional aliases
 });
+
+// Safe registration (won't error if already registered)
+engine.registerComponentIfNotExists({
+  component: { id: 'auth', /* ... */ },
+  strings: { /* ... */ }
+});
 ```
 
 ### Translation
@@ -493,6 +499,12 @@ Contributions welcome! Please:
 - **Examples**: See tests/ directory
 
 ## ChangeLog
+
+### Version 2.1.15
+
+- Add `registerIfNotExists()` method to I18nEngine for safe component registration
+- Add `registerComponentIfNotExists()` method to PluginI18nEngine
+- Prevents "Component already registered" errors when reusing engine instances
 
 ### Version 2.1.12
 

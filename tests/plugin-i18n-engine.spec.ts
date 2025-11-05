@@ -122,6 +122,58 @@ describe('PluginI18nEngine', () => {
       engine.registerComponent(registration);
     });
 
+    it('should not throw when using registerComponentIfNotExists on duplicate', () => {
+      const testComponent: ComponentDefinition<TestStrings> = {
+        id: 'test-component',
+        name: 'Test Component',
+        stringKeys: Object.values(TestStrings),
+      };
+
+      const registration: ComponentRegistration<TestStrings, 'en'> = {
+        component: testComponent,
+        strings: { en: { [TestStrings.Welcome]: 'Welcome' } },
+      };
+
+      const result = engine.registerComponentIfNotExists(registration);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toEqual([]);
+      expect(result.warnings).toEqual([]);
+    });
+
+    it('should register component when using registerComponentIfNotExists on new component', () => {
+      const newComponent: ComponentDefinition<TestStrings> = {
+        id: 'new-component',
+        name: 'New Component',
+        stringKeys: Object.values(TestStrings),
+      };
+
+      const registration: ComponentRegistration<TestStrings, 'en' | 'fr' | 'es'> = {
+        component: newComponent,
+        strings: {
+          en: {
+            [TestStrings.Welcome]: 'Hello',
+            [TestStrings.Goodbye]: 'Bye',
+            [TestStrings.Template]: 'Hi, {name}!',
+          },
+          fr: {
+            [TestStrings.Welcome]: 'Salut',
+            [TestStrings.Goodbye]: 'Au revoir',
+            [TestStrings.Template]: 'Salut, {name}!',
+          },
+          es: {
+            [TestStrings.Welcome]: 'Hola',
+            [TestStrings.Goodbye]: 'Adiós',
+            [TestStrings.Template]: '¡Hola, {name}!',
+          },
+        },
+      };
+
+      const result = engine.registerComponentIfNotExists(registration);
+      expect(result.isValid).toBe(true);
+      expect(engine.hasComponent('new-component')).toBe(true);
+      expect(engine.translate('new-component', TestStrings.Welcome)).toBe('Hello');
+    });
+
     it('should translate simple strings', () => {
       const result = engine.translate('test-component', TestStrings.Welcome);
       expect(result).toBe('Welcome');

@@ -86,6 +86,13 @@ export class I18nEngine implements II18nEngine {
     return this.componentStore.register(config);
   }
 
+  registerIfNotExists(config: ComponentConfig): ValidationResult {
+    if (this.hasComponent(config.id)) {
+      return { isValid: true, errors: [], warnings: [] };
+    }
+    return this.register(config);
+  }
+
   private registerComponentMetadata(config: ComponentConfig): void {
     const componentId = config.id;
     const aliases = config.aliases || [];

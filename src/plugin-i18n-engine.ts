@@ -378,6 +378,18 @@ export class PluginI18nEngine<TLanguages extends string> {
   }
 
   /**
+   * Register a component only if it doesn't already exist
+   */
+  public registerComponentIfNotExists<TStringKeys extends string>(
+    registration: ComponentRegistration<TStringKeys, TLanguages>,
+  ) {
+    if (this.hasComponent(registration.component.id)) {
+      return { isValid: true, errors: [], warnings: [] };
+    }
+    return this.registerComponent(registration);
+  }
+
+  /**
    * Update strings for an existing component
    */
   public updateComponentStrings<TStringKeys extends string>(

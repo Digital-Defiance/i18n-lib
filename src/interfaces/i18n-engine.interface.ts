@@ -10,6 +10,7 @@ import { ValidationResult } from './validation-result.interface';
 export interface II18nEngine {
   // Component management
   register(config: ComponentConfig): ValidationResult;
+  registerIfNotExists(config: ComponentConfig): ValidationResult;
   updateStrings(componentId: string, strings: Record<string, Record<string, string>>): ValidationResult;
   hasComponent(componentId: string): boolean;
   getComponents(): readonly ComponentConfig[];
