@@ -482,7 +482,11 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
-### Version 2.1.3
+### Version 2.1.5
+
+- Minor timezone/currency export fix
+
+### Version 2.1.4
 
 - Version bump
 

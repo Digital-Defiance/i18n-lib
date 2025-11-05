@@ -5,7 +5,6 @@
 import { codes } from 'currency-codes';
 import { TranslatableError } from '../errors/translatable';
 import { CoreStringKey } from '../core-string-key';
-import { I18nEngine } from '../core';
 
 export type CurrencyPosition = 'prefix' | 'postfix' | 'infix';
 

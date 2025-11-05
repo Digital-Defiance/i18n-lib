@@ -5,6 +5,10 @@ export * from './errors';
 export * from './interfaces';
 export * from './utils';
 
+// Explicit exports for type safety
+export { Timezone, isValidTimezone } from './utils/timezone';
+export { CurrencyCode } from './utils/currency';
+
 // Convenience aliases
 export { I18nEngine as I18n } from './core/i18n-engine';
 export { I18nBuilder as Builder } from './builders/i18n-builder';
