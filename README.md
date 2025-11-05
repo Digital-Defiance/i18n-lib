@@ -482,6 +482,10 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 2.1.3
+
+- Version bump
+
 ### Version 2.1.1
 
 - Minor fix, set this.name in errors

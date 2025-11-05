@@ -767,7 +767,7 @@ export const coreI18nEngine = new Proxy({} as PluginI18nEngine<string>, {
 
 // Reset function for tests
 export function resetCoreI18nEngine(): void {
-  _coreI18nEngine = createCoreI18nEngine();
+  _coreI18nEngine = undefined;
 }
 
 /**

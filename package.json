@@ -1,13 +1,13 @@
 {
   "name": "@digitaldefiance/i18n-lib",
-  "version": "2.1.1",
+  "version": "2.1.4",
   "description": "i18n library with enum translation support",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "scripts": {
     "build": "npx nx build digitaldefiance-i18n-lib",
     "build:stream": "npx nx build --outputStyle=stream digitaldefiance-i18n-lib",
-    "build:logged": "npx nx build --outputStyle=stream digitaldefiance-i18n-lib 2>&1 | ansifilter -o build.log",
+    "build:logged": "npx nx build --outputStyle=stream --skip-nx-cache digitaldefiance-i18n-lib 2>&1 | ansifilter -o build.log",
     "test": "npx nx test digitaldefiance-i18n-lib",
     "test:stream": "npx nx test --outputStyle=stream digitaldefiance-i18n-lib",
     "test:logged": "npx nx test --skip-nx-cache --outputStyle=stream digitaldefiance-i18n-lib 2>&1 | ansifilter -o test.log",
