@@ -210,6 +210,18 @@ engine.t('Language: {language}'); // "Language: fr"
 engine.t('Price in {currency}', { currency: 'USD' }); // "Price in USD"
 ```
 
+### Constants Management
+
+```typescript
+// Merge constants (adds/overwrites specific keys)
+engine.mergeConstants({ Version: '2.0', NewKey: 'value' });
+// Existing constants preserved, specified ones added/updated
+
+// Update all constants (replaces everything)
+engine.updateConstants({ Site: 'NewSite', Version: '2.0' });
+// All previous constants removed, only these remain
+```
+
 ### Language Management
 
 ```typescript
@@ -482,7 +494,13 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
-### Convergence bump
+### Version 2.1.12
+
+- Add constants updateConstants mergeConstants functions to engine
+
+### Version 2.1.10
+
+- Convergence bump
 
 ### Version 2.1.6
 

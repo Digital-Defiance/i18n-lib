@@ -220,6 +220,46 @@ describe('I18nEngine v2', () => {
     });
   });
 
+  describe('Constants Management', () => {
+    let engine: I18nEngine;
+
+    beforeEach(() => {
+      engine = I18nBuilder.create()
+        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withConstants({ Site: 'OriginalSite', Version: '1.0' })
+        .build();
+
+      engine.register({
+        id: 'app',
+        strings: {
+          'en-US': {
+            info: 'Welcome to {Site} v{Version}',
+            site: '{Site}',
+          },
+        },
+      });
+    });
+
+    it('should use initial constants', () => {
+      expect(engine.translate('app', 'info')).toBe('Welcome to OriginalSite v1.0');
+    });
+
+    it('should merge constants', () => {
+      engine.mergeConstants({ Version: '2.0', Author: 'Test' });
+      expect(engine.translate('app', 'info')).toBe('Welcome to OriginalSite v2.0');
+    });
+
+    it('should preserve existing constants when merging', () => {
+      engine.mergeConstants({ Version: '2.0' });
+      expect(engine.translate('app', 'site')).toBe('OriginalSite');
+    });
+
+    it('should update all constants', () => {
+      engine.updateConstants({ NewSite: 'UpdatedSite' });
+      expect(engine.translate('app', 'site')).toBe('{Site}'); // Original constant gone
+    });
+  });
+
   describe('Language Management', () => {
     let engine: I18nEngine;
 

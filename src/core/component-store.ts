@@ -126,6 +126,10 @@ export class ComponentStore {
     };
   }
 
+  setConstants(constants: Record<string, any>): void {
+    this.constants = constants;
+  }
+
   clear(): void {
     this.components.clear();
     this.aliasMap.clear();

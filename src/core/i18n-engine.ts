@@ -348,6 +348,16 @@ export class I18nEngine implements II18nEngine {
     return LanguageRegistry.has(language);
   }
 
+  // Constants management
+  mergeConstants(constants: Record<string, any>): void {
+    Object.assign(this.config.constants, constants);
+  }
+
+  updateConstants(constants: Record<string, any>): void {
+    this.config.constants = constants;
+    this.componentStore.setConstants(constants);
+  }
+
   // Context management
   switchToAdmin(): void {
     I18nEngine.contextManager.switchToAdmin(this.instanceKey);
