@@ -22,7 +22,8 @@
     "skipLibCheck": true
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "tests/i18n-engine.registerIfNotExists.spec.ts"
   ],
   "exclude": [
     "**/*.spec.ts",

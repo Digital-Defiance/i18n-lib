@@ -427,6 +427,13 @@ export class I18nEngine implements II18nEngine {
     });
   }
 
+  static registerIfNotExists(key: string, languages: readonly LanguageDefinition[], config?: EngineConfig): I18nEngine {
+    if (I18nEngine.hasInstance(key)) {
+      return I18nEngine.getInstance(key);
+    }
+    return I18nEngine.createInstance(key, languages, config);
+  }
+
   static getInstance(key?: string): I18nEngine {
     const instanceKey = key || I18nEngine.defaultKey || I18nEngine.DEFAULT_KEY;
     const instance = I18nEngine.instances.get(instanceKey);

@@ -500,6 +500,10 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 2.1.16
+
+- Add statis registerIfNotExists to i28nengine
+
 ### Version 2.1.15
 
 - Add `registerIfNotExists()` method to I18nEngine for safe component registration

@@ -830,11 +830,11 @@ export function safeCorePluginTranslation(
  * IMPORTANT: Uses 'default' as instance key so TypedHandleableError can find it
  */
 function createInstance(): I18nEngine {
-  const engine = I18nEngine.createInstance('default', createDefaultLanguages());
+  const engine = I18nEngine.registerIfNotExists('default', createDefaultLanguages());
   
-  // Register core component first (required for error messages)
+  // Register core component if not already registered
   const coreReg = createCoreComponentRegistration();
-  engine.register({
+  engine.registerIfNotExists({
     id: coreReg.component.id,
     strings: coreReg.strings as Record<string, Record<string, string>>,
   });
