@@ -270,27 +270,27 @@ export class I18nEngine implements II18nEngine {
 
         if (context) {
           // Add context variables
-          combined.language = context.language;
-          combined.adminLanguage = context.adminLanguage;
-          combined.currentContext = context.currentContext;
+          combined['language'] = context.language;
+          combined['adminLanguage'] = context.adminLanguage;
+          combined['currentContext'] = context.currentContext;
           
           if (context.currencyCode) {
             // Extract value from CurrencyCode object
             const currencyValue = this.extractValue(context.currencyCode);
-            combined.currencyCode = currencyValue;
-            combined.currency = currencyValue;
+            combined['currencyCode'] = currencyValue;
+            combined['currency'] = currencyValue;
           }
           
           if (context.timezone) {
             // Extract value from Timezone object
             const timezoneValue = this.extractValue(context.timezone);
-            combined.timezone = timezoneValue;
-            combined.userTimezone = timezoneValue;
+            combined['timezone'] = timezoneValue;
+            combined['userTimezone'] = timezoneValue;
           }
           
           if (context.adminTimezone) {
             // Extract value from Timezone object
-            combined.adminTimezone = this.extractValue(context.adminTimezone);
+            combined['adminTimezone'] = this.extractValue(context.adminTimezone);
           }
         }
       }

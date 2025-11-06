@@ -716,7 +716,7 @@ export function createCoreComponentConfig(): ComponentConfig {
   return {
     id: CoreI18nComponentId,
     strings: createCoreComponentStrings(),
-    aliases: ['CoreStringKey', 'core'],
+    aliases: ['CoreStringKey'],
   };
 }
 

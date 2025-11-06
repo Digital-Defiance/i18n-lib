@@ -500,9 +500,13 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 2.1.25
+
+- Improve test coverage
+
 ### Version 2.1.16
 
-- Add statis registerIfNotExists to i28nengine
+- Add static registerIfNotExists to i8nengine
 
 ### Version 2.1.15
 
