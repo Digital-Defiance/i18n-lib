@@ -11,6 +11,7 @@
     "test": "npx nx test digitaldefiance-i18n-lib",
     "test:stream": "npx nx test --outputStyle=stream digitaldefiance-i18n-lib",
     "test:logged": "npx nx test --skip-nx-cache --outputStyle=stream digitaldefiance-i18n-lib 2>&1 | ansifilter -o test.log",
+    "test:coverage": "npx jest --coverage --testPathPattern=digitaldefiance-i18n-lib --coverageReporters=text",
     "lint": "npx nx lint digitaldefiance-i18n-lib",
     "lint:fix": "npx nx lint digitaldefiance-i18n-lib --fix",
     "prettier:check": "prettier --check 'src/**/*.{ts,tsx}' 'tests/**/*.{ts,tsx}'",
