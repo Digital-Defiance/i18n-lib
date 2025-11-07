@@ -500,6 +500,10 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 2.1.32
+
+- Expose config instead of constants
+
 ### Version 2.1.31
 
 - Add constants param to i18n creation

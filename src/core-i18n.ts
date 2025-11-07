@@ -9,8 +9,9 @@ import { LanguageCodes } from './language-codes';
 import { LanguageDefinition } from './language-definition';
 import { PluginI18nEngine } from './plugin-i18n-engine';
 import { createCompleteComponentStrings } from './strict-types';
-import { ComponentConfig } from './interfaces';
+import { ComponentConfig, EngineConfig } from './interfaces';
 import { I18nEngine } from './core';
+import { RegistryConfig } from './registry-config';
 
 /**
  * Helper function to create multiple language definitions
@@ -742,13 +743,13 @@ export function getCoreLanguageDefinitions(): LanguageDefinition[] {
  */
 export function createCorePluginI18nEngine(
   instanceKey: string = DefaultInstanceKey,
-  constants?: Record<string, string | number>,
+  config?: Partial<RegistryConfig<string>>,
 ): PluginI18nEngine<string> {
   const languages = createDefaultLanguages();
   const engine = PluginI18nEngine.createInstance<string>(
     instanceKey,
     languages,
-    { constants }
+    config
   );
   engine.registerComponent(createCoreComponentRegistration());
   return engine;
@@ -831,8 +832,8 @@ export function safeCorePluginTranslation(
  * Uses i18n 2.0 pattern with runtime validation
  * IMPORTANT: Uses 'default' as instance key so TypedHandleableError can find it
  */
-function createInstance(constants?: Record<string, string | number>): I18nEngine {
-  const engine = I18nEngine.registerIfNotExists('default', createDefaultLanguages(), { constants });
+function createInstance(config?: EngineConfig): I18nEngine {
+  const engine = I18nEngine.registerIfNotExists('default', createDefaultLanguages(), config);
   
   // Register core component if not already registered
   const coreReg = createCoreComponentRegistration();
