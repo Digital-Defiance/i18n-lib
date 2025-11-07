@@ -500,6 +500,10 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 2.1.31
+
+- Add constants param to i18n creation
+
 ### Version 2.1.30
 
 - Version alignment bump

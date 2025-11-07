@@ -742,11 +742,13 @@ export function getCoreLanguageDefinitions(): LanguageDefinition[] {
  */
 export function createCorePluginI18nEngine(
   instanceKey: string = DefaultInstanceKey,
+  constants?: Record<string, string | number>,
 ): PluginI18nEngine<string> {
   const languages = createDefaultLanguages();
   const engine = PluginI18nEngine.createInstance<string>(
     instanceKey,
     languages,
+    { constants }
   );
   engine.registerComponent(createCoreComponentRegistration());
   return engine;
@@ -829,8 +831,8 @@ export function safeCorePluginTranslation(
  * Uses i18n 2.0 pattern with runtime validation
  * IMPORTANT: Uses 'default' as instance key so TypedHandleableError can find it
  */
-function createInstance(): I18nEngine {
-  const engine = I18nEngine.registerIfNotExists('default', createDefaultLanguages());
+function createInstance(constants?: Record<string, string | number>): I18nEngine {
+  const engine = I18nEngine.registerIfNotExists('default', createDefaultLanguages(), { constants });
   
   // Register core component if not already registered
   const coreReg = createCoreComponentRegistration();
