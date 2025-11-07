@@ -500,6 +500,10 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 2.1.30
+
+- Version alignment bump
+
 ### Version 2.1.25
 
 - Improve test coverage
