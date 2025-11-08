@@ -2,6 +2,8 @@
 
 A production-ready TypeScript internationalization library with component-based architecture, type-safe translations, and comprehensive error handling.
 
+Part of [Express Suite](https://github.com/Digital-Defiance/express-suite)
+
 ## Features
 
 - **Component-Based Architecture**: Register translation components with full type safety
@@ -499,6 +501,10 @@ Contributions welcome! Please:
 - **Examples**: See tests/ directory
 
 ## ChangeLog
+
+### Version 2.1.40
+
+- Alignment
 
 ### Version 2.1.32
 
