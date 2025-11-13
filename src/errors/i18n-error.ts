@@ -14,6 +14,9 @@ export const I18nErrorCode = {
   INSTANCE_NOT_FOUND: 'INSTANCE_NOT_FOUND',
   INSTANCE_EXISTS: 'INSTANCE_EXISTS',
   INVALID_CONTEXT: 'INVALID_CONTEXT',
+  PLURAL_FORM_NOT_FOUND: 'PLURAL_FORM_NOT_FOUND',
+  INVALID_PLURAL_CATEGORY: 'INVALID_PLURAL_CATEGORY',
+  MISSING_COUNT_VARIABLE: 'MISSING_COUNT_VARIABLE',
 } as const;
 
 export type I18nErrorCode = (typeof I18nErrorCode)[keyof typeof I18nErrorCode];
@@ -114,6 +117,35 @@ export class I18nError extends Error {
       I18nErrorCode.INVALID_CONTEXT,
       `Invalid context key '${contextKey}'`,
       { contextKey },
+    );
+  }
+
+  static pluralFormNotFound(
+    category: string,
+    language: string,
+    key: string,
+    availableForms: string[],
+  ): I18nError {
+    return new I18nError(
+      I18nErrorCode.PLURAL_FORM_NOT_FOUND,
+      `Plural form '${category}' not found for language '${language}' in key '${key}'. Available forms: ${availableForms.join(', ')}`,
+      { category, language, key, availableForms },
+    );
+  }
+
+  static invalidPluralCategory(category: string, validCategories: string[]): I18nError {
+    return new I18nError(
+      I18nErrorCode.INVALID_PLURAL_CATEGORY,
+      `Invalid plural category '${category}'. Valid categories: ${validCategories.join(', ')}`,
+      { category, validCategories },
+    );
+  }
+
+  static missingCountVariable(key: string): I18nError {
+    return new I18nError(
+      I18nErrorCode.MISSING_COUNT_VARIABLE,
+      `Plural forms used in key '${key}' but no 'count' variable provided`,
+      { key },
     );
   }
 }

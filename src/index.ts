@@ -4,6 +4,10 @@ export * from './core';
 export * from './errors';
 export * from './interfaces';
 export * from './utils';
+export * from './types';
+export * from './pluralization';
+export * from './gender';
+export * from './validation';
 
 // Explicit exports for type safety
 export { Timezone, isValidTimezone } from './utils/timezone';

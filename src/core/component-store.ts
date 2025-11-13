@@ -5,6 +5,8 @@
 import { I18nError } from '../errors';
 import { ComponentConfig, ValidationResult } from '../interfaces';
 import { replaceVariables } from '../utils';
+import { PluralString, isPluralString, resolvePluralString } from '../types/plural-types';
+import { getPluralCategory } from '../pluralization/language-plural-map';
 
 export class ComponentStore {
   private components = new Map<string, ComponentConfig>();
@@ -72,18 +74,47 @@ export class ComponentStore {
     language?: string,
   ): string {
     const component = this.get(componentId);
-    const langStrings = component.strings[language || 'en-US'];
+    const lang = language || 'en-US';
+    const langStrings = component.strings[lang];
 
     if (!langStrings) {
-      throw I18nError.languageNotFound(language || 'en-US');
+      throw I18nError.languageNotFound(lang);
     }
 
-    const translation = langStrings[key];
-    if (!translation) {
-      throw I18nError.translationMissing(componentId, key, language || 'en-US');
+    const value = langStrings[key];
+    if (!value) {
+      throw I18nError.translationMissing(componentId, key, lang);
     }
 
+    // Resolve plural form if needed
+    const translation = this.resolvePluralForm(value, variables?.count, lang);
+    
     return replaceVariables(translation, variables, this.constants);
+  }
+
+  /**
+   * Resolve plural form from a PluralString based on count variable
+   */
+  private resolvePluralForm(
+    value: string | PluralString,
+    count: number | undefined,
+    language: string
+  ): string {
+    // If it's a simple string, return as-is
+    if (typeof value === 'string') {
+      return value;
+    }
+
+    // If no count provided, use 'other' form or first available
+    if (count === undefined) {
+      return resolvePluralString(value, 'other') || '';
+    }
+
+    // Get the appropriate plural category for this count and language
+    const category = getPluralCategory(language, count) as any;
+    
+    // Resolve the plural form with fallback logic
+    return resolvePluralString(value, category) || '';
   }
 
   safeTranslate(

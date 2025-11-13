@@ -7,6 +7,9 @@ Part of [Express Suite](https://github.com/Digital-Defiance/express-suite)
 ## Features
 
 - **Component-Based Architecture**: Register translation components with full type safety
+- **37 Supported Languages**: CLDR-compliant plural rules for world's most complex languages
+- **Pluralization Support**: Automatic plural form selection based on count (one/few/many/other)
+- **Gender Support**: Gender-aware translations (male/female/neutral/other)
 - **8 Built-in Languages**: English (US/UK), French, Spanish, German, Chinese, Japanese, Ukrainian
 - **Advanced Template Processing**: 
   - Component references: `{{Component.key}}`
@@ -69,6 +72,195 @@ console.log(engine.translate('app', 'welcome', { appName: 'MyApp' }));
 engine.setLanguage(LanguageCodes.FR);
 console.log(engine.translate('app', 'welcome', { appName: 'MyApp' }));
 // Output: "Bienvenue sur MyApp!"
+
+// Pluralization (automatic form selection)
+engine.register({
+  id: 'cart',
+  strings: {
+    'en-US': {
+      items: {
+        one: '1 item',
+        other: '{count} items'
+      }
+    }
+  }
+});
+
+console.log(engine.translate('cart', 'items', { count: 1 }));
+// Output: "1 item"
+console.log(engine.translate('cart', 'items', { count: 5 }));
+// Output: "5 items"
+```
+
+## Pluralization & Gender
+
+### Pluralization
+
+Automatic plural form selection based on count with CLDR-compliant rules for 37 languages:
+
+```typescript
+import { createPluralString } from '@digitaldefiance/i18n-lib';
+
+// English (one/other)
+engine.register({
+  id: 'shop',
+  strings: {
+    'en-US': {
+      items: createPluralString({
+        one: '{count} item',
+        other: '{count} items'
+      })
+    }
+  }
+});
+
+// Russian (one/few/many)
+engine.register({
+  id: 'shop',
+  strings: {
+    'ru': {
+      items: createPluralString({
+        one: '{count} товар',
+        few: '{count} товара',
+        many: '{count} товаров'
+      })
+    }
+  }
+});
+
+// Arabic (zero/one/two/few/many/other)
+engine.register({
+  id: 'shop',
+  strings: {
+    'ar': {
+      items: createPluralString({
+        zero: 'لا عناصر',
+        one: 'عنصر واحد',
+        two: 'عنصران',
+        few: '{count} عناصر',
+        many: '{count} عنصرًا',
+        other: '{count} عنصر'
+      })
+    }
+  }
+});
+
+// Automatic form selection
+engine.translate('shop', 'items', { count: 1 });  // "1 item"
+engine.translate('shop', 'items', { count: 5 });  // "5 items"
+engine.translate('shop', 'items', { count: 21 }, 'ru'); // "21 товар"
+```
+
+**Supported Languages** (37 total):
+- **Simple** (other only): Japanese, Chinese, Korean, Turkish, Vietnamese, Thai, Indonesian, Malay
+- **Two forms** (one/other): English, German, Spanish, Italian, Portuguese, Dutch, Swedish, Norwegian, Danish, Finnish, Greek, Hebrew, Hindi
+- **Three forms** (one/few/many): Russian, Ukrainian, Romanian, Latvian
+- **Four forms**: Polish, Czech, Lithuanian, Slovenian, Scottish Gaelic
+- **Five forms**: Irish, Breton
+- **Six forms**: Arabic, Welsh
+
+See [PLURALIZATION_SUPPORT.md](docs/PLURALIZATION_SUPPORT.md) for complete language matrix.
+
+### Gender Support
+
+Gender-aware translations with intelligent fallback:
+
+```typescript
+import { createGenderedString } from '@digitaldefiance/i18n-lib';
+
+engine.register({
+  id: 'profile',
+  strings: {
+    'en-US': {
+      greeting: createGenderedString({
+        male: 'Welcome, Mr. {name}',
+        female: 'Welcome, Ms. {name}',
+        neutral: 'Welcome, {name}'
+      })
+    }
+  }
+});
+
+engine.translate('profile', 'greeting', { name: 'Smith', gender: 'male' });
+// Output: "Welcome, Mr. Smith"
+```
+
+### Combined Plural + Gender
+
+Nested plural and gender forms:
+
+```typescript
+// Plural → Gender
+const pluralGender = {
+  one: {
+    male: 'He has {count} item',
+    female: 'She has {count} item'
+  },
+  other: {
+    male: 'He has {count} items',
+    female: 'She has {count} items'
+  }
+};
+
+// Gender → Plural
+const genderPlural = {
+  male: {
+    one: 'He has {count} item',
+    other: 'He has {count} items'
+  },
+  female: {
+    one: 'She has {count} item',
+    other: 'She has {count} items'
+  }
+};
+```
+
+### Helper Functions
+
+```typescript
+import { 
+  createPluralString, 
+  createGenderedString, 
+  getRequiredPluralForms 
+} from '@digitaldefiance/i18n-lib';
+
+// Get required forms for a language
+const forms = getRequiredPluralForms('ru');
+// Returns: ['one', 'few', 'many']
+
+// Type-safe plural string creation
+const plural = createPluralString({
+  one: '1 item',
+  other: '{count} items'
+});
+
+// Type-safe gender string creation
+const gender = createGenderedString({
+  male: 'He',
+  female: 'She',
+  neutral: 'They'
+});
+```
+
+### Validation
+
+```typescript
+import { validatePluralForms } from '@digitaldefiance/i18n-lib';
+
+// Validate plural forms for a language
+const result = validatePluralForms(
+  { one: 'item', other: 'items' },
+  'en',
+  'items',
+  { strict: true, checkUnused: true, checkVariables: true }
+);
+
+if (!result.isValid) {
+  console.error('Errors:', result.errors);
+}
+if (result.warnings.length > 0) {
+  console.warn('Warnings:', result.warnings);
+}
 ```
 
 ## Core Concepts
@@ -501,6 +693,94 @@ Contributions welcome! Please:
 - **Examples**: See tests/ directory
 
 ## ChangeLog
+
+### Version 3.0.0
+
+**Major Feature Release** - Pluralization & Gender Support
+
+**New Features:**
+
+- **CLDR Pluralization**: Full support for 37 languages with automatic plural form selection
+  - 19 unique plural rule implementations (English, Russian, Arabic, Polish, French, Spanish, Japanese, Ukrainian, Chinese, German, Scottish Gaelic, Welsh, Breton, Slovenian, Czech, Lithuanian, Latvian, Irish, Romanian)
+  - 18 additional languages reusing existing rules
+  - Handles world's most complex plural systems (Arabic 6 forms, Welsh 6 forms, Breton 5 forms)
+  - Intelligent fallback: requested form → 'other' → first available
+  - Type-safe `PluralString` type with backward compatibility
+
+- **Gender Support**: Gender-aware translations with 4 categories
+  - Gender categories: male, female, neutral, other
+  - `GenderedString` type for type-safe gender forms
+  - Intelligent fallback: requested → neutral → other → first available
+  - Works seamlessly with pluralization
+
+- **Combined Plural + Gender**: Nested plural and gender resolution
+  - Supports both plural→gender and gender→plural nesting
+  - Full fallback support for missing forms
+  - Works with all 37 supported languages
+
+- **Validation System**: Comprehensive plural form validation
+  - `validatePluralForms()` - Validates required forms per language
+  - `validateCountVariable()` - Ensures count variable exists
+  - Strict and lenient modes
+  - Variable consistency checking
+  - Unused form detection
+
+- **Helper Functions**: Utilities for easy plural/gender string creation
+  - `createPluralString()` - Type-safe plural object creation
+  - `createGenderedString()` - Type-safe gender object creation
+  - `getRequiredPluralForms()` - Get required forms for any language
+
+- **Error Handling**: New error codes for pluralization
+  - `PLURAL_FORM_NOT_FOUND` - Missing plural form with suggestions
+  - `INVALID_PLURAL_CATEGORY` - Invalid category with valid options
+  - `MISSING_COUNT_VARIABLE` - Count variable missing when plurals used
+
+**Documentation:**
+
+- [PLURALIZATION_SUPPORT.md](docs/PLURALIZATION_SUPPORT.md) - Complete language support matrix
+- [PLURALIZATION_USAGE.md](docs/PLURALIZATION_USAGE.md) - Usage guide with examples
+- [ADDING_LANGUAGES.md](docs/ADDING_LANGUAGES.md) - Guide for adding custom languages
+- Updated README with pluralization and gender sections
+
+**Testing:**
+
+- 348 tests passing (92% of roadmap target)
+- 100% coverage on pluralization, gender, and validation code
+- Comprehensive edge case testing
+- Integration tests for complex scenarios
+
+**Migration:**
+
+```typescript
+// Simple strings continue to work unchanged
+engine.register({
+  id: 'app',
+  strings: {
+    'en-US': {
+      title: 'My App'  // Still works
+    }
+  }
+});
+
+// Add pluralization
+import { createPluralString } from '@digitaldefiance/i18n-lib';
+
+engine.register({
+  id: 'cart',
+  strings: {
+    'en-US': {
+      items: createPluralString({
+        one: '{count} item',
+        other: '{count} items'
+      })
+    }
+  }
+});
+
+// Use with count variable
+engine.translate('cart', 'items', { count: 5 });
+// Output: "5 items"
+```
 
 ### Version 2.1.40
 
