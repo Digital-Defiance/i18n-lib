@@ -2,6 +2,8 @@
  * String utility functions
  */
 
+import { escapeHtml, safeStringify } from './html-escape';
+
 /**
  * Extract the actual value from an object that might be a wrapper (CurrencyCode, Timezone, etc.)
  */
@@ -13,10 +15,15 @@ function extractValue(value: any): any {
   return value;
 }
 
+export interface ReplaceVariablesOptions {
+  escapeHtml?: boolean;
+}
+
 export function replaceVariables(
   str: string,
   vars?: Record<string, any>,
   constants?: Record<string, any>,
+  options?: ReplaceVariablesOptions,
 ): string {
   if (typeof str !== 'string') {
     str = String(str);
@@ -32,13 +39,11 @@ export function replaceVariables(
 
     if (vars && varName in vars) {
       const value = extractValue(vars[varName]);
-      replacement = String(value);
+      replacement = safeStringify(value, options);
+      result = result.replace(variable, replacement);
     } else if (constants && varName in constants) {
       const value = extractValue(constants[varName]);
-      replacement = String(value);
-    }
-
-    if (replacement) {
+      replacement = safeStringify(value, options);
       result = result.replace(variable, replacement);
     }
   }

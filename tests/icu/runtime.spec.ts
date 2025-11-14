@@ -21,14 +21,14 @@ describe('Runtime', () => {
     const msg = 'Hello {name}';
     runtime.format(msg, { name: 'Alice' }, { locale: 'en-US' });
     runtime.format(msg, { name: 'Bob' }, { locale: 'en-US' });
-    expect(runtime['cache'].size).toBe(1);
+    expect(runtime['cache'].size()).toBe(1);
   });
 
   it('should clear cache', () => {
     runtime.format('Hello {name}', { name: 'Alice' }, { locale: 'en-US' });
-    expect(runtime['cache'].size).toBe(1);
+    expect(runtime['cache'].size()).toBe(1);
     runtime.clearCache();
-    expect(runtime['cache'].size).toBe(0);
+    expect(runtime['cache'].size()).toBe(0);
   });
 
   it('should handle complex nested message', () => {

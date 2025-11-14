@@ -24,8 +24,13 @@ export class ParseError extends Error {
 export class Parser {
   private tokens: Token[];
   private position: number = 0;
+  private depth: number = 0;
+  private readonly MAX_DEPTH = 10;
 
   constructor(input: string) {
+    if (input.length > 10000) {
+      throw new ParseError('Input exceeds maximum length', 0);
+    }
     this.tokens = new Tokenizer(input).tokenize();
   }
 
@@ -34,6 +39,10 @@ export class Parser {
   }
 
   private parseMessage(): MessageNode {
+    if (++this.depth > this.MAX_DEPTH) {
+      throw new ParseError(`Maximum nesting depth of ${this.MAX_DEPTH} exceeded`, this.position);
+    }
+    
     const elements: ASTNode[] = [];
 
     while (!this.isAtEnd() && !this.check(TokenType.CLOSE_BRACE)) {
@@ -50,6 +59,7 @@ export class Parser {
       }
     }
 
+    this.depth--;
     return { type: NodeType.MESSAGE, elements };
   }
 

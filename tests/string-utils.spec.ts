@@ -137,19 +137,17 @@ describe('String Utils', () => {
 
     it('should handle null values', () => {
       const result = replaceVariables('Value: {value}', { value: null });
-      expect(result).toBe('Value: null');
+      expect(result).toBe('Value: ');
     });
 
-    it('should handle objects without value property', () => {
+    it('should reject objects without value property', () => {
       const obj = { data: 'test' };
-      const result = replaceVariables('Object: {obj}', { obj });
-      expect(result).toBe('Object: [object Object]');
+      expect(() => replaceVariables('Object: {obj}', { obj })).toThrow(/invalid value type/i);
     });
 
-    it('should handle arrays', () => {
+    it('should reject arrays', () => {
       const arr = [1, 2, 3];
-      const result = replaceVariables('Array: {arr}', { arr });
-      expect(result).toBe('Array: 1,2,3');
+      expect(() => replaceVariables('Array: {arr}', { arr })).toThrow(/invalid value type/i);
     });
 
     it('should handle special characters in values', () => {

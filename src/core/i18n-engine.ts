@@ -17,6 +17,8 @@ import { EnumRegistry } from './enum-registry';
 import { LanguageRegistry } from './language-registry';
 import { CurrencyCode } from '../utils/currency';
 import { Timezone } from '../utils/timezone';
+import { createSafeObject, safeAssign, validateObjectKeys } from '../utils/safe-object';
+import { validateTemplateLength, validateComponentId } from '../utils/validation';
 
 export class I18nEngine implements II18nEngine {
   private static instances = new Map<string, I18nEngine>();
@@ -82,6 +84,7 @@ export class I18nEngine implements II18nEngine {
 
   // Component management
   register(config: ComponentConfig): ValidationResult {
+    validateComponentId(config.id);
     this.registerComponentMetadata(config);
     return this.componentStore.register(config);
   }
@@ -217,13 +220,15 @@ export class I18nEngine implements II18nEngine {
   }
 
   t(template: string, variables?: Record<string, any>, language?: string): string {
+    validateTemplateLength(template);
     const lang = language || I18nEngine.contextManager.getCurrentLanguage(this.instanceKey);
 
     // Build combined variables: constants + context + provided (provided overrides all)
     const combinedVars = this.buildCombinedVariables(variables);
 
     // Replace {{component.key}} or {{EnumName.key}} patterns with alias support
-    let result = template.replace(/\{\{([^}]+)\}\}/g, (match, pattern) => {
+    // Limited pattern to prevent ReDoS: max 100 chars between braces
+    let result = template.replace(/\{\{([^}]{1,100})\}\}/g, (match, pattern) => {
       const parts = pattern.split('.');
       if (parts.length === 2) {
         const [rawPrefix, rawKey] = parts;
@@ -240,7 +245,8 @@ export class I18nEngine implements II18nEngine {
     });
 
     // Replace {variable} patterns with combined variables
-    result = result.replace(/\{(\w+)\}/g, (match, varName) => {
+    // Limited pattern to prevent ReDoS: max 50 chars for variable names
+    result = result.replace(/\{(\w{1,50})\}/g, (match, varName) => {
       return combinedVars[varName] !== undefined ? String(combinedVars[varName]) : match;
     });
 
@@ -248,7 +254,10 @@ export class I18nEngine implements II18nEngine {
   }
 
   private buildCombinedVariables(variables?: Record<string, any>): Record<string, any> {
-    const combined: Record<string, any> = {};
+    if (variables) {
+      validateObjectKeys(variables);
+    }
+    const combined: Record<string, any> = createSafeObject();
 
     // 1. Start with constants from config
     if (this.config.constants) {
@@ -301,11 +310,11 @@ export class I18nEngine implements II18nEngine {
     // 3. Override with provided variables (highest priority)
     // Also extract values from any CurrencyCode or Timezone objects
     if (variables) {
-      const processedVars: Record<string, any> = {};
       for (const [key, value] of Object.entries(variables)) {
-        processedVars[key] = this.extractValue(value);
+        if (!['__proto__', 'constructor', 'prototype'].includes(key)) {
+          combined[key] = this.extractValue(value);
+        }
       }
-      Object.assign(combined, processedVars);
     }
 
     return combined;
@@ -357,10 +366,12 @@ export class I18nEngine implements II18nEngine {
 
   // Constants management
   mergeConstants(constants: Record<string, any>): void {
-    Object.assign(this.config.constants, constants);
+    validateObjectKeys(constants);
+    safeAssign(this.config.constants, constants);
   }
 
   updateConstants(constants: Record<string, any>): void {
+    validateObjectKeys(constants);
     this.config.constants = constants;
     this.componentStore.setConstants(constants);
   }

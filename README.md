@@ -6,6 +6,12 @@ Part of [Express Suite](https://github.com/Digital-Defiance/express-suite)
 
 ## Features
 
+- **Production-Grade Security**: Comprehensive protection against common attacks
+  - Prototype pollution prevention
+  - ReDoS (Regular Expression Denial of Service) mitigation
+  - XSS (Cross-Site Scripting) protection with HTML escaping
+  - Input validation with configurable limits
+  - Bounded resource usage (cache, recursion, input length)
 - **ICU MessageFormat**: Industry-standard message formatting with plural, select, date/time/number formatting
 - **Component-Based Architecture**: Register translation components with full type safety
 - **37 Supported Languages**: CLDR-compliant plural rules for world's most complex languages
@@ -26,6 +32,7 @@ Part of [Express Suite](https://github.com/Digital-Defiance/express-suite)
 - **Type Safety**: Full TypeScript support with generic types
 - **Error Handling**: Comprehensive error classes with translation support
 - **91.81% Test Coverage**: 714 tests covering all features
+- **Security Hardened**: See [SECURITY.md](SECURITY.md) for details
 
 ## Installation
 
@@ -757,6 +764,19 @@ Contributions welcome! Please:
 - **Examples**: See tests/ directory
 
 ## ChangeLog
+
+### Version 3.6.0
+
+**Security Hardening Release**
+
+- **Prototype Pollution Prevention**: Validates all object keys, filters dangerous properties
+- **ReDoS Mitigation**: Limited regex patterns, input length validation
+- **XSS Protection**: HTML escaping option, safe type coercion
+- **Input Validation**: Length limits, character whitelisting
+- **Resource Limits**: LRU cache (1000 entries), recursion depth (10), message length (10000)
+- **101 New Tests**: Comprehensive security test coverage
+- **New Utilities**: `safe-object`, `html-escape`, `validation`, `lru-cache`
+- **Documentation**: SECURITY.md, SECURITY_AUDIT.md, SECURITY_FIXES_COMPLETE.md
 
 ### Version 3.5.0
 

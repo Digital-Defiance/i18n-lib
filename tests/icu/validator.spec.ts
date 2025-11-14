@@ -139,13 +139,8 @@ describe('ICU MessageFormat Validator', () => {
     });
 
     it('should reject excessive nesting by default', () => {
-      let message = 'text';
-      for (let i = 0; i < 15; i++) {
-        message = `{v${i}, select, a {${message}} other {${message}}}`;
-      }
-      const ast = parse(message);
-      expect(() => validate(ast)).toThrow(ValidationError);
-      expect(() => validate(ast)).toThrow('Maximum nesting depth');
+      const message = '{a, select, x {{b, select, y {{c, select, z {{d, select, w {{e, select, v {{f, select, u {{g, select, t {{h, select, s {{i, select, r {{j, select, q {{k, select, p {text} other {text}}} other {text}}} other {text}}} other {text}}} other {text}}} other {text}}} other {text}}} other {text}}} other {text}}} other {text}}';
+      expect(() => parse(message)).toThrow(/depth/i);
     });
 
     it('should allow custom max depth', () => {

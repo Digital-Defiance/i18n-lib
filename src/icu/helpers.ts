@@ -7,7 +7,7 @@ import { MessageNode } from './ast';
 const defaultRuntime = new Runtime();
 
 export function isICUMessage(message: string): boolean {
-  return /\{[^}]+\}/.test(message);
+  return /\{[^}]{1,100}\}/.test(message);
 }
 
 export function parseICUMessage(message: string): MessageNode {

@@ -36,7 +36,8 @@ export function createTemplateProcessor<
     ...otherVars: Record<string, string | number>[]
   ): string {
     let varIndex = 0;
-    const pattern = new RegExp(`\\{\\{${enumName}\\.(\\w+)\\}\\}`, 'g');
+    // Limited pattern to prevent ReDoS
+    const pattern = new RegExp(`\\{\\{${enumName}\\.(\\w{1,50})\\}\\}`, 'g');
 
     // First replace enum patterns
     let result = str.replace(pattern, (match, enumKey) => {
@@ -53,8 +54,16 @@ export function createTemplateProcessor<
     });
 
     // Then replace any remaining variables from all otherVars
-    const allVars = otherVars.reduce((acc, vars) => ({ ...acc, ...vars }), {});
-    result = result.replace(/\{(\w+)\}/g, (match, varName) => {
+    const allVars: Record<string, string | number> = {};
+    for (const vars of otherVars) {
+      for (const [key, value] of Object.entries(vars)) {
+        if (!['__proto__', 'constructor', 'prototype'].includes(key)) {
+          allVars[key] = value;
+        }
+      }
+    }
+    // Limited pattern to prevent ReDoS
+    result = result.replace(/\{(\w{1,50})\}/g, (match, varName) => {
       return allVars[varName] !== undefined ? String(allVars[varName]) : match;
     });
 
