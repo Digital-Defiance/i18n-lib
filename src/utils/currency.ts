@@ -2,7 +2,7 @@
  * Currency utilities (v2)
  */
 
-import { codes } from 'currency-codes';
+import { codes, data } from 'currency-codes';
 import { TranslatableError } from '../errors/translatable';
 import { CoreStringKey } from '../core-string-key';
 
@@ -13,6 +13,14 @@ export interface CurrencyFormat {
   position: CurrencyPosition;
   groupSeparator: string;
   decimalSeparator: string;
+}
+
+export interface CurrencyData {
+  code: string;
+  number: string;
+  digits: number;
+  currency: string;
+  countries: string[];
 }
 
 export class CurrencyCode {
@@ -43,6 +51,10 @@ export class CurrencyCode {
 
   static getAll(): string[] {
     return codes();
+  }
+
+  static getAllData(): CurrencyData[] {
+    return data as CurrencyData[];
   }
 }
 

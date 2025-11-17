@@ -765,6 +765,10 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 3.6.1
+
+- Upgrade currency-codes
+
 ### Version 3.6.0
 
 **Security Hardening Release**

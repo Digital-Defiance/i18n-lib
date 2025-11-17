@@ -11,7 +11,8 @@ export * from './validation';
 
 // Explicit exports for type safety
 export { Timezone, isValidTimezone } from './utils/timezone';
-export { CurrencyCode } from './utils/currency';
+export { CurrencyCode, getCurrencyFormat } from './utils/currency';
+export type { CurrencyData, CurrencyFormat, CurrencyPosition } from './utils/currency';
 
 // Convenience aliases
 export { I18nEngine as I18n } from './core/i18n-engine';
