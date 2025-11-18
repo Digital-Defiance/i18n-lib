@@ -765,6 +765,10 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 3.6.4
+
+- Add DefaultLanguageCode
+
 ### Version 3.6.3
 
 - make getCodeLabelMap() not readonly

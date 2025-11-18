@@ -18,6 +18,11 @@ export const DefaultCurrencyCode: string = 'USD';
 export const DefaultTimezone: string = 'UTC';
 
 /**
+ * Default language code
+ */
+export const DefaultLanguageCode: string = 'en-US';
+
+/**
  * Currency position type
  */
 export type CurrencyPosition = 'prefix' | 'postfix' | 'infix';
