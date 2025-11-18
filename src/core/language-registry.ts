@@ -85,7 +85,7 @@ export class LanguageRegistry {
    * Retrieves an array of objects mapping language codes to their labels.
    * @returns An array of objects with code and label properties.
    */
-  static getCodeLabelMap(): readonly { code: string; label: string }[] {
+  static getCodeLabelMap(): { code: string; label: string }[] {
     return Array.from(this.languages.values()).map((l) => ({ code: l.code, label: l.name }));
   }
 

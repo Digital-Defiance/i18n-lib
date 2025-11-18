@@ -765,6 +765,10 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 3.6.3
+
+- make getCodeLabelMap() not readonly
+
 ### Version 3.6.2
 
 - Add getCodeLabelMap() for use with react components
