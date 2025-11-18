@@ -31,6 +31,12 @@ export class ComponentRegistry<TLanguages extends string> {
   private readonly registeredLanguages: Set<TLanguages>;
   private readonly constants?: Record<string, any>;
 
+  /**
+   * Creates a new ComponentRegistry.
+   * @param languages - Array of supported language codes.
+   * @param validationConfig - Configuration for validation rules.
+   * @param constants - Optional constants for variable replacement in templates.
+   */
   constructor(
     languages: readonly TLanguages[],
     validationConfig: ValidationConfig,
@@ -42,7 +48,8 @@ export class ComponentRegistry<TLanguages extends string> {
   }
 
   /**
-   * Update the set of registered languages (for dynamic language addition)
+   * Update the set of registered languages (for dynamic language addition).
+   * @param languages - Array of language codes to register.
    */
   public updateRegisteredLanguages(languages: readonly TLanguages[]): void {
     this.registeredLanguages.clear();
@@ -50,7 +57,10 @@ export class ComponentRegistry<TLanguages extends string> {
   }
 
   /**
-   * Register a new component with its translations
+   * Register a new component with its translations.
+   * @param registration - Component registration payload.
+   * @returns ValidationResult indicating success or errors.
+   * @throws RegistryError if component is already registered or validation fails.
    */
   public registerComponent<TStringKeys extends string>(
     registration: ComponentRegistration<TStringKeys, TLanguages>,
@@ -100,7 +110,11 @@ export class ComponentRegistry<TLanguages extends string> {
   }
 
   /**
-   * Update strings for an existing component
+   * Update strings for an existing component.
+   * @param componentId - The ID of the component to update.
+   * @param strings - Partial strings to update.
+   * @returns ValidationResult indicating success or errors.
+   * @throws RegistryError if component is not found.
    */
   public updateComponentStrings<TStringKeys extends string>(
     componentId: string,
@@ -142,7 +156,10 @@ export class ComponentRegistry<TLanguages extends string> {
   }
 
   /**
-   * Get a translation for a specific component, string key, and language
+   * Get a translation for a specific component, string key, and language.
+   * @param request - Translation request containing componentId, stringKey, language, and variables.
+   * @returns TranslationResponse with the translated string and metadata.
+   * @throws RegistryError if component, language, or string key is not found.
    */
   public getTranslation<TStringKeys extends string>(
     request: TranslationRequest<TStringKeys, TLanguages>,
@@ -219,14 +236,17 @@ export class ComponentRegistry<TLanguages extends string> {
   }
 
   /**
-   * Get all registered components
+   * Get all registered components.
+   * @returns Array of all registered ComponentDefinition objects.
    */
   public getComponents(): ReadonlyArray<ComponentDefinition<any>> {
     return Array.from(this.components.values());
   }
 
   /**
-   * Get a specific component by ID
+   * Get a specific component by ID.
+   * @param componentId - The ID of the component to retrieve.
+   * @returns The ComponentDefinition or undefined if not found.
    */
   public getComponent<TStringKeys extends string>(
     componentId: string,
@@ -237,14 +257,18 @@ export class ComponentRegistry<TLanguages extends string> {
   }
 
   /**
-   * Check if a component is registered
+   * Check if a component is registered.
+   * @param componentId - The ID of the component to check.
+   * @returns True if the component is registered, false otherwise.
    */
   public hasComponent(componentId: string): boolean {
     return this.components.has(componentId);
   }
 
   /**
-   * Get all strings for a component in all languages
+   * Get all strings for a component in all languages.
+   * @param componentId - The ID of the component.
+   * @returns ComponentLanguageStrings or undefined if not found.
    */
   public getComponentStrings<TStringKeys extends string>(
     componentId: string,
@@ -255,7 +279,9 @@ export class ComponentRegistry<TLanguages extends string> {
   }
 
   /**
-   * Validate a component registration
+   * Validate a component registration.
+   * @param registration - Component registration to validate.
+   * @returns ValidationResult with details of missing keys and errors.
    */
   private validateComponentRegistration<TStringKeys extends string>(
     registration: ComponentRegistration<TStringKeys, TLanguages>,
@@ -315,7 +341,10 @@ export class ComponentRegistry<TLanguages extends string> {
   }
 
   /**
-   * Complete missing strings with fallbacks
+   * Complete missing strings with fallbacks.
+   * @param component - The component definition.
+   * @param strings - Partial strings provided.
+   * @returns Complete strings with fallbacks filled in.
    */
   private completeStringsWithFallbacks<TStringKeys extends string>(
     component: ComponentDefinition<TStringKeys>,
@@ -352,7 +381,10 @@ export class ComponentRegistry<TLanguages extends string> {
   }
 
   /**
-   * Merge existing strings with new strings
+   * Merge existing strings with new strings.
+   * @param existing - Existing complete strings.
+   * @param updates - Partial updates to apply.
+   * @returns Merged partial strings.
    */
   private mergeStrings<TStringKeys extends string>(
     existing: ComponentLanguageStrings<TStringKeys, TLanguages>,
@@ -386,7 +418,7 @@ export class ComponentRegistry<TLanguages extends string> {
   }
 
   /**
-   * Clear all components and their strings (useful for testing)
+   * Clear all components and their strings (useful for testing).
    */
   public clearAllComponents(): void {
     this.components.clear();

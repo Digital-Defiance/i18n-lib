@@ -5,7 +5,9 @@
 import { escapeHtml, safeStringify } from './html-escape';
 
 /**
- * Extract the actual value from an object that might be a wrapper (CurrencyCode, Timezone, etc.)
+ * Extract the actual value from an object that might be a wrapper (CurrencyCode, Timezone, etc.).
+ * @param value - The value to extract from
+ * @returns The extracted value or the original value if not a wrapper
  */
 function extractValue(value: any): any {
   // Handle objects with a 'value' property (CurrencyCode, Timezone, etc.)
@@ -15,10 +17,23 @@ function extractValue(value: any): any {
   return value;
 }
 
+/**
+ * Options for the replaceVariables function.
+ */
 export interface ReplaceVariablesOptions {
+  /** If true, HTML-escapes the replaced values */
   escapeHtml?: boolean;
 }
 
+/**
+ * Replaces variables in a string template with values from vars or constants.
+ * Variables are denoted by {variableName} in the template string.
+ * @param str - The template string containing variables
+ * @param vars - Optional object mapping variable names to values
+ * @param constants - Optional object containing constant values
+ * @param options - Optional configuration including HTML escaping
+ * @returns The string with variables replaced
+ */
 export function replaceVariables(
   str: string,
   vars?: Record<string, any>,
@@ -51,6 +66,12 @@ export function replaceVariables(
   return result;
 }
 
+/**
+ * Checks if a string key indicates a template that expects variable replacement.
+ * Template keys end with 'template' (case-insensitive).
+ * @param key - The key to check
+ * @returns True if the key indicates a template, false otherwise
+ */
 export function isTemplate(key: string): boolean {
   return key.trim().toLowerCase().endsWith('template');
 }

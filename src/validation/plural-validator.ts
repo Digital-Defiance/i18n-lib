@@ -6,20 +6,38 @@ import { PluralCategory } from '../pluralization/plural-categories';
 import { PluralString, isPluralString } from '../types/plural-types';
 import { getRequiredPluralForms, getAllPluralForms } from '../pluralization/language-plural-map';
 
+/**
+ * Result of validating plural forms.
+ */
 export interface PluralValidationResult {
+  /** Whether the validation passed */
   isValid: boolean;
+  /** Array of validation errors */
   errors: string[];
+  /** Array of validation warnings */
   warnings: string[];
 }
 
+/**
+ * Options for plural form validation.
+ */
 export interface PluralValidationOptions {
+  /** If true, treat missing required forms as errors instead of warnings */
   strict?: boolean;
+  /** If true, warn about unused plural forms */
   checkUnused?: boolean;
+  /** If true, check for consistent variable usage across forms */
   checkVariables?: boolean;
 }
 
 /**
- * Validate plural forms for a specific language
+ * Validate plural forms for a specific language.
+ * Checks that all required plural forms are present and optionally validates variable consistency.
+ * @param value - The plural string value to validate
+ * @param language - The language code
+ * @param key - The translation key (for error messages)
+ * @param options - Validation options
+ * @returns Validation result with errors and warnings
  */
 export function validatePluralForms(
   value: PluralString,
@@ -75,7 +93,10 @@ export function validatePluralForms(
 }
 
 /**
- * Extract all variables from plural forms
+ * Extract all variables from plural forms.
+ * Scans all plural form texts for {variable} patterns.
+ * @param value - The plural string value
+ * @returns Set of all variable names found
  */
 function extractVariables(value: PluralString): Set<string> {
   const vars = new Set<string>();
@@ -93,7 +114,11 @@ function extractVariables(value: PluralString): Set<string> {
 }
 
 /**
- * Find forms with inconsistent variables
+ * Find forms with inconsistent variables.
+ * Identifies plural forms that are missing variables used in other forms.
+ * @param value - The plural string value
+ * @param allVars - Set of all variables found across all forms
+ * @returns Object mapping form names to arrays of missing variable names
  */
 function findInconsistentVariables(
   value: PluralString,
@@ -120,7 +145,12 @@ function findInconsistentVariables(
 }
 
 /**
- * Validate that count variable exists when plural forms are used
+ * Validate that count variable exists when plural forms are used.
+ * Pluralization requires a 'count' variable to determine which form to use.
+ * @param value - The plural string value
+ * @param variables - The variables object to check
+ * @param key - The translation key (for error messages)
+ * @returns Validation result with warnings if count is missing
  */
 export function validateCountVariable(
   value: PluralString,

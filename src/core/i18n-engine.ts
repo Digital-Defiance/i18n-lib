@@ -20,6 +20,10 @@ import { Timezone } from '../utils/timezone';
 import { createSafeObject, safeAssign, validateObjectKeys } from '../utils/safe-object';
 import { validateTemplateLength, validateComponentId } from '../utils/validation';
 
+/**
+ * I18nEngine implements the II18nEngine interface, providing translation,
+ * component registration, enum translation, and context management.
+ */
 export class I18nEngine implements II18nEngine {
   private static instances = new Map<string, I18nEngine>();
   private static defaultKey: string | null = null;
@@ -33,6 +37,18 @@ export class I18nEngine implements II18nEngine {
   private readonly aliasToComponent = new Map<string, string>();
   private readonly componentKeyLookup = new Map<string, Map<string, string>>();
 
+  /**
+   * Constructs an I18nEngine instance, registering languages, setting defaults,
+   * and optionally registering and setting this instance as default.
+   *
+   * @param languages - Array of language definitions to register.
+   * @param config - Engine configuration options.
+   * @param options - Optional creation options.
+   * @param options.instanceKey - Key to identify this instance.
+   * @param options.registerInstance - Whether to add this instance to the registry.
+   * @param options.setAsDefault - Whether to set this instance as the default.
+   * @throws {I18nError} If an instance with the same key already exists.
+   */
   constructor(
     languages: readonly LanguageDefinition[],
     config: EngineConfig = {},
@@ -82,13 +98,22 @@ export class I18nEngine implements II18nEngine {
     }
   }
 
-  // Component management
+  /**
+   * Registers a translation component configuration.
+   * @param config - Component configuration object.
+   * @returns ValidationResult containing any warnings or errors.
+   */
   register(config: ComponentConfig): ValidationResult {
     validateComponentId(config.id);
     this.registerComponentMetadata(config);
     return this.componentStore.register(config);
   }
 
+  /**
+   * Registers a component if not already registered.
+   * @param config - Component configuration object.
+   * @returns ValidationResult containing any warnings or errors.
+   */
   registerIfNotExists(config: ComponentConfig): ValidationResult {
     if (this.hasComponent(config.id)) {
       return { isValid: true, errors: [], warnings: [] };
@@ -96,6 +121,10 @@ export class I18nEngine implements II18nEngine {
     return this.register(config);
   }
 
+  /**
+   * Internal: Builds metadata lookup maps from component config.
+   * @param config - Component configuration object.
+   */
   private registerComponentMetadata(config: ComponentConfig): void {
     const componentId = config.id;
     const aliases = config.aliases || [];
@@ -147,6 +176,11 @@ export class I18nEngine implements II18nEngine {
     }
   }
 
+  /**
+   * Internal: Normalizes legacy keys into snake_case lowercased.
+   * @param rawKey - The raw key string to normalize.
+   * @returns Normalized key or null if empty.
+   */
   private normalizeLegacyKey(rawKey: string): string | null {
     if (!rawKey) return null;
     const normalized = rawKey
@@ -157,6 +191,12 @@ export class I18nEngine implements II18nEngine {
     return normalized.length > 0 ? normalized : null;
   }
 
+  /**
+   * Internal: Resolves the component prefix and key to actual IDs.
+   * @param prefix - Component or enum alias.
+   * @param rawKey - Raw translation key.
+   * @returns Object containing resolved componentId and stringKey.
+   */
   private resolveComponentAndKey(
     prefix: string,
     rawKey: string,
@@ -184,19 +224,41 @@ export class I18nEngine implements II18nEngine {
     return { componentId, stringKey: rawKey };
   }
 
+  /**
+   * Updates translation strings for a component.
+   * @param componentId - ID of the component to update.
+   * @param strings - Language-keyed string records.
+   * @returns ValidationResult containing any warnings or errors.
+   */
   updateStrings(componentId: string, strings: Record<string, Record<string, string>>): ValidationResult {
     return this.componentStore.update(componentId, strings);
   }
 
+  /**
+   * Checks if a component is registered.
+   * @param componentId - ID of the component.
+   * @returns True if the component exists.
+   */
   hasComponent(componentId: string): boolean {
     return this.componentStore.has(componentId);
   }
 
+  /**
+   * Retrieves all registered component configs.
+   * @returns Array of ComponentConfig.
+   */
   getComponents(): readonly ComponentConfig[] {
     return this.componentStore.getAll();
   }
 
-  // Translation
+  /**
+   * Translates a key for a component in a given or current language.
+   * @param componentId - ID of the component.
+   * @param key - Translation key.
+   * @param variables - Optional variables for template.
+   * @param language - Language code to translate into.
+   * @returns Translated string.
+   */
   translate(
     componentId: string,
     key: string,
@@ -208,6 +270,14 @@ export class I18nEngine implements II18nEngine {
     return this.componentStore.translate(componentId, key, combinedVars, lang);
   }
 
+  /**
+   * Safely translates a key, returning a placeholder for missing translations.
+   * @param componentId - ID of the component.
+   * @param key - Translation key.
+   * @param variables - Optional variables for template.
+   * @param language - Language code to translate into.
+   * @returns Safe translated string.
+   */
   safeTranslate(
     componentId: string,
     key: string,
@@ -219,6 +289,14 @@ export class I18nEngine implements II18nEngine {
     return this.componentStore.safeTranslate(componentId, key, combinedVars, lang);
   }
 
+  /**
+   * Processes a translation template, replacing component and variable placeholders.
+   * @param template - Template string containing {{component.key}} and {variable}.
+   * @param variables - Optional variables for substitution.
+   * @param language - Language code to translate into.
+   * @returns Processed template string.
+   * @throws {I18nError} If template length exceeds limits.
+   */
   t(template: string, variables?: Record<string, any>, language?: string): string {
     validateTemplateLength(template);
     const lang = language || I18nEngine.contextManager.getCurrentLanguage(this.instanceKey);
@@ -253,6 +331,11 @@ export class I18nEngine implements II18nEngine {
     return result;
   }
 
+  /**
+   * Internal: Combines constants, context, and provided variables for translation.
+   * @param variables - Optional overrides for context and constants.
+   * @returns Combined variables record.
+   */
   private buildCombinedVariables(variables?: Record<string, any>): Record<string, any> {
     if (variables) {
       validateObjectKeys(variables);
@@ -274,9 +357,7 @@ export class I18nEngine implements II18nEngine {
       const GlobalActiveContext = (globalThis as any).GlobalActiveContext;
 
       if (GlobalActiveContext && typeof GlobalActiveContext.getInstance === 'function') {
-        const globalContext = GlobalActiveContext.getInstance();
-        const context = globalContext?.context;
-
+        const context = GlobalActiveContext.getInstance()?.context;
         if (context) {
           // Add context variables
           combined['language'] = context.language;
@@ -320,16 +401,14 @@ export class I18nEngine implements II18nEngine {
     return combined;
   }
 
+  /**
+   * Internal: Extracts primitive or object 'value' fields, handling CurrencyCode and Timezone.
+   * @param value - Value or wrapper object.
+   * @returns Extracted primitive value.
+   */
   private extractValue(value: any): any {
-    // Handle CurrencyCode objects
-    if (value instanceof CurrencyCode) {
-      return value.value;
-    }
-    // Handle Timezone objects
-    if (value instanceof Timezone) {
-      return value.value;
-    }
-    // Handle objects with a 'value' property (duck typing for cross-context compatibility)
+    if (value instanceof CurrencyCode) return value.value;
+    if (value instanceof Timezone) return value.value;
     if (value && typeof value === 'object' && 'value' in value && typeof value.value !== 'function') {
       return value.value;
     }
@@ -337,11 +416,19 @@ export class I18nEngine implements II18nEngine {
     return value;
   }
 
-  // Language management
+  /**
+   * Registers a language in the global LanguageRegistry.
+   * @param language - LanguageDefinition to register.
+   */
   registerLanguage(language: LanguageDefinition): void {
     LanguageRegistry.register(language);
   }
 
+  /**
+   * Sets the current translation language for this instance.
+   * @param language - Language code to set.
+   * @throws {I18nError} If the language is not registered.
+   */
   setLanguage(language: string): void {
     if (!LanguageRegistry.has(language)) {
       throw I18nError.languageNotFound(language);
@@ -349,6 +436,11 @@ export class I18nEngine implements II18nEngine {
     I18nEngine.contextManager.setLanguage(this.instanceKey, language);
   }
 
+  /**
+   * Sets the current admin translation language for this instance.
+   * @param language - Language code to set.
+   * @throws {I18nError} If the language is not registered.
+   */
   setAdminLanguage(language: string): void {
     if (!LanguageRegistry.has(language)) {
       throw I18nError.languageNotFound(language);
@@ -356,40 +448,70 @@ export class I18nEngine implements II18nEngine {
     I18nEngine.contextManager.setAdminLanguage(this.instanceKey, language);
   }
 
+  /**
+   * Retrieves all registered languages.
+   * @returns Array of LanguageDefinition.
+   */
   getLanguages(): readonly LanguageDefinition[] {
     return LanguageRegistry.getAll();
   }
 
+  /**
+   * Checks if a language is registered in the global registry.
+   * @param language - Language code to check.
+   * @returns True if the language exists.
+   */
   hasLanguage(language: string): boolean {
     return LanguageRegistry.has(language);
   }
 
-  // Constants management
+  /**
+   * Merges new constants into existing config constants.
+   * @param constants - Key-value constants to merge.
+   */
   mergeConstants(constants: Record<string, any>): void {
     validateObjectKeys(constants);
     safeAssign(this.config.constants, constants);
   }
 
+  /**
+   * Updates config constants and componentStore constants to new values.
+   * @param constants - New constants record.
+   */
   updateConstants(constants: Record<string, any>): void {
     validateObjectKeys(constants);
     this.config.constants = constants;
     this.componentStore.setConstants(constants);
   }
 
-  // Context management
+  /**
+   * Switches translation context to admin.
+   */
   switchToAdmin(): void {
     I18nEngine.contextManager.switchToAdmin(this.instanceKey);
   }
 
+  /**
+   * Switches translation context to user.
+   */
   switchToUser(): void {
     I18nEngine.contextManager.switchToUser(this.instanceKey);
   }
 
+  /**
+   * Retrieves the current language for this instance.
+   * @returns Current language code.
+   */
   getCurrentLanguage(): string {
     return I18nEngine.contextManager.getCurrentLanguage(this.instanceKey);
   }
 
-  // Enum translation
+  /**
+   * Registers an enum for translation.
+   * @param enumObj - Enum object to register.
+   * @param translations - Language keyed translations for enum values.
+   * @param enumName - Name to identify the enum in templates.
+   */
   registerEnum<TEnum extends string | number>(
     enumObj: Record<string, TEnum>,
     translations: Record<string, Record<TEnum, string>>,
@@ -398,6 +520,13 @@ export class I18nEngine implements II18nEngine {
     this.enumRegistry.register(enumObj, translations, enumName);
   }
 
+  /**
+   * Translates an enum value for the current or specified language.
+   * @param enumObj - Enum object.
+   * @param value - Enum value to translate.
+   * @param language - Optional language code.
+   * @returns Translated enum string.
+   */
   translateEnum<TEnum extends string | number>(
     enumObj: Record<string, TEnum>,
     value: TEnum,
@@ -407,11 +536,19 @@ export class I18nEngine implements II18nEngine {
     return this.enumRegistry.translate(enumObj, value, lang);
   }
 
+  /**
+   * Checks if an enum is registered.
+   * @param enumObj - Enum object to check.
+   * @returns True if the enum is registered.
+   */
   hasEnum(enumObj: any): boolean {
     return this.enumRegistry.has(enumObj);
   }
 
-  // Validation
+  /**
+   * Validates all registered components for missing translations or warnings.
+   * @returns ValidationResult containing errors and warnings.
+   */
   validate(): ValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
@@ -429,7 +566,13 @@ export class I18nEngine implements II18nEngine {
     };
   }
 
-  // Static methods
+  /**
+   * Creates a new engine instance with the given key, languages, and config.
+   * @param key - Unique key for the new instance.
+   * @param languages - Array of language definitions to register.
+   * @param config - Optional engine configuration.
+   * @returns Newly created I18nEngine instance.
+   */
   static createInstance(key: string, languages: readonly LanguageDefinition[], config?: EngineConfig): I18nEngine {
     return new I18nEngine(languages, config, {
       instanceKey: key,
@@ -438,6 +581,13 @@ export class I18nEngine implements II18nEngine {
     });
   }
 
+  /**
+   * Registers or retrieves an existing engine instance by key.
+   * @param key - Unique key for the instance.
+   * @param languages - Array of language definitions.
+   * @param config - Optional engine configuration.
+   * @returns Existing or newly created I18nEngine instance.
+   */
   static registerIfNotExists(key: string, languages: readonly LanguageDefinition[], config?: EngineConfig): I18nEngine {
     if (I18nEngine.hasInstance(key)) {
       return I18nEngine.getInstance(key);
@@ -445,6 +595,12 @@ export class I18nEngine implements II18nEngine {
     return I18nEngine.createInstance(key, languages, config);
   }
 
+  /**
+   * Retrieves an engine instance by key or default if none provided.
+   * @param key - Optional instance key.
+   * @returns I18nEngine instance.
+   * @throws {I18nError} If instance not found.
+   */
   static getInstance(key?: string): I18nEngine {
     const instanceKey = key || I18nEngine.defaultKey || I18nEngine.DEFAULT_KEY;
     const instance = I18nEngine.instances.get(instanceKey);
@@ -454,11 +610,21 @@ export class I18nEngine implements II18nEngine {
     return instance;
   }
 
+  /**
+   * Checks if an engine instance exists.
+   * @param key - Optional instance key.
+   * @returns True if instance exists.
+   */
   static hasInstance(key?: string): boolean {
     const instanceKey = key || I18nEngine.DEFAULT_KEY;
     return I18nEngine.instances.has(instanceKey);
   }
 
+  /**
+   * Removes an engine instance by key.
+   * @param key - Optional instance key.
+   * @returns True if the instance was removed.
+   */
   static removeInstance(key?: string): boolean {
     const instanceKey = key || I18nEngine.DEFAULT_KEY;
     const removed = I18nEngine.instances.delete(instanceKey);
@@ -468,6 +634,9 @@ export class I18nEngine implements II18nEngine {
     return removed;
   }
 
+  /**
+   * Resets all engine instances and clears global registries.
+   */
   static resetAll(): void {
     I18nEngine.instances.clear();
     I18nEngine.defaultKey = null;

@@ -65,7 +65,7 @@ describe('EnumTranslationRegistry', () => {
       expect(() => {
         registry.register(TestStatus, invalidTranslations as any, 'TestStatus');
       }).toThrow(
-        "Language 'French' in enum 'TestStatus' is not available in this engine instance",
+        "Language 'French' in enum 'TestStatus' is not available in this registry",
       );
     });
 

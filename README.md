@@ -765,6 +765,11 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 3.6.2
+
+- Add getCodeLabelMap() for use with react components
+- Add documentation jsdocs
+
 ### Version 3.6.1
 
 - Upgrade currency-codes

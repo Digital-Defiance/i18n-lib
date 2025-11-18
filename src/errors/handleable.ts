@@ -1,16 +1,33 @@
 import { IHandleable } from '../interfaces/handleable';
 import { HandleableErrorOptions } from '../interfaces/handleable-error-options';
 
+/**
+ * Extended Error constructor type that includes stack trace capture functionality.
+ */
 type ErrorConstructorWithStack = ErrorConstructor & {
   captureStackTrace?: (target: Error, constructorOpt?: Function) => void;
 };
 
+/**
+ * Base error class that implements IHandleable interface.
+ * Provides enhanced error handling capabilities including status codes, handled state tracking,
+ * and source data preservation.
+ */
 export class HandleableError extends Error implements IHandleable {
+  /** The original error that caused this error */
   public override readonly cause?: Error;
+  /** HTTP status code associated with this error */
   public readonly statusCode: number;
+  /** Optional source data related to the error */
   public readonly sourceData?: unknown;
+  /** Internal tracking of whether this error has been handled */
   private _handled: boolean;
 
+  /**
+   * Creates a new HandleableError instance.
+   * @param source - The original error being wrapped
+   * @param options - Optional configuration for the error
+   */
   constructor(source: Error, options?: HandleableErrorOptions) {
     super(source.message);
     this.name = this.constructor.name;
@@ -33,14 +50,28 @@ export class HandleableError extends Error implements IHandleable {
     }
   }
 
+  /**
+   * Gets the handled state of this error.
+   * @returns True if the error has been handled, false otherwise
+   */
   public get handled(): boolean {
     return this._handled;
   }
 
+  /**
+   * Sets the handled state of this error.
+   * @param value - The new handled state
+   */
   public set handled(value: boolean) {
     this._handled = value;
   }
 
+  /**
+   * Serializes a value to a JSON-compatible format.
+   * Handles objects with toJSON methods, Error instances, arrays, and plain objects.
+   * @param value - The value to serialize
+   * @returns The serialized value
+   */
   private serializeValue(value: unknown): unknown {
     if (
       value &&
@@ -64,6 +95,11 @@ export class HandleableError extends Error implements IHandleable {
     return value;
   }
 
+  /**
+   * Converts the error to a JSON-serializable object.
+   * Includes name, message, status code, handled state, stack trace, and optional source data.
+   * @returns A plain object representation of the error
+   */
   public toJSON(): Record<string, unknown> {
     return {
       name: this.name,

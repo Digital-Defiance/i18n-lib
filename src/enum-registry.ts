@@ -1,23 +1,26 @@
 import { EnumLanguageTranslation } from './types';
 
 /**
- * Registry for managing enum translations across multiple languages.
+ * Registry for managing translations of enum values across multiple languages.
+ *
+ * @template TStringKey Type of translation key used in error messages.
+ * @template TLanguage Type of supported language codes.
  */
 export class EnumTranslationRegistry<
   TStringKey extends string,
   TLanguage extends string,
 > {
-  protected translations = new Map<
-    any,
-    EnumLanguageTranslation<any, TLanguage>
-  >();
+  protected translations = new Map<any, EnumLanguageTranslation<any, TLanguage>>();
   protected enumNames = new WeakMap<any, string>();
   protected availableLanguages: Set<TLanguage>;
-  protected translateFn?: (
-    key: TStringKey,
-    vars?: Record<string, any>,
-  ) => string;
+  protected translateFn?: (key: TStringKey, vars?: Record<string, any>) => string;
 
+  /**
+   * Creates a new EnumTranslationRegistry.
+   *
+   * @param availableLanguages Array of supported language codes.
+   * @param translateFn Optional translation function for error templates.
+   */
   constructor(
     availableLanguages: TLanguage[],
     translateFn?: (key: TStringKey, vars?: Record<string, any>) => string,
@@ -27,10 +30,13 @@ export class EnumTranslationRegistry<
   }
 
   /**
-   * Registers an enumeration with its translations and a name.
-   * @param enumObj The enumeration object
-   * @param translations The translations for the enumeration
-   * @param enumName The name of the enumeration
+   * Registers an enum and its language-specific translations.
+   *
+   * @template TEnum Enum value type (string or number).
+   * @param enumObj The enum object to register.
+   * @param translations Mapping of language codes to value-to-string translations.
+   * @param enumName Human-readable name of the enum (used in errors).
+   * @throws {Error} If translations contain languages not in availableLanguages.
    */
   public register<TEnum extends string | number>(
     enumObj: Record<string, TEnum>,
@@ -43,11 +49,14 @@ export class EnumTranslationRegistry<
   }
 
   /**
-   * Translates a value from the given enumeration to the specified language.
-   * @param enumObj The enumeration object
-   * @param value The value to translate
-   * @param language The target language for translation
-   * @returns The translated string
+   * Translates a specific enum value into the target language.
+   *
+   * @template TEnum Enum value type.
+   * @param enumObj The enum object registered previously.
+   * @param value The enum value to translate.
+   * @param language The target language code.
+   * @returns The translated string.
+   * @throws {Error} If the enum or language or value is not found.
    */
   public translate<TEnum extends string | number>(
     enumObj: Record<string, TEnum>,
@@ -97,27 +106,32 @@ export class EnumTranslationRegistry<
   }
 
   /**
-   * Gets the name of the enumeration.
-   * @param enumObj The enumeration object
-   * @returns The name of the enumeration
+   * Checks whether translations exist for the given enum object.
+   *
+   * @param enumObj The enum object to check.
+   * @returns True if registered, false otherwise.
+   */
+  public has(enumObj: any): boolean {
+    return this.translations.has(enumObj);
+  }
+
+  /**
+   * Internal: Retrieves the human-readable name of the enum.
+   *
+   * @param enumObj The enum object.
+   * @returns Registered enum name or 'UnknownEnum' if not set.
    */
   private getEnumName(enumObj: any): string {
     return this.enumNames.get(enumObj) || 'UnknownEnum';
   }
 
   /**
-   * Checks if the registry has translations for the given enumeration.
-   * @param enumObj The enumeration object
-   * @returns True if translations exist, false otherwise
-   */
-  has(enumObj: any): boolean {
-    return this.translations.has(enumObj);
-  }
-
-  /**
-   * Validates that enum translations only contain available languages.
-   * @param translations The translations to validate
-   * @param enumName The name of the enumeration for error messages
+   * Internal: Validates that translation entries only use available languages.
+   *
+   * @template TEnum Enum value type.
+   * @param translations Mapping of language codes to translations.
+   * @param enumName Enum name for error reporting.
+   * @throws {Error} If a translation language is not available.
    */
   private validateTranslations<TEnum extends string | number>(
     translations: EnumLanguageTranslation<TEnum, TLanguage>,
@@ -130,7 +144,7 @@ export class EnumTranslationRegistry<
               'Error_EnumLanguageNotAvailableTemplate' as TStringKey,
               { language, enumName },
             )
-          : `Language '${language}' in enum '${enumName}' is not available in this engine instance`;
+          : `Language '${language}' in enum '${enumName}' is not available in this registry`;
         throw new Error(message);
       }
     }
