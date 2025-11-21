@@ -16,7 +16,35 @@ export type CompleteReasonMap<
 > = Record<TEnum[keyof TEnum], TStringKey>;
 
 /**
- * Base typed error class with common patterns
+ * Base typed error class with full i18n feature support.
+ * 
+ * **Supported i18n Features** (via translation strings):
+ * - ICU MessageFormat: plural, select, selectordinal
+ * - Pluralization: 37 languages with CLDR rules
+ * - Gender support: male, female, neutral, other
+ * - Number formatting: integer, currency, percent
+ * - Date/Time formatting: short, medium, long, full
+ * - Nested messages: up to 4 levels deep
+ * 
+ * **Translation String Examples:**
+ * ```typescript
+ * // Register translations with ICU features
+ * engine.registerComponent({
+ *   component: { id: 'errors', name: 'Errors', stringKeys: ['invalidCount'] },
+ *   strings: {
+ *     'en-US': {
+ *       invalidCount: "{count, plural, one {# item is invalid} other {# items are invalid}}"
+ *     }
+ *   }
+ * });
+ * 
+ * // Use with typed error
+ * throw BaseTypedError.createTranslated(
+ *   engine, 'errors', ErrorType.InvalidCount, reasonMap,
+ *   { count: 5 }, 'en-US'
+ * );
+ * // Result: "5 items are invalid"
+ * ```
  */
 export abstract class BaseTypedError<
   TEnum extends Record<string, string>,
@@ -88,7 +116,38 @@ export abstract class BaseTypedError<
 }
 
 /**
- * Legacy TypedError that ensures complete enum coverage (for backward compatibility)
+ * TypedError with complete enum coverage and full i18n feature support.
+ * 
+ * **Supported i18n Features** (via translation strings):
+ * - ICU MessageFormat: plural, select, selectordinal
+ * - Pluralization: 37 languages with CLDR rules
+ * - Gender support: male, female, neutral, other
+ * - Number formatting: integer, currency, percent
+ * - Nested messages: up to 4 levels deep
+ * 
+ * **Translation String Examples:**
+ * ```typescript
+ * // Define error types
+ * enum ValidationError {
+ *   InvalidCount = 'invalidCount',
+ *   ThresholdExceeded = 'thresholdExceeded'
+ * }
+ * 
+ * // Register translations with ICU
+ * engine.registerComponent({
+ *   component: { id: 'validation', stringKeys: ['invalidCount', 'thresholdExceeded'] },
+ *   strings: {
+ *     'en-US': {
+ *       invalidCount: "{count, plural, one {# error found} other {# errors found}}",
+ *       thresholdExceeded: "Value {value, number, integer} exceeds limit"
+ *     }
+ *   }
+ * });
+ * 
+ * // Use typed error
+ * throw new MyTypedError('validation', ValidationError.InvalidCount, reasonMap, 'en-US', { count: 3 });
+ * // Result: "3 errors found"
+ * ```
  */
 export abstract class TypedError<
   TEnum extends Record<string, string>,
@@ -171,7 +230,39 @@ export abstract class PluginTypedError<
 }
 
 /**
- * Component-based TypedError that works with the component registration system
+ * Component-based TypedError with full i18n feature support.
+ * 
+ * **Supported i18n Features** (via translation strings):
+ * - ICU MessageFormat: plural, select, selectordinal
+ * - Pluralization: 37 languages with CLDR rules
+ * - Gender support: male, female, neutral, other
+ * - Number formatting: integer, currency, percent
+ * - SelectOrdinal: 1st, 2nd, 3rd formatting
+ * - Nested messages: complex multi-level patterns
+ * 
+ * **Translation String Examples:**
+ * ```typescript
+ * // Define component errors
+ * enum UserError {
+ *   AccountLocked = 'accountLocked',
+ *   TooManyAttempts = 'tooManyAttempts'
+ * }
+ * 
+ * // Register with ICU features
+ * engine.registerComponent({
+ *   component: { id: 'user', stringKeys: ['accountLocked', 'tooManyAttempts'] },
+ *   strings: {
+ *     'en-US': {
+ *       accountLocked: "{gender, select, male {His account} female {Her account} other {Their account}} is locked",
+ *       tooManyAttempts: "{count, plural, one {# attempt} other {# attempts}} failed. Try again in {minutes, number, integer} minutes."
+ *     }
+ *   }
+ * });
+ * 
+ * // Use component error
+ * throw new MyComponentError('user', UserError.TooManyAttempts, reasonMap, 'en-US', { count: 5, minutes: 10 });
+ * // Result: "5 attempts failed. Try again in 10 minutes."
+ * ```
  */
 export abstract class ComponentTypedError<
   TEnum extends Record<string, string>,
@@ -213,7 +304,32 @@ export abstract class ComponentTypedError<
 }
 
 /**
- * Core system TypedError using the core component strings
+ * Core system TypedError using core component strings with full i18n support.
+ * 
+ * **Supported i18n Features** (via CoreStringKey translations):
+ * - ICU MessageFormat: plural, select, selectordinal
+ * - Pluralization: 37 languages with CLDR rules
+ * - Gender support: male, female, neutral, other
+ * - Number formatting: integer, currency, percent
+ * - Nested messages: complex patterns
+ * 
+ * **Usage Example:**
+ * ```typescript
+ * // Define core error types
+ * enum CoreErrorType {
+ *   InvalidOperation = 'invalidOperation',
+ *   ResourceNotFound = 'resourceNotFound'
+ * }
+ * 
+ * // Core strings already registered with ICU features
+ * const reasonMap: CompleteReasonMap<typeof CoreErrorType, CoreStringKey> = {
+ *   [CoreErrorType.InvalidOperation]: CoreStringKey.Error_InvalidOperation,
+ *   [CoreErrorType.ResourceNotFound]: CoreStringKey.Error_ResourceNotFound
+ * };
+ * 
+ * // Use core typed error
+ * throw new MyCoreError(CoreErrorType.ResourceNotFound, reasonMap, 'en-US', { resource: 'user', id: 123 });
+ * ```
  */
 export abstract class CoreTypedError<
   TEnum extends Record<string, string>,

@@ -17,8 +17,9 @@ Part of [Express Suite](https://github.com/Digital-Defiance/express-suite)
 - **37 Supported Languages**: CLDR-compliant plural rules for world's most complex languages
 - **Pluralization Support**: Automatic plural form selection based on count (one/few/many/other)
 - **Gender Support**: Gender-aware translations (male/female/neutral/other)
+- **Advanced Number Formatting**: Thousand separators, currency, percent with decimal precision
 - **8 Built-in Languages**: English (US/UK), French, Spanish, German, Chinese, Japanese, Ukrainian
-- **Advanced Template Processing**: 
+- **Advanced Template Processing**:
   - Component references: `{{Component.key}}`
   - Alias resolution: `{{Alias.key}}`
   - Enum name resolution: `{{EnumName.value}}`
@@ -30,8 +31,8 @@ Part of [Express Suite](https://github.com/Digital-Defiance/express-suite)
 - **Fluent Builder**: I18nBuilder for clean, chainable engine configuration
 - **Core System Strings**: Pre-built translations for common UI elements and errors
 - **Type Safety**: Full TypeScript support with generic types
-- **Error Handling**: Comprehensive error classes with translation support
-- **91.81% Test Coverage**: 714 tests covering all features
+- **Error Handling**: Comprehensive error classes with translation support and ICU formatting
+- **93.22% Test Coverage**: 1,738 tests covering all features
 - **Security Hardened**: See [SECURITY.md](SECURITY.md) for details
 
 ## Installation
@@ -223,6 +224,7 @@ engine.translate('shop', 'items', { count: 21 }, 'ru'); // "21 товар"
 ```
 
 **Supported Languages** (37 total):
+
 - **Simple** (other only): Japanese, Chinese, Korean, Turkish, Vietnamese, Thai, Indonesian, Malay
 - **Two forms** (one/other): English, German, Spanish, Italian, Portuguese, Dutch, Swedish, Norwegian, Danish, Finnish, Greek, Hebrew, Hindi
 - **Three forms** (one/few/many): Russian, Ukrainian, Romanian, Latvian
@@ -764,6 +766,121 @@ Contributions welcome! Please:
 - **Examples**: See tests/ directory
 
 ## ChangeLog
+
+### Version 3.7.0 (January 2026)
+
+**Comprehensive ICU Integration & Number Formatting Enhancements**
+
+Enhanced **all** I18nError methods and core ICU infrastructure to fully leverage 3.5.0 advanced ICU MessageFormat features:
+
+**Core Infrastructure Improvements:**
+
+- **ICU Compiler Enhancements**:
+  - Fixed `#` placeholder in plural/selectordinal to use `Intl.NumberFormat` with thousand separators
+  - Numbers in plural messages now properly formatted (1,500 instead of 1500)
+  - Locale-aware formatting respects regional preferences
+
+- **Number Formatter Upgrades**:
+  - **Percent formatting** now shows decimal precision (0-2 places): 5.67% instead of 5%
+  - **Integer formatting** maintains thousand separators automatically
+  - **Currency formatting** preserves decimal places with locale-specific symbols
+
+**Enhanced Error Methods** (13 existing + 4 new):
+
+*Enhanced Existing Methods:*
+  - `componentNotFound()` - ICU select for namespaced components
+  - `stringKeyNotFound()` - SelectOrdinal for nested depth levels
+  - `duplicateComponent()` - Nested select for namespace context
+  - `instanceNotFound()` - Select for default vs named instances
+  - `instanceExists()` - Nested select with detailed messages
+  - `translationMissing()` - Nested select detecting key paths
+  - `duplicateLanguage()` - Template literal with proper quoting
+  - `pluralFormNotFound()` - Nested select + plural + number formatting (form count)
+  - `invalidPluralCategory()` - Nested plural + number formatting (category count)
+  - And 4 more existing methods with ICU enhancements...
+
+*New Advanced Methods:*
+  - `validationThresholdExceeded()` - **Number formatting**: Currency ($1,500.50), Percent (5.67%), Integer (1,500)
+  - `operationStepFailed()` - **SelectOrdinal**: 1st, 2nd, 3rd, 4th, 21st, 22nd, 23rd...
+  - `rateLimitExceeded()` - **4-level nested messages**: Plural + number + select with thousand separators
+  - `nestedValidationError()` - **Complex nesting**: Multiple select + plural for validation context
+
+**ICU Features Fully Integrated:**
+
+  - ✅ **Number Formatters**: Currency ($1,500.50), percent (5.67%), integer (1,500) with thousand separators
+  - ✅ **SelectOrdinal**: Ordinal formatting (1st, 2nd, 3rd, 21st, 22nd, 23rd)
+  - ✅ **Nested Messages**: Up to 4 levels deep with combined plural, select, and number formatting
+  - ✅ **ICU Plural**: `#` placeholder now formats with thousand separators
+  - ✅ **ICU Select**: Nested within plural messages for complex conditional logic
+  - ✅ **Decimal Precision**: Percent values show up to 2 decimal places
+  - ✅ **Locale-Aware**: All formatting respects target language/locale
+
+- **Real-World Use Cases**:
+  - Validation threshold errors with formatted currency/percentages
+  - Multi-step operation failures with ordinal step numbers  
+  - Rate limiting with nested request counts and retry timing
+  - Complex nested field validation with severity levels
+
+**Testing & Quality:**
+
+  - **1,738 total tests passing** (93.22% coverage)
+  - **250+ new tests** for advanced ICU features:
+    - Currency formatting: $1,500.50, €1.500,50, ¥1,500
+    - Percent precision: 5.67%, 0.5%, 100%
+    - SelectOrdinal: 1st-100th with edge cases (11th, 21st, 22nd, 23rd)
+    - Nested messages: 4 levels deep validation
+    - Thousand separators: 1,000, 10,000, 1,000,000
+    - Multilingual: 8+ languages tested
+    - Real-world scenarios: API rate limits, validation thresholds, multi-step operations
+
+**Documentation:**
+
+  - All error methods include comprehensive JSDoc with ICU pattern examples
+  - EnhancedErrorHelper base class with static utility methods
+  - Integration patterns for all error class types
+  - Migration guide showing before/after message formats
+
+**New Error Codes:**
+- `VALIDATION_THRESHOLD_EXCEEDED` - Numeric threshold violations with formatted values
+- `OPERATION_STEP_FAILED` - Step-based operation failures with ordinal formatting
+- `RATE_LIMIT_EXCEEDED` - Rate limiting with nested plural/number formatting
+- `NESTED_VALIDATION_ERROR` - Complex nested validation with 4-level messages
+
+**Files Modified:**
+- `src/icu/compiler.ts` - Enhanced `#` placeholder with `Intl.NumberFormat`
+- `src/icu/formatters/number-formatter.ts` - Added percent decimal precision (0-2 places)
+- `src/errors/i18n-error.ts` - Enhanced all 17 error methods with ICU patterns
+- `src/errors/enhanced-error-base.ts` - New base class with static helper methods
+- `src/errors/*.ts` - Enhanced 8 error classes with comprehensive JSDoc
+- `tests/errors/*.spec.ts` - 250+ new tests, updated expectations
+
+**Breaking Changes:**
+
+None - Fully backward compatible! All changes are enhancements:
+- Enhanced error message formats (more detailed, better formatted)
+- Metadata structure extended (formCount, count added where useful)
+- New optional parameters for advanced error methods
+- All existing code continues to work unchanged
+
+**Migration:**
+
+No migration required! Your existing code works as-is. To use new features:
+
+```typescript
+// Use new number formatting in errors
+const error = I18nError.validationThresholdExceeded(
+  'price', 99.99, 50.00, 'currency', 'en-US'
+);
+// Message: "Validation failed for price: value $99.99 exceeds maximum threshold of $50.00"
+
+// Use selectordinal for steps
+const error = I18nError.operationStepFailed(3, 'deployment', 'Connection timeout');
+// Message: "Operation 'deployment' failed at 3rd step: Connection timeout"
+
+// Numbers in plural messages now have thousand separators automatically
+const error = I18nError.rateLimitExceeded(1500, 1000, 3600, 300);
+// Message: "Rate limit exceeded: 1,500 requests made, exceeding limit of 1,000..."
+```
 
 ### Version 3.6.4
 

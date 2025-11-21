@@ -62,7 +62,10 @@ export class Compiler {
     if (!caseNode) return '';
     
     const result = this.compileMessage(caseNode, values, context);
-    return result.replace(/#/g, String(num));
+    // Format number with thousand separators using Intl.NumberFormat
+    const locale = context.locale || 'en-US';
+    const formattedNum = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(num);
+    return result.replace(/#/g, formattedNum);
   }
 
   private compileSelect(node: SelectNode, values: Record<string, any>, context: FormatterContext): string {
@@ -85,6 +88,9 @@ export class Compiler {
     if (!caseNode) return '';
     
     const result = this.compileMessage(caseNode, values, context);
-    return result.replace(/#/g, String(num));
+    // Format number with thousand separators using Intl.NumberFormat
+    const locale = context.locale || 'en-US';
+    const formattedNum = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(num);
+    return result.replace(/#/g, formattedNum);
   }
 }

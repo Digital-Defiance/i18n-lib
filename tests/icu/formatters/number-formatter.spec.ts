@@ -59,7 +59,7 @@ describe('NumberFormatter', () => {
     });
 
     it('should format decimal as percent', () => {
-      expect(formatter.format(0.123, 'percent', { locale: 'en-US' })).toBe('12%');
+      expect(formatter.format(0.123, 'percent', { locale: 'en-US' })).toBe('12.3%');
     });
 
     it('should format whole number as percent', () => {

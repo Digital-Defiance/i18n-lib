@@ -1,7 +1,37 @@
 import { I18nEngine } from '../core';
+import { PluralCategory } from '../pluralization/plural-categories';
+import { GenderCategory } from '../gender/gender-categories';
 
 /**
- * Generic translatable error that works with any plugin engine and component
+ * Generic translatable error that works with any plugin engine and component.
+ * 
+ * **Full i18n 3.0/3.5 Feature Support:**
+ * - ICU MessageFormat (all formatters: plural, select, selectordinal)
+ * - Pluralization for 37 languages with CLDR rules
+ * - Gender-aware translations (male, female, neutral, other)
+ * - Number formatting (integer, currency, percent)
+ * - Date/Time formatting (short, medium, long, full)
+ * - Nested messages up to 4 levels deep
+ * - Context variable injection
+ * 
+ * **Usage Examples:**
+ * ```typescript
+ * // Plural-aware error
+ * new TranslatableGenericError('component', 'errorKey', { count: 5 });
+ * // Translation: \"{count, plural, one {# error} other {# errors}}\"
+ * 
+ * // Gender-aware error
+ * new TranslatableGenericError('component', 'userError', { gender: 'female', name: 'Alice' });
+ * // Translation: \"{gender, select, male {He} female {She}} {name} caused an error\"
+ * 
+ * // Number formatting
+ * new TranslatableGenericError('component', 'thresholdError', { value: 1500.50, limit: 1000 });
+ * // Translation: \"Value {value, number, currency} exceeds {limit, number, currency}\"
+ * 
+ * // SelectOrdinal
+ * new TranslatableGenericError('component', 'stepError', { step: 3 });
+ * // Translation: \"Failed at {step, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} step\"
+ * ```
  */
 export class TranslatableGenericError<TStringKey extends string = string> extends Error {
   public readonly stringKey: TStringKey;
@@ -97,5 +127,114 @@ export class TranslatableGenericError<TStringKey extends string = string> extend
     } catch (error) {
       return `[${this.componentId}.${this.stringKey}]`;
     }
+  }
+
+  /**
+   * Create error with plural count
+   * Translation string should use ICU plural format
+   */
+  static withCount<TStringKey extends string>(
+    componentId: string,
+    stringKey: TStringKey,
+    count: number,
+    otherVars?: Record<string, string | number>,
+    language?: string,
+    instanceKey?: string,
+  ): TranslatableGenericError<TStringKey> {
+    return new TranslatableGenericError(
+      componentId,
+      stringKey,
+      { ...otherVars, count },
+      language,
+      undefined,
+      instanceKey,
+    );
+  }
+
+  /**
+   * Create error with gender context
+   * Translation string should use ICU select format
+   */
+  static withGender<TStringKey extends string>(
+    componentId: string,
+    stringKey: TStringKey,
+    gender: GenderCategory,
+    otherVars?: Record<string, string | number>,
+    language?: string,
+    instanceKey?: string,
+  ): TranslatableGenericError<TStringKey> {
+    return new TranslatableGenericError(
+      componentId,
+      stringKey,
+      { ...otherVars, gender },
+      language,
+      undefined,
+      instanceKey,
+    );
+  }
+
+  /**
+   * Create error with ordinal number
+   * Translation string should use ICU selectordinal format
+   */
+  static withOrdinal<TStringKey extends string>(
+    componentId: string,
+    stringKey: TStringKey,
+    ordinalNumber: number,
+    otherVars?: Record<string, string | number>,
+    language?: string,
+    instanceKey?: string,
+  ): TranslatableGenericError<TStringKey> {
+    return new TranslatableGenericError(
+      componentId,
+      stringKey,
+      { ...otherVars, ordinalNumber },
+      language,
+      undefined,
+      instanceKey,
+    );
+  }
+
+  /**
+   * Create error with number formatting
+   * Translation string should use ICU number format
+   */
+  static withNumberFormat<TStringKey extends string>(
+    componentId: string,
+    stringKey: TStringKey,
+    value: number,
+    otherVars?: Record<string, string | number>,
+    language?: string,
+    instanceKey?: string,
+  ): TranslatableGenericError<TStringKey> {
+    return new TranslatableGenericError(
+      componentId,
+      stringKey,
+      { ...otherVars, value },
+      language,
+      undefined,
+      instanceKey,
+    );
+  }
+
+  /**
+   * Create error with multiple i18n features combined
+   * Translation string can use nested ICU messages
+   */
+  static withMultipleFeatures<TStringKey extends string>(
+    componentId: string,
+    stringKey: TStringKey,
+    features: Record<string, string | number>,
+    language?: string,
+    instanceKey?: string,
+  ): TranslatableGenericError<TStringKey> {
+    return new TranslatableGenericError(
+      componentId,
+      stringKey,
+      features,
+      language,
+      undefined,
+      instanceKey,
+    );
   }
 }

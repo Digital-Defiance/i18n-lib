@@ -3,6 +3,7 @@
  */
 
 export * from './context-error';
+export * from './enhanced-error-base';
 export * from './handleable';
 export * from './i18n-error';
 export * from './translatable-generic';

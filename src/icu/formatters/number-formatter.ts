@@ -18,6 +18,9 @@ export class NumberFormatter implements Formatter {
         break;
       case 'percent':
         options.style = 'percent';
+        // Show up to 2 decimal places for percent, but don't force trailing zeros
+        options.minimumFractionDigits = 0;
+        options.maximumFractionDigits = 2;
         break;
       case 'decimal':
       default:

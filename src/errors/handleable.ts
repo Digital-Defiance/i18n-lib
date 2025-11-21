@@ -9,9 +9,45 @@ type ErrorConstructorWithStack = ErrorConstructor & {
 };
 
 /**
- * Base error class that implements IHandleable interface.
+ * Base error class that implements IHandleable interface with full i18n support.
+ * 
  * Provides enhanced error handling capabilities including status codes, handled state tracking,
- * and source data preservation.
+ * and source data preservation. Fully compatible with all i18n features when used with
+ * translation strings.
+ * 
+ * **Supported i18n Features** (via translation strings in derived classes):
+ * - ICU MessageFormat: plural, select, selectordinal
+ * - Pluralization: 37 languages with CLDR rules
+ * - Gender support: male, female, neutral, other
+ * - Number formatting: integer, currency, percent
+ * - Nested messages: complex patterns
+ * 
+ * **Usage Pattern:**
+ * ```typescript
+ * // Extend HandleableError with translated messages
+ * class MyHandleableError extends HandleableError {
+ *   constructor(componentId: string, stringKey: string, variables?: Record<string, any>) {
+ *     const engine = I18nEngine.getInstance();
+ *     const message = engine.translate(componentId, stringKey, variables);
+ *     const error = new Error(message);
+ *     super(error, { statusCode: 400 });
+ *   }
+ * }
+ * 
+ * // Register translation with ICU features
+ * engine.registerComponent({
+ *   component: { id: 'api', stringKeys: ['validationError'] },
+ *   strings: {
+ *     'en-US': {
+ *       validationError: \"{count, plural, one {# field is invalid} other {# fields are invalid}}\"
+ *     }
+ *   }
+ * });
+ * 
+ * // Use with i18n features
+ * throw new MyHandleableError('api', 'validationError', { count: 3 });
+ * // Result: \"3 fields are invalid\"
+ * ```
  */
 export class HandleableError extends Error implements IHandleable {
   /** The original error that caused this error */

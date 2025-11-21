@@ -35,6 +35,7 @@ describe('Plural Error Messages', () => {
         language: 'ru',
         key: 'items',
         availableForms: ['one', 'many'],
+        formCount: 2,
       });
     });
   });
@@ -61,6 +62,7 @@ describe('Plural Error Messages', () => {
       expect(error.metadata).toEqual({
         category: 'invalid',
         validCategories: ['one', 'other'],
+        count: 2,
       });
     });
   });
