@@ -767,7 +767,11 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
-### Version 3.7.0 (January 2026)
+### Version 3.7.1
+
+- Minor version bump to fix an export
+
+### Version 3.7.0
 
 **Comprehensive ICU Integration & Number Formatting Enhancements**
 

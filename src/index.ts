@@ -13,6 +13,7 @@ export * from './validation';
 export { Timezone, isValidTimezone } from './utils/timezone';
 export { CurrencyCode, getCurrencyFormat } from './utils/currency';
 export type { CurrencyData, CurrencyFormat, CurrencyPosition } from './utils/currency';
+export { createPluralString, createGenderedString } from './utils/plural-helpers';
 
 // Convenience aliases
 export { I18nEngine as I18n } from './core/i18n-engine';
