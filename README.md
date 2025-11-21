@@ -767,6 +767,10 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 3.7.2
+
+- Minor version bump to fix an export
+
 ### Version 3.7.1
 
 - Minor version bump to fix an export

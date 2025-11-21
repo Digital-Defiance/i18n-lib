@@ -14,6 +14,8 @@ export { Timezone, isValidTimezone } from './utils/timezone';
 export { CurrencyCode, getCurrencyFormat } from './utils/currency';
 export type { CurrencyData, CurrencyFormat, CurrencyPosition } from './utils/currency';
 export { createPluralString, createGenderedString } from './utils/plural-helpers';
+export type { PluralString } from './types/plural-types';
+export type { GenderedString } from './gender/gender-categories';
 
 // Convenience aliases
 export { I18nEngine as I18n } from './core/i18n-engine';
