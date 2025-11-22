@@ -3,14 +3,14 @@
  * Ensures all error classes properly translate messages
  */
 
-import { I18nEngine } from '../src/core/i18n-engine';
+import { CoreI18nComponentId, CoreStringKey } from '../src';
 import { I18nBuilder } from '../src/builders/i18n-builder';
+import { I18nEngine } from '../src/core/i18n-engine';
 import { I18nError, I18nErrorCode } from '../src/errors/i18n-error';
-import { TypedError, CompleteReasonMap } from '../src/errors/typed';
-import { TypedHandleableError } from '../src/errors/typed-handleable';
 import { TranslatableError } from '../src/errors/translatable';
 import { TranslatableGenericError } from '../src/errors/translatable-generic';
-import { CoreI18nComponentId, CoreStringKey } from '../src';
+import { CompleteReasonMap } from '../src/errors/typed';
+import { TypedHandleableError } from '../src/errors/typed-handleable';
 import { HandleableErrorOptions } from '../src/interfaces/handleable-error-options';
 
 describe('Error Translation - Comprehensive Tests', () => {
@@ -35,24 +35,30 @@ describe('Error Translation - Comprehensive Tests', () => {
           [CoreStringKey.Error_InvalidInput]: 'Invalid input provided',
           [CoreStringKey.Error_NetworkError]: 'Network connection error',
           [CoreStringKey.Error_NotFound]: 'Resource not found',
-          [CoreStringKey.Error_MissingTranslationKeyTemplate]: "Missing translation key: {stringKey}",
-          [CoreStringKey.Error_ComponentNotFoundTemplate]: 'Component "{componentId}" not found',
+          [CoreStringKey.Error_MissingTranslationKeyTemplate]:
+            'Missing translation key: {stringKey}',
+          [CoreStringKey.Error_ComponentNotFoundTemplate]:
+            'Component "{componentId}" not found',
         },
         fr: {
           [CoreStringKey.Common_Test]: 'Test',
           [CoreStringKey.Error_InvalidInput]: 'Entrée invalide fournie',
           [CoreStringKey.Error_NetworkError]: 'Erreur de connexion réseau',
           [CoreStringKey.Error_NotFound]: 'Ressource non trouvée',
-          [CoreStringKey.Error_MissingTranslationKeyTemplate]: "Clé de traduction manquante: {stringKey}",
-          [CoreStringKey.Error_ComponentNotFoundTemplate]: 'Composant "{componentId}" non trouvé',
+          [CoreStringKey.Error_MissingTranslationKeyTemplate]:
+            'Clé de traduction manquante: {stringKey}',
+          [CoreStringKey.Error_ComponentNotFoundTemplate]:
+            'Composant "{componentId}" non trouvé',
         },
         es: {
           [CoreStringKey.Common_Test]: 'Test',
           [CoreStringKey.Error_InvalidInput]: 'Entrada inválida proporcionada',
           [CoreStringKey.Error_NetworkError]: 'Error de conexión de red',
           [CoreStringKey.Error_NotFound]: 'Recurso no encontrado',
-          [CoreStringKey.Error_MissingTranslationKeyTemplate]: "Clave de traducción faltante: {stringKey}",
-          [CoreStringKey.Error_ComponentNotFoundTemplate]: 'Componente "{componentId}" no encontrado',
+          [CoreStringKey.Error_MissingTranslationKeyTemplate]:
+            'Clave de traducción faltante: {stringKey}',
+          [CoreStringKey.Error_ComponentNotFoundTemplate]:
+            'Componente "{componentId}" no encontrado',
         },
       },
     });
@@ -63,17 +69,17 @@ describe('Error Translation - Comprehensive Tests', () => {
       strings: {
         'en-US': {
           simpleError: 'Simple error occurred',
-          templateError: "Error in {field}: {reason}",
+          templateError: 'Error in {field}: {reason}',
           userNotFound: "User '{username}' not found",
         },
         fr: {
           simpleError: 'Erreur simple survenue',
-          templateError: "Erreur dans {field}: {reason}",
+          templateError: 'Erreur dans {field}: {reason}',
           userNotFound: "Utilisateur '{username}' introuvable",
         },
         es: {
           simpleError: 'Error simple ocurrido',
-          templateError: "Error en {field}: {reason}",
+          templateError: 'Error en {field}: {reason}',
           userNotFound: "Usuario '{username}' no encontrado",
         },
       },
@@ -120,7 +126,10 @@ describe('Error Translation - Comprehensive Tests', () => {
       [TestErrorType.NotFound]: CoreStringKey.Error_NotFound,
     };
 
-    class TestTypedError extends TypedError<typeof TestErrorType, CoreStringKey> {
+    class TestTypedError extends AbstractTypedError<
+      typeof TestErrorType,
+      CoreStringKey
+    > {
       constructor(
         type: TestErrorType,
         language?: string,
@@ -432,11 +441,7 @@ describe('Error Translation - Comprehensive Tests', () => {
         },
       });
 
-      const error = new TranslatableError(
-        'test',
-        'countError',
-        { count: 42 },
-      );
+      const error = new TranslatableError('test', 'countError', { count: 42 });
 
       expect(error.message).toBe('Found 42 errors');
     });
@@ -451,11 +456,9 @@ describe('Error Translation - Comprehensive Tests', () => {
         },
       });
 
-      const error = new TranslatableError(
-        'test',
-        'pathError',
-        { path: '/usr/local/bin' },
-      );
+      const error = new TranslatableError('test', 'pathError', {
+        path: '/usr/local/bin',
+      });
 
       expect(error.message).toBe("Path '/usr/local/bin' is invalid");
     });

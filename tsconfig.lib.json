@@ -23,7 +23,8 @@
   },
   "include": [
     "src/**/*.ts",
-    "tests/i18n-engine.registerIfNotExists.spec.ts"
+    "tests/i18n-engine.registerIfNotExists.spec.ts",
+    "../../types/**/*.d.ts"
   ],
   "exclude": [
     "**/*.spec.ts",

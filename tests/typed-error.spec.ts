@@ -1,11 +1,10 @@
-import { CoreI18nComponentId, LanguageCodes, PluginI18nEngine } from '../src';
-import { I18nEngine } from '../src/core/i18n-engine';
+import { CoreI18nComponentId, LanguageCodes } from '../src';
 import { CoreStringKey } from '../src/core-string-key';
+import { I18nEngine } from '../src/core/i18n-engine';
 import {
   BaseTypedError,
   CompleteReasonMap,
   TranslationEngine,
-  TypedError,
   createTranslatedError,
 } from '../src/errors/typed';
 import {
@@ -24,7 +23,10 @@ const reasonMap: CompleteReasonMap<typeof TestErrorType, CoreStringKey> = {
   [TestErrorType.Template]: CoreStringKey.Error_MissingTranslationTemplate,
 };
 
-class TestError extends TypedError<typeof TestErrorType, CoreStringKey> {
+class TestError extends AbstractTypedError<
+  typeof TestErrorType,
+  CoreStringKey
+> {
   constructor(
     type: TestErrorType,
     language?: string,
@@ -39,21 +41,28 @@ describe('TypedError', () => {
     // Clear singleton instances before each test
     I18nEngine.resetAll();
     const engine = new I18nEngine([
-      { id: LanguageCodes.EN_US, name: 'English (US)', code: 'en-US', isDefault: true },
-      { id: LanguageCodes.FR, name: 'Français', code: 'fr' }
+      {
+        id: LanguageCodes.EN_US,
+        name: 'English (US)',
+        code: 'en-US',
+        isDefault: true,
+      },
+      { id: LanguageCodes.FR, name: 'Français', code: 'fr' },
     ]);
     engine.register({
       id: CoreI18nComponentId,
       strings: {
         [LanguageCodes.EN_US]: {
-          'common_test': 'Test',
-          'error_missingTranslationTemplate': "Missing translation for key '{key}' in language '{language}'"
+          common_test: 'Test',
+          error_missingTranslationTemplate:
+            "Missing translation for key '{key}' in language '{language}'",
         },
         [LanguageCodes.FR]: {
-          'common_test': 'Test',
-          'error_missingTranslationTemplate': "Traduction manquante pour la clé '{key}' dans la langue '{language}'"
-        }
-      }
+          common_test: 'Test',
+          error_missingTranslationTemplate:
+            "Traduction manquante pour la clé '{key}' dans la langue '{language}'",
+        },
+      },
     });
   });
 

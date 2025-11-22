@@ -767,6 +767,92 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 3.7.5
+
+**Type Safety Improvements Release**
+
+This release eliminates all unsafe type casts from the production codebase, improving type safety and maintainability.
+
+**Type Safety Enhancements:**
+
+- **New SimpleTypedError Class**: Introduced a type-safe error class (`simple-typed-error.ts`) that properly extends Error without using type casts
+  - Supports `type`, `componentId`, `reasonMap`, `metadata` properties with full type safety
+  - Includes error cause chaining (ES2022 standard)
+  - Provides `isTypedError()` type guard and `fromError()` conversion utility
+  - Maintains proper prototype chain for instanceof checks
+
+- **Refactored Error Helper Functions**: Updated all error creation helpers to use SimpleTypedError
+  - `createComponentTypedError()` - Now returns SimpleTypedError instead of casting properties
+  - `createCoreTypedError()` - Type-safe error creation for core system errors
+  - `createTranslatedError()` - Type-safe translated error creation
+  - All functions now have proper return types without `as any` casts
+
+- **Fixed Empty Object Initializations**: Replaced `{} as any` with proper `Partial<T>` types
+  - `buildTypeSafeReasonMap()` in utils.ts now uses proper partial types
+  - `ensureAllLanguagesHaveAllKeys()` in component-registry.ts uses type-safe initialization
+
+- **Improved Enum Translation Type Safety**: Enhanced type safety in enum registry and plural handling
+  - Enum registry now uses `String()` conversion instead of `as any` casts
+  - Added type guards for PluralCategory validation in `hasPluralForm()`
+  - Fixed `getPluralCategory()` return type to properly return `PluralCategory`
+  - Removed unsafe casts in plural category handling
+
+- **Global Context Type Safety**: Leveraged ambient type declarations for global objects
+  - Removed `(globalThis as any).GlobalActiveContext` casts
+  - Uses ambient declarations from `types/global.d.ts` for type-safe global access
+  - Fixed Proxy pattern in core-i18n.ts to use proper keyof access
+
+- **Enhanced I18n Engine Interface**: Created comprehensive engine type definitions
+  - New `src/types/engine.ts` with generic `II18nEngine<TStringKeys>` interface
+  - Proper generic constraints for type-safe string key handling
+  - Re-exports main II18nEngine interface for centralized imports
+
+- **Renamed for Clarity**: Improved naming to avoid confusion
+  - Renamed abstract `TypedError` to `AbstractTypedError` (with deprecation notice)
+  - New `SimpleTypedError` class is the recommended type-safe implementation
+  - Maintains backward compatibility with existing code
+
+**Code Quality:**
+
+- **Zero Type Casts**: Eliminated approximately 20 instances of `as any` and `as unknown` casts from production code
+- **Improved Type Inference**: Better TypeScript type inference throughout the codebase
+- **Enhanced Maintainability**: Clearer code structure with explicit types instead of casts
+
+**Testing:**
+
+- Added comprehensive unit tests for SimpleTypedError class
+- Added property-based tests using fast-check for error property preservation
+- Created type-safety-fixes.spec.ts with tests for all improvements
+- All existing tests continue to pass with enhanced type safety
+
+**Documentation:**
+
+- Updated JSDoc comments with proper type information
+- Added deprecation notices for legacy patterns
+- Improved code examples in documentation
+
+**Migration Notes:**
+
+This release is fully backward compatible. Existing code will continue to work unchanged. To use the new type-safe patterns:
+
+```typescript
+// New: Use SimpleTypedError directly
+import { TypedError } from '@digitaldefiance/i18n-lib/errors/simple-typed-error';
+
+const error = new TypedError('Error message', {
+  type: 'validation',
+  componentId: 'my-component',
+  metadata: { field: 'email' }
+});
+
+// Old abstract classes still work (now called AbstractTypedError)
+// Helper functions automatically use the new SimpleTypedError internally
+```
+
+**Breaking Changes:**
+
+None - This release maintains full backward compatibility while improving internal type safety.
+
 ### Version 3.7.2
 
 - Minor version bump to fix an export
@@ -796,32 +882,34 @@ Enhanced **all** I18nError methods and core ICU infrastructure to fully leverage
 **Enhanced Error Methods** (13 existing + 4 new):
 
 *Enhanced Existing Methods:*
-  - `componentNotFound()` - ICU select for namespaced components
-  - `stringKeyNotFound()` - SelectOrdinal for nested depth levels
-  - `duplicateComponent()` - Nested select for namespace context
-  - `instanceNotFound()` - Select for default vs named instances
-  - `instanceExists()` - Nested select with detailed messages
-  - `translationMissing()` - Nested select detecting key paths
-  - `duplicateLanguage()` - Template literal with proper quoting
-  - `pluralFormNotFound()` - Nested select + plural + number formatting (form count)
-  - `invalidPluralCategory()` - Nested plural + number formatting (category count)
-  - And 4 more existing methods with ICU enhancements...
+
+- `componentNotFound()` - ICU select for namespaced components
+- `stringKeyNotFound()` - SelectOrdinal for nested depth levels
+- `duplicateComponent()` - Nested select for namespace context
+- `instanceNotFound()` - Select for default vs named instances
+- `instanceExists()` - Nested select with detailed messages
+- `translationMissing()` - Nested select detecting key paths
+- `duplicateLanguage()` - Template literal with proper quoting
+- `pluralFormNotFound()` - Nested select + plural + number formatting (form count)
+- `invalidPluralCategory()` - Nested plural + number formatting (category count)
+- And 4 more existing methods with ICU enhancements...
 
 *New Advanced Methods:*
-  - `validationThresholdExceeded()` - **Number formatting**: Currency ($1,500.50), Percent (5.67%), Integer (1,500)
-  - `operationStepFailed()` - **SelectOrdinal**: 1st, 2nd, 3rd, 4th, 21st, 22nd, 23rd...
-  - `rateLimitExceeded()` - **4-level nested messages**: Plural + number + select with thousand separators
-  - `nestedValidationError()` - **Complex nesting**: Multiple select + plural for validation context
+
+- `validationThresholdExceeded()` - **Number formatting**: Currency ($1,500.50), Percent (5.67%), Integer (1,500)
+- `operationStepFailed()` - **SelectOrdinal**: 1st, 2nd, 3rd, 4th, 21st, 22nd, 23rd...
+- `rateLimitExceeded()` - **4-level nested messages**: Plural + number + select with thousand separators
+- `nestedValidationError()` - **Complex nesting**: Multiple select + plural for validation context
 
 **ICU Features Fully Integrated:**
 
-  - ✅ **Number Formatters**: Currency ($1,500.50), percent (5.67%), integer (1,500) with thousand separators
-  - ✅ **SelectOrdinal**: Ordinal formatting (1st, 2nd, 3rd, 21st, 22nd, 23rd)
-  - ✅ **Nested Messages**: Up to 4 levels deep with combined plural, select, and number formatting
-  - ✅ **ICU Plural**: `#` placeholder now formats with thousand separators
-  - ✅ **ICU Select**: Nested within plural messages for complex conditional logic
-  - ✅ **Decimal Precision**: Percent values show up to 2 decimal places
-  - ✅ **Locale-Aware**: All formatting respects target language/locale
+- ✅ **Number Formatters**: Currency ($1,500.50), percent (5.67%), integer (1,500) with thousand separators
+- ✅ **SelectOrdinal**: Ordinal formatting (1st, 2nd, 3rd, 21st, 22nd, 23rd)
+- ✅ **Nested Messages**: Up to 4 levels deep with combined plural, select, and number formatting
+- ✅ **ICU Plural**: `#` placeholder now formats with thousand separators
+- ✅ **ICU Select**: Nested within plural messages for complex conditional logic
+- ✅ **Decimal Precision**: Percent values show up to 2 decimal places
+- ✅ **Locale-Aware**: All formatting respects target language/locale
 
 - **Real-World Use Cases**:
   - Validation threshold errors with formatted currency/percentages
@@ -831,30 +919,32 @@ Enhanced **all** I18nError methods and core ICU infrastructure to fully leverage
 
 **Testing & Quality:**
 
-  - **1,738 total tests passing** (93.22% coverage)
-  - **250+ new tests** for advanced ICU features:
-    - Currency formatting: $1,500.50, €1.500,50, ¥1,500
-    - Percent precision: 5.67%, 0.5%, 100%
-    - SelectOrdinal: 1st-100th with edge cases (11th, 21st, 22nd, 23rd)
-    - Nested messages: 4 levels deep validation
-    - Thousand separators: 1,000, 10,000, 1,000,000
-    - Multilingual: 8+ languages tested
-    - Real-world scenarios: API rate limits, validation thresholds, multi-step operations
+- **1,738 total tests passing** (93.22% coverage)
+- **250+ new tests** for advanced ICU features:
+  - Currency formatting: $1,500.50, €1.500,50, ¥1,500
+  - Percent precision: 5.67%, 0.5%, 100%
+  - SelectOrdinal: 1st-100th with edge cases (11th, 21st, 22nd, 23rd)
+  - Nested messages: 4 levels deep validation
+  - Thousand separators: 1,000, 10,000, 1,000,000
+  - Multilingual: 8+ languages tested
+  - Real-world scenarios: API rate limits, validation thresholds, multi-step operations
 
 **Documentation:**
 
-  - All error methods include comprehensive JSDoc with ICU pattern examples
-  - EnhancedErrorHelper base class with static utility methods
-  - Integration patterns for all error class types
-  - Migration guide showing before/after message formats
+- All error methods include comprehensive JSDoc with ICU pattern examples
+- EnhancedErrorHelper base class with static utility methods
+- Integration patterns for all error class types
+- Migration guide showing before/after message formats
 
 **New Error Codes:**
+
 - `VALIDATION_THRESHOLD_EXCEEDED` - Numeric threshold violations with formatted values
 - `OPERATION_STEP_FAILED` - Step-based operation failures with ordinal formatting
 - `RATE_LIMIT_EXCEEDED` - Rate limiting with nested plural/number formatting
 - `NESTED_VALIDATION_ERROR` - Complex nested validation with 4-level messages
 
 **Files Modified:**
+
 - `src/icu/compiler.ts` - Enhanced `#` placeholder with `Intl.NumberFormat`
 - `src/icu/formatters/number-formatter.ts` - Added percent decimal precision (0-2 places)
 - `src/errors/i18n-error.ts` - Enhanced all 17 error methods with ICU patterns
@@ -865,6 +955,7 @@ Enhanced **all** I18nError methods and core ICU infrastructure to fully leverage
 **Breaking Changes:**
 
 None - Fully backward compatible! All changes are enhancements:
+
 - Enhanced error message formats (more detailed, better formatted)
 - Metadata structure extended (formCount, count added where useful)
 - New optional parameters for advanced error methods

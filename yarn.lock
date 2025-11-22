@@ -9,10 +9,38 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@digitaldefiance/i18n-lib@workspace:."
   dependencies:
+    currency-codes: "npm:^2.2.0"
+    fast-check: "npm:^4.3.0"
     moment: "npm:^2.30.1"
     moment-timezone: "npm:^0.6.0"
   languageName: unknown
   linkType: soft
+
+"currency-codes@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "currency-codes@npm:2.2.0"
+  dependencies:
+    first-match: "npm:~0.0.1"
+    nub: "npm:~0.0.0"
+  checksum: 10c0/1abc8b08a6be6173ac768c3f076448771ce5f707248160983f2d17df5ea6b8ade74e89623e75fd86a0de7ee8c7e7d945602d29404067b23806c80d78c5b5f8ff
+  languageName: node
+  linkType: hard
+
+"fast-check@npm:^4.3.0":
+  version: 4.3.0
+  resolution: "fast-check@npm:4.3.0"
+  dependencies:
+    pure-rand: "npm:^7.0.0"
+  checksum: 10c0/91d73395d6a7523f94514c9c2bda7452c506e73f9d68e77eb45cc83c525c9cc01c5b4331cc18607219f0327ab2dc83963e45c9216e7fd6d85b49b871b4ea2033
+  languageName: node
+  linkType: hard
+
+"first-match@npm:~0.0.1":
+  version: 0.0.1
+  resolution: "first-match@npm:0.0.1"
+  checksum: 10c0/1639a2ba8cab9b1e5c2c91120b0c5090124ed25326422162de583dcdda103294cb33c271b19c5d7ac4e48c9ad1d134dd108de76a5b840823d767b5c84afab915
+  languageName: node
+  linkType: hard
 
 "moment-timezone@npm:^0.6.0":
   version: 0.6.0
@@ -27,5 +55,19 @@ __metadata:
   version: 2.30.1
   resolution: "moment@npm:2.30.1"
   checksum: 10c0/865e4279418c6de666fca7786607705fd0189d8a7b7624e2e56be99290ac846f90878a6f602e34b4e0455c549b85385b1baf9966845962b313699e7cb847543a
+  languageName: node
+  linkType: hard
+
+"nub@npm:~0.0.0":
+  version: 0.0.0
+  resolution: "nub@npm:0.0.0"
+  checksum: 10c0/25f3c6612378d79a468b12b143325a4c25c331c2f26b3b4ef940950c016781687301956262709491d1d805d55e7b3e1cf82f5b18f475d0533266484c09db5c6c
+  languageName: node
+  linkType: hard
+
+"pure-rand@npm:^7.0.0":
+  version: 7.0.1
+  resolution: "pure-rand@npm:7.0.1"
+  checksum: 10c0/9cade41030f5ec95f5d55a11a71404cd6f46b69becaad892097cd7f58e2c6248cd0a933349ca7d21336ab629f1da42ffe899699b671bc4651600eaf6e57f837e
   languageName: node
   linkType: hard

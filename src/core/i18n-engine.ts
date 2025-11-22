@@ -11,14 +11,21 @@ import {
   LanguageDefinition,
   ValidationResult,
 } from '../interfaces';
+import { CurrencyCode } from '../utils/currency';
+import {
+  createSafeObject,
+  safeAssign,
+  validateObjectKeys,
+} from '../utils/safe-object';
+import { Timezone } from '../utils/timezone';
+import {
+  validateComponentId,
+  validateTemplateLength,
+} from '../utils/validation';
 import { ComponentStore } from './component-store';
 import { ContextManager } from './context-manager';
 import { EnumRegistry } from './enum-registry';
 import { LanguageRegistry } from './language-registry';
-import { CurrencyCode } from '../utils/currency';
-import { Timezone } from '../utils/timezone';
-import { createSafeObject, safeAssign, validateObjectKeys } from '../utils/safe-object';
-import { validateTemplateLength, validateComponentId } from '../utils/validation';
 
 /**
  * I18nEngine implements the II18nEngine interface, providing translation,
@@ -79,11 +86,16 @@ export class I18nEngine implements II18nEngine {
     };
 
     this.componentStore = new ComponentStore(this.config.constants);
-    this.enumRegistry = new EnumRegistry((key, vars) => this.safeTranslate(CoreI18nComponentId, key, vars));
+    this.enumRegistry = new EnumRegistry((key, vars) =>
+      this.safeTranslate(CoreI18nComponentId, key, vars),
+    );
     this.instanceKey = options?.instanceKey || I18nEngine.DEFAULT_KEY;
 
     // Create context
-    I18nEngine.contextManager.create(this.instanceKey, this.config.defaultLanguage);
+    I18nEngine.contextManager.create(
+      this.instanceKey,
+      this.config.defaultLanguage,
+    );
 
     // Register instance
     if (options?.registerInstance !== false) {
@@ -128,8 +140,14 @@ export class I18nEngine implements II18nEngine {
   private registerComponentMetadata(config: ComponentConfig): void {
     const componentId = config.id;
     const aliases = config.aliases || [];
-    const enumName = (config as any).enumName;
-    const enumObject = (config as any).enumObject;
+    // These properties may exist on extended config types
+    // Use type-safe property access with index signature
+    const configWithOptional = config as ComponentConfig & {
+      enumName?: string;
+      enumObject?: Record<string, unknown>;
+    };
+    const enumName = configWithOptional.enumName;
+    const enumObject = configWithOptional.enumObject;
 
     const aliasSet = new Set<string>();
     if (componentId) aliasSet.add(componentId);
@@ -230,7 +248,10 @@ export class I18nEngine implements II18nEngine {
    * @param strings - Language-keyed string records.
    * @returns ValidationResult containing any warnings or errors.
    */
-  updateStrings(componentId: string, strings: Record<string, Record<string, string>>): ValidationResult {
+  updateStrings(
+    componentId: string,
+    strings: Record<string, Record<string, string>>,
+  ): ValidationResult {
     return this.componentStore.update(componentId, strings);
   }
 
@@ -265,7 +286,9 @@ export class I18nEngine implements II18nEngine {
     variables?: Record<string, any>,
     language?: string,
   ): string {
-    const lang = language || I18nEngine.contextManager.getCurrentLanguage(this.instanceKey);
+    const lang =
+      language ||
+      I18nEngine.contextManager.getCurrentLanguage(this.instanceKey);
     const combinedVars = this.buildCombinedVariables(variables);
     return this.componentStore.translate(componentId, key, combinedVars, lang);
   }
@@ -284,9 +307,16 @@ export class I18nEngine implements II18nEngine {
     variables?: Record<string, any>,
     language?: string,
   ): string {
-    const lang = language || I18nEngine.contextManager.getCurrentLanguage(this.instanceKey);
+    const lang =
+      language ||
+      I18nEngine.contextManager.getCurrentLanguage(this.instanceKey);
     const combinedVars = this.buildCombinedVariables(variables);
-    return this.componentStore.safeTranslate(componentId, key, combinedVars, lang);
+    return this.componentStore.safeTranslate(
+      componentId,
+      key,
+      combinedVars,
+      lang,
+    );
   }
 
   /**
@@ -297,35 +327,49 @@ export class I18nEngine implements II18nEngine {
    * @returns Processed template string.
    * @throws {I18nError} If template length exceeds limits.
    */
-  t(template: string, variables?: Record<string, any>, language?: string): string {
+  t(
+    template: string,
+    variables?: Record<string, any>,
+    language?: string,
+  ): string {
     validateTemplateLength(template);
-    const lang = language || I18nEngine.contextManager.getCurrentLanguage(this.instanceKey);
+    const lang =
+      language ||
+      I18nEngine.contextManager.getCurrentLanguage(this.instanceKey);
 
     // Build combined variables: constants + context + provided (provided overrides all)
     const combinedVars = this.buildCombinedVariables(variables);
 
     // Replace {{component.key}} or {{EnumName.key}} patterns with alias support
     // Limited pattern to prevent ReDoS: max 100 chars between braces
-    let result = template.replace(/\{\{([^}]{1,100})\}\}/g, (match, pattern) => {
-      const parts = pattern.split('.');
-      if (parts.length === 2) {
-        const [rawPrefix, rawKey] = parts;
-        const prefix = rawPrefix.trim();
-        const key = rawKey.trim();
-        
-        // Always pass combined variables to translations
-        // The translation will use them if the string has placeholders
-        // Resolve aliases and enum names to actual component IDs
-        const { componentId, stringKey } = this.resolveComponentAndKey(prefix, key);
-        return this.safeTranslate(componentId, stringKey, combinedVars, lang);
-      }
-      return match;
-    });
+    let result = template.replace(
+      /\{\{([^}]{1,100})\}\}/g,
+      (match, pattern) => {
+        const parts = pattern.split('.');
+        if (parts.length === 2) {
+          const [rawPrefix, rawKey] = parts;
+          const prefix = rawPrefix.trim();
+          const key = rawKey.trim();
+
+          // Always pass combined variables to translations
+          // The translation will use them if the string has placeholders
+          // Resolve aliases and enum names to actual component IDs
+          const { componentId, stringKey } = this.resolveComponentAndKey(
+            prefix,
+            key,
+          );
+          return this.safeTranslate(componentId, stringKey, combinedVars, lang);
+        }
+        return match;
+      },
+    );
 
     // Replace {variable} patterns with combined variables
     // Limited pattern to prevent ReDoS: max 50 chars for variable names
     result = result.replace(/\{(\w{1,50})\}/g, (match, varName) => {
-      return combinedVars[varName] !== undefined ? String(combinedVars[varName]) : match;
+      return combinedVars[varName] !== undefined
+        ? String(combinedVars[varName])
+        : match;
     });
 
     return result;
@@ -336,7 +380,9 @@ export class I18nEngine implements II18nEngine {
    * @param variables - Optional overrides for context and constants.
    * @returns Combined variables record.
    */
-  private buildCombinedVariables(variables?: Record<string, any>): Record<string, any> {
+  private buildCombinedVariables(
+    variables?: Record<string, any>,
+  ): Record<string, any> {
     if (variables) {
       validateObjectKeys(variables);
     }
@@ -354,33 +400,38 @@ export class I18nEngine implements II18nEngine {
     // GlobalActiveContext is optional and may not be available in all environments
     try {
       // Check if GlobalActiveContext is available in global scope
-      const GlobalActiveContext = (globalThis as any).GlobalActiveContext;
+      const GlobalActiveContext = globalThis.GlobalActiveContext;
 
-      if (GlobalActiveContext && typeof GlobalActiveContext.getInstance === 'function') {
+      if (
+        GlobalActiveContext &&
+        typeof GlobalActiveContext.getInstance === 'function'
+      ) {
         const context = GlobalActiveContext.getInstance()?.context;
         if (context) {
           // Add context variables
           combined['language'] = context.language;
           combined['adminLanguage'] = context.adminLanguage;
           combined['currentContext'] = context.currentContext;
-          
+
           if (context.currencyCode) {
             // Extract value from CurrencyCode object
             const currencyValue = this.extractValue(context.currencyCode);
             combined['currencyCode'] = currencyValue;
             combined['currency'] = currencyValue;
           }
-          
+
           if (context.timezone) {
             // Extract value from Timezone object
             const timezoneValue = this.extractValue(context.timezone);
             combined['timezone'] = timezoneValue;
             combined['userTimezone'] = timezoneValue;
           }
-          
+
           if (context.adminTimezone) {
             // Extract value from Timezone object
-            combined['adminTimezone'] = this.extractValue(context.adminTimezone);
+            combined['adminTimezone'] = this.extractValue(
+              context.adminTimezone,
+            );
           }
         }
       }
@@ -409,7 +460,12 @@ export class I18nEngine implements II18nEngine {
   private extractValue(value: any): any {
     if (value instanceof CurrencyCode) return value.value;
     if (value instanceof Timezone) return value.value;
-    if (value && typeof value === 'object' && 'value' in value && typeof value.value !== 'function') {
+    if (
+      value &&
+      typeof value === 'object' &&
+      'value' in value &&
+      typeof value.value !== 'function'
+    ) {
       return value.value;
     }
     // Return as-is for primitives and other objects
@@ -573,7 +629,11 @@ export class I18nEngine implements II18nEngine {
    * @param config - Optional engine configuration.
    * @returns Newly created I18nEngine instance.
    */
-  static createInstance(key: string, languages: readonly LanguageDefinition[], config?: EngineConfig): I18nEngine {
+  static createInstance(
+    key: string,
+    languages: readonly LanguageDefinition[],
+    config?: EngineConfig,
+  ): I18nEngine {
     return new I18nEngine(languages, config, {
       instanceKey: key,
       registerInstance: true,
@@ -588,7 +648,11 @@ export class I18nEngine implements II18nEngine {
    * @param config - Optional engine configuration.
    * @returns Existing or newly created I18nEngine instance.
    */
-  static registerIfNotExists(key: string, languages: readonly LanguageDefinition[], config?: EngineConfig): I18nEngine {
+  static registerIfNotExists(
+    key: string,
+    languages: readonly LanguageDefinition[],
+    config?: EngineConfig,
+  ): I18nEngine {
     if (I18nEngine.hasInstance(key)) {
       return I18nEngine.getInstance(key);
     }

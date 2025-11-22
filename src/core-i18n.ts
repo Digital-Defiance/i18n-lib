@@ -4,22 +4,22 @@
 
 import { ComponentDefinition } from './component-definition';
 import { ComponentRegistration } from './component-registration';
+import { I18nEngine } from './core';
 import { CoreStringKey } from './core-string-key';
+import { ComponentConfig, EngineConfig } from './interfaces';
 import { LanguageCodes } from './language-codes';
 import { LanguageDefinition } from './language-definition';
 import { PluginI18nEngine } from './plugin-i18n-engine';
-import { createCompleteComponentStrings } from './strict-types';
-import { ComponentConfig, EngineConfig } from './interfaces';
-import { I18nEngine } from './core';
 import { RegistryConfig } from './registry-config';
-import { americanEnglishString } from './strings/en-US';
-import { BritishEnglishStrings } from './strings/en-GB';
-import { frenchStrings } from './strings/fr';
-import { spanishStrings } from './strings/es';
+import { createCompleteComponentStrings } from './strict-types';
 import { germanStrings } from './strings/de';
-import { mandarinStrings } from './strings/zh-CN';
+import { BritishEnglishStrings } from './strings/en-GB';
+import { americanEnglishString } from './strings/en-US';
+import { spanishStrings } from './strings/es';
+import { frenchStrings } from './strings/fr';
 import { japaneseStrings } from './strings/ja';
 import { ukrainianStrings } from './strings/uk';
+import { mandarinStrings } from './strings/zh-CN';
 
 /**
  * Helper function to create multiple language definitions
@@ -184,7 +184,7 @@ export function createCorePluginI18nEngine(
   const engine = PluginI18nEngine.createInstance<string>(
     instanceKey,
     languages,
-    config
+    config,
   );
   engine.registerComponent(createCoreComponentRegistration());
   return engine;
@@ -200,7 +200,7 @@ export function getCorePluginI18nEngine(): PluginI18nEngine<string> {
     _corePluginI18nEngine = createCorePluginI18nEngine();
     return _corePluginI18nEngine;
   }
-  
+
   // Lazy re-initialization if instance was cleared
   try {
     PluginI18nEngine.getInstance<string>(DefaultInstanceKey);
@@ -214,7 +214,8 @@ export function getCorePluginI18nEngine(): PluginI18nEngine<string> {
 // Getter for direct reference - lazily initialized
 export const corePluginI18nEngine = new Proxy({} as PluginI18nEngine<string>, {
   get(_target, prop) {
-    return (getCorePluginI18nEngine() as any)[prop];
+    const engine = getCorePluginI18nEngine();
+    return engine[prop as keyof PluginI18nEngine<string>];
   },
 });
 
@@ -239,7 +240,9 @@ export function getCorePluginTranslation(
   instanceKey?: string,
 ): string {
   // Use core engine if no instance key specified, otherwise use specified instance
-  const engine = instanceKey ? PluginI18nEngine.getInstance<string>(instanceKey) : getCoreI18nEngine();
+  const engine = instanceKey
+    ? PluginI18nEngine.getInstance<string>(instanceKey)
+    : getCoreI18nEngine();
   return engine.translate(CoreI18nComponentId, stringKey, variables, language);
 }
 
@@ -253,7 +256,12 @@ export function safeCorePluginTranslation(
   instanceKey?: string,
 ): string {
   try {
-    return getCorePluginTranslation(stringKey, variables, language, instanceKey);
+    return getCorePluginTranslation(
+      stringKey,
+      variables,
+      language,
+      instanceKey,
+    );
   } catch {
     return `[CoreStringKey.${stringKey}]`;
   }
@@ -268,15 +276,19 @@ export function safeCorePluginTranslation(
  * IMPORTANT: Uses 'default' as instance key so TypedHandleableError can find it
  */
 function createInstance(config?: EngineConfig): I18nEngine {
-  const engine = I18nEngine.registerIfNotExists('default', createDefaultLanguages(), config);
-  
+  const engine = I18nEngine.registerIfNotExists(
+    'default',
+    createDefaultLanguages(),
+    config,
+  );
+
   // Register core component if not already registered
   const coreReg = createCoreComponentRegistration();
   engine.registerIfNotExists({
     id: coreReg.component.id,
     strings: coreReg.strings as Record<string, Record<string, string>>,
   });
-  
+
   return engine;
 }
 
@@ -296,7 +308,7 @@ export function getCoreI18nEngine(): I18nEngine {
     }
     return _coreEngine;
   }
-  
+
   // Lazy re-initialization if instance was cleared
   if (I18nEngine.hasInstance('default')) {
     return _coreEngine;
@@ -312,7 +324,7 @@ export function getCoreI18nEngine(): I18nEngine {
 export const coreI18nEngine = new Proxy({} as I18nEngine, {
   get(target, prop) {
     return getCoreI18nEngine()[prop as keyof I18nEngine];
-  }
+  },
 });
 
 /**
@@ -330,7 +342,12 @@ export function getCoreTranslation(
   variables?: Record<string, string | number>,
   language?: string,
 ): string {
-  return getCoreI18nEngine().translate(CoreI18nComponentId, stringKey, variables, language);
+  return getCoreI18nEngine().translate(
+    CoreI18nComponentId,
+    stringKey,
+    variables,
+    language,
+  );
 }
 
 /**
