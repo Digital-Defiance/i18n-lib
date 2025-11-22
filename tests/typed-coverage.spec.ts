@@ -1,17 +1,16 @@
+import { CoreI18nComponentId, CoreStringKey } from '../src';
+import { I18nEngine } from '../src/core';
 import {
   BaseTypedError,
-  TypedError,
-  PluginTypedError,
+  CompleteReasonMap,
   ComponentTypedError,
   CoreTypedError,
-  createTranslatedError,
-  createPluginTypedError,
+  PluginTypedError,
   createComponentTypedError,
   createCoreTypedError,
-  CompleteReasonMap,
+  createPluginTypedError,
+  createTranslatedError,
 } from '../src/errors/typed';
-import { I18nEngine } from '../src/core';
-import { CoreStringKey, CoreI18nComponentId } from '../src';
 
 enum TestErrorType {
   Error1 = 'error1',
@@ -23,14 +22,25 @@ const testReasonMap: CompleteReasonMap<typeof TestErrorType, CoreStringKey> = {
   [TestErrorType.Error2]: CoreStringKey.Error_NetworkError,
 };
 
-class TestTypedError extends TypedError<typeof TestErrorType, CoreStringKey> {
-  constructor(type: TestErrorType, language?: string, vars?: Record<string, string | number>) {
+class TestTypedError extends AbstractTypedError<
+  typeof TestErrorType,
+  CoreStringKey
+> {
+  constructor(
+    type: TestErrorType,
+    language?: string,
+    vars?: Record<string, string | number>,
+  ) {
     super(CoreI18nComponentId, type, testReasonMap, language, vars);
   }
 }
 
 class TestBaseTypedError extends BaseTypedError<typeof TestErrorType> {
-  constructor(type: TestErrorType, message: string, metadata?: Record<string, any>) {
+  constructor(
+    type: TestErrorType,
+    message: string,
+    metadata?: Record<string, any>,
+  ) {
     super(type, message, metadata);
   }
 }
@@ -91,7 +101,10 @@ describe('typed error coverage', () => {
         { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
       ]);
 
-      const incompleteMap = {} as CompleteReasonMap<typeof TestErrorType, CoreStringKey>;
+      const incompleteMap = {} as CompleteReasonMap<
+        typeof TestErrorType,
+        CoreStringKey
+      >;
       const error = TestBaseTypedError.createTranslated(
         engine,
         CoreI18nComponentId,
@@ -109,7 +122,10 @@ describe('typed error coverage', () => {
         { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
       ]);
 
-      const incompleteMap = {} as CompleteReasonMap<typeof TestErrorType, CoreStringKey>;
+      const incompleteMap = {} as CompleteReasonMap<
+        typeof TestErrorType,
+        CoreStringKey
+      >;
       const metadata = { detail: 'test' };
       const error = TestBaseTypedError.createTranslated(
         engine,
@@ -133,10 +149,17 @@ describe('typed error coverage', () => {
       ]);
       engine.registerIfNotExists({
         id: CoreI18nComponentId,
-        strings: { 'en-US': { [CoreStringKey.Error_StringKeyNotFoundTemplate]: 'Key not found' } },
+        strings: {
+          'en-US': {
+            [CoreStringKey.Error_StringKeyNotFoundTemplate]: 'Key not found',
+          },
+        },
       });
 
-      class TestPluginError extends PluginTypedError<typeof TestErrorType, CoreStringKey> {
+      class TestPluginError extends PluginTypedError<
+        typeof TestErrorType,
+        CoreStringKey
+      > {
         constructor(type: TestErrorType) {
           super(CoreI18nComponentId, type, {} as any, 'en-US');
         }
@@ -153,10 +176,17 @@ describe('typed error coverage', () => {
       ]);
       engine.registerIfNotExists({
         id: CoreI18nComponentId,
-        strings: { 'en-US': { [CoreStringKey.Error_StringKeyNotFoundTemplate]: 'Key not found' } },
+        strings: {
+          'en-US': {
+            [CoreStringKey.Error_StringKeyNotFoundTemplate]: 'Key not found',
+          },
+        },
       });
 
-      class TestComponentError extends ComponentTypedError<typeof TestErrorType, CoreStringKey> {
+      class TestComponentError extends ComponentTypedError<
+        typeof TestErrorType,
+        CoreStringKey
+      > {
         constructor(type: TestErrorType) {
           super(CoreI18nComponentId, type, {} as any, 'en-US');
         }
@@ -173,7 +203,11 @@ describe('typed error coverage', () => {
       ]);
       engine.registerIfNotExists({
         id: CoreI18nComponentId,
-        strings: { 'en-US': { [CoreStringKey.Error_StringKeyNotFoundTemplate]: 'Key not found' } },
+        strings: {
+          'en-US': {
+            [CoreStringKey.Error_StringKeyNotFoundTemplate]: 'Key not found',
+          },
+        },
       });
 
       class TestCoreError extends CoreTypedError<typeof TestErrorType> {

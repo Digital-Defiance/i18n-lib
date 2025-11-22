@@ -40,10 +40,11 @@ export function safeAssign<T extends Record<string, any>>(
 ): T {
   for (const source of sources) {
     if (!source) continue;
-    
+
     for (const key of Object.keys(source)) {
       if (!isDangerousKey(key)) {
-        (target as any)[key] = source[key];
+        // Type-safe property assignment using index signature
+        (target as Record<string, any>)[key] = source[key];
       }
     }
   }
@@ -56,7 +57,9 @@ export function safeAssign<T extends Record<string, any>>(
  * @param obj - The object to get entries from
  * @returns Array of [key, value] pairs, excluding dangerous keys
  */
-export function safeObjectEntries<T>(obj: Record<string, T>): Array<[string, T]> {
+export function safeObjectEntries<T>(
+  obj: Record<string, T>,
+): Array<[string, T]> {
   return Object.entries(obj).filter(([key]) => !isDangerousKey(key));
 }
 
@@ -67,7 +70,7 @@ export function safeObjectEntries<T>(obj: Record<string, T>): Array<[string, T]>
  */
 export function validateObjectKeys(obj: Record<string, any>): void {
   if (!obj || typeof obj !== 'object') return;
-  
+
   // Check for dangerous keys in Object.keys and getOwnPropertyNames
   const allKeys = [...Object.keys(obj), ...Object.getOwnPropertyNames(obj)];
   for (const key of allKeys) {

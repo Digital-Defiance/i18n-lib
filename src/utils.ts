@@ -158,17 +158,19 @@ export function buildTypeSafeReasonMap<
   prefixes: TPrefixes,
   templateKeys?: TTemplateKeys,
 ): ReasonMapFromEnum<TEnum, TStringKey, TPrefixes, TTemplateKeys> {
-  const map = {} as any;
+  const map: Partial<
+    ReasonMapFromEnum<TEnum, TStringKey, TPrefixes, TTemplateKeys>
+  > = {};
 
   Object.values(enumObj).forEach((value) => {
     const baseKey = [...prefixes, value].join('_');
     const finalKey = templateKeys?.has(value as TEnum[keyof TEnum])
       ? baseKey + 'Template'
       : baseKey;
-    map[value as TEnum[keyof TEnum]] = finalKey;
+    map[value as TEnum[keyof TEnum]] = finalKey as any;
   });
 
-  return map;
+  return map as ReasonMapFromEnum<TEnum, TStringKey, TPrefixes, TTemplateKeys>;
 }
 
 /**

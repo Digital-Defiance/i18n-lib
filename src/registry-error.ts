@@ -1,8 +1,8 @@
 // CoreLanguageCode is deprecated - using string
-import { CoreStringKey } from './core-string-key';
-import { RegistryErrorType } from './registry-error-type';
-import { TranslationEngine, createTranslatedError } from './errors/typed';
 import { CoreI18nComponentId } from './core-i18n';
+import { CoreStringKey } from './core-string-key';
+import { TranslationEngine, createTranslatedError } from './errors/typed';
+import { RegistryErrorType } from './registry-error-type';
 
 /**
  * Reason map for registry errors
@@ -29,9 +29,9 @@ const REGISTRY_ERROR_REASON_MAP = {
  */
 export class RegistryError extends Error {
   constructor(
-    public readonly type: RegistryErrorType,
+    public override readonly type: RegistryErrorType,
     message: string,
-    public readonly metadata?: Record<string, any>,
+    public override readonly metadata?: Record<string, any>,
   ) {
     super(message);
     this.name = 'RegistryError';

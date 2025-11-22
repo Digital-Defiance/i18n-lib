@@ -17,7 +17,9 @@ export class EnumRegistry {
    * Creates a new EnumRegistry instance.
    * @param translateFn - Optional translation function for error messages
    */
-  constructor(translateFn?: (key: string, vars?: Record<string, any>) => string) {
+  constructor(
+    translateFn?: (key: string, vars?: Record<string, any>) => string,
+  ) {
     this.translateFn = translateFn;
   }
 
@@ -30,10 +32,10 @@ export class EnumRegistry {
    */
   register<TEnum extends string | number>(
     enumObj: Record<string, TEnum>,
-    translations: Record<string, Record<TEnum, string>>,
+    translations: Record<string, Record<string, string>>,
     enumName: string,
   ): void {
-    this.translations.set(enumObj, translations as any);
+    this.translations.set(enumObj, translations);
     this.enumNames.set(enumObj, enumName);
   }
 
@@ -63,11 +65,17 @@ export class EnumRegistry {
       throw I18nError.languageNotFound(language);
     }
 
-    let result = langTranslations[value as any];
+    // Convert value to string for lookup
+    const valueKey = String(value);
+    let result = langTranslations[valueKey];
+
+    // For numeric enums, also try the reverse mapping (string key to value)
     if (!result && typeof value === 'number') {
-      const stringKey = Object.keys(enumObj).find((key) => enumObj[key] === value);
+      const stringKey = Object.keys(enumObj).find(
+        (key) => enumObj[key] === value,
+      );
       if (stringKey) {
-        result = langTranslations[stringKey as any];
+        result = langTranslations[stringKey];
       }
     }
 

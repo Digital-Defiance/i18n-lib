@@ -1,14 +1,14 @@
 import { IActiveContext } from './active-context';
-import { ContextError } from './errors/context-error';
 import { ContextErrorType } from './context-error-type';
-import { CurrencyCode } from './utils/currency';
+import { ContextError } from './errors/context-error';
 import { IGlobalActiveContext } from './interfaces/global-active-context';
-import { Timezone } from './utils/timezone';
 import {
   DefaultCurrencyCode,
   DefaultTimezone,
   LanguageContextSpace,
 } from './types';
+import { CurrencyCode } from './utils/currency';
+import { Timezone } from './utils/timezone';
 
 export class GlobalActiveContext<
   TLanguage extends string,
@@ -27,11 +27,11 @@ export class GlobalActiveContext<
     }
     return this._instance;
   }
-  
+
   // Register in globalThis for cross-module access
   static {
     if (typeof globalThis !== 'undefined') {
-      (globalThis as any).GlobalActiveContext = GlobalActiveContext;
+      globalThis.GlobalActiveContext = GlobalActiveContext;
     }
   }
   public static getInstance<

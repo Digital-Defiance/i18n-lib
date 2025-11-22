@@ -1,9 +1,10 @@
 // New plugin architecture imports
 // CoreLanguageCode is deprecated - using string for flexibility
+import { I18nEngine } from '../core';
+import { CoreI18nComponentId } from '../core-i18n';
 import { CoreStringKey } from '../core-string-key';
 import { TranslationEngine } from '../translation-engine';
-import { CoreI18nComponentId } from '../core-i18n';
-import { I18nEngine } from '../core';
+import { TypedError as SimpleTypedError } from './simple-typed-error';
 
 export type { TranslationEngine };
 
@@ -17,7 +18,7 @@ export type CompleteReasonMap<
 
 /**
  * Base typed error class with full i18n feature support.
- * 
+ *
  * **Supported i18n Features** (via translation strings):
  * - ICU MessageFormat: plural, select, selectordinal
  * - Pluralization: 37 languages with CLDR rules
@@ -25,7 +26,7 @@ export type CompleteReasonMap<
  * - Number formatting: integer, currency, percent
  * - Date/Time formatting: short, medium, long, full
  * - Nested messages: up to 4 levels deep
- * 
+ *
  * **Translation String Examples:**
  * ```typescript
  * // Register translations with ICU features
@@ -37,7 +38,7 @@ export type CompleteReasonMap<
  *     }
  *   }
  * });
- * 
+ *
  * // Use with typed error
  * throw BaseTypedError.createTranslated(
  *   engine, 'errors', ErrorType.InvalidCount, reasonMap,
@@ -50,9 +51,9 @@ export abstract class BaseTypedError<
   TEnum extends Record<string, string>,
 > extends Error {
   constructor(
-    public readonly type: TEnum[keyof TEnum],
+    public override readonly type: TEnum[keyof TEnum],
     message: string,
-    public readonly metadata?: Record<string, any>,
+    public override readonly metadata?: Record<string, any>,
   ) {
     super(message);
     this.name = this.constructor.name;
@@ -116,15 +117,16 @@ export abstract class BaseTypedError<
 }
 
 /**
- * TypedError with complete enum coverage and full i18n feature support.
- * 
+ * AbstractTypedError with complete enum coverage and full i18n feature support.
+ * @deprecated Use SimpleTypedError from './simple-typed-error' for new code
+ *
  * **Supported i18n Features** (via translation strings):
  * - ICU MessageFormat: plural, select, selectordinal
  * - Pluralization: 37 languages with CLDR rules
  * - Gender support: male, female, neutral, other
  * - Number formatting: integer, currency, percent
  * - Nested messages: up to 4 levels deep
- * 
+ *
  * **Translation String Examples:**
  * ```typescript
  * // Define error types
@@ -132,7 +134,7 @@ export abstract class BaseTypedError<
  *   InvalidCount = 'invalidCount',
  *   ThresholdExceeded = 'thresholdExceeded'
  * }
- * 
+ *
  * // Register translations with ICU
  * engine.registerComponent({
  *   component: { id: 'validation', stringKeys: ['invalidCount', 'thresholdExceeded'] },
@@ -143,20 +145,20 @@ export abstract class BaseTypedError<
  *     }
  *   }
  * });
- * 
+ *
  * // Use typed error
  * throw new MyTypedError('validation', ValidationError.InvalidCount, reasonMap, 'en-US', { count: 3 });
  * // Result: "3 errors found"
  * ```
  */
-export abstract class TypedError<
+export abstract class AbstractTypedError<
   TEnum extends Record<string, string>,
   TStringKey extends string,
 > extends Error {
   constructor(
-    public readonly componentId: string,
-    public readonly type: TEnum[keyof TEnum],
-    public readonly reasonMap: CompleteReasonMap<TEnum, TStringKey>,
+    public override readonly componentId: string,
+    public override readonly type: TEnum[keyof TEnum],
+    public override readonly reasonMap: CompleteReasonMap<TEnum, TStringKey>,
     public readonly language?: string,
     public readonly otherVars?: Record<string, string | number>,
   ) {
@@ -166,12 +168,12 @@ export abstract class TypedError<
       throw new Error(
         engine.safeTranslate(
           CoreI18nComponentId,
-          CoreStringKey.Error_MissingTranslationKeyTemplate as any,
+          CoreStringKey.Error_MissingTranslationKeyTemplate,
           { type },
           language,
         ),
       );
-    
+
     // Use translate instead of safeTranslate to get actual translations
     let message: string;
     try {
@@ -180,7 +182,7 @@ export abstract class TypedError<
       // Fallback to safeTranslate if translate fails
       message = engine.safeTranslate(componentId, key, otherVars, language);
     }
-    
+
     super(message);
     this.name = this.constructor.name;
   }
@@ -195,9 +197,9 @@ export abstract class PluginTypedError<
   TStringKey extends string,
 > extends Error {
   constructor(
-    public readonly componentId: string,
-    public readonly type: TEnum[keyof TEnum],
-    public readonly reasonMap: CompleteReasonMap<TEnum, TStringKey>,
+    public override readonly componentId: string,
+    public override readonly type: TEnum[keyof TEnum],
+    public override readonly reasonMap: CompleteReasonMap<TEnum, TStringKey>,
     public readonly language?: string,
     public readonly otherVars?: Record<string, string | number>,
   ) {
@@ -231,7 +233,7 @@ export abstract class PluginTypedError<
 
 /**
  * Component-based TypedError with full i18n feature support.
- * 
+ *
  * **Supported i18n Features** (via translation strings):
  * - ICU MessageFormat: plural, select, selectordinal
  * - Pluralization: 37 languages with CLDR rules
@@ -239,7 +241,7 @@ export abstract class PluginTypedError<
  * - Number formatting: integer, currency, percent
  * - SelectOrdinal: 1st, 2nd, 3rd formatting
  * - Nested messages: complex multi-level patterns
- * 
+ *
  * **Translation String Examples:**
  * ```typescript
  * // Define component errors
@@ -247,7 +249,7 @@ export abstract class PluginTypedError<
  *   AccountLocked = 'accountLocked',
  *   TooManyAttempts = 'tooManyAttempts'
  * }
- * 
+ *
  * // Register with ICU features
  * engine.registerComponent({
  *   component: { id: 'user', stringKeys: ['accountLocked', 'tooManyAttempts'] },
@@ -258,7 +260,7 @@ export abstract class PluginTypedError<
  *     }
  *   }
  * });
- * 
+ *
  * // Use component error
  * throw new MyComponentError('user', UserError.TooManyAttempts, reasonMap, 'en-US', { count: 5, minutes: 10 });
  * // Result: "5 attempts failed. Try again in 10 minutes."
@@ -269,9 +271,9 @@ export abstract class ComponentTypedError<
   TStringKey extends string,
 > extends Error {
   constructor(
-    public readonly componentId: string,
-    public readonly type: TEnum[keyof TEnum],
-    public readonly reasonMap: CompleteReasonMap<TEnum, TStringKey>,
+    public override readonly componentId: string,
+    public override readonly type: TEnum[keyof TEnum],
+    public override readonly reasonMap: CompleteReasonMap<TEnum, TStringKey>,
     public readonly language?: string,
     public readonly otherVars?: Record<string, string | number>,
   ) {
@@ -305,14 +307,14 @@ export abstract class ComponentTypedError<
 
 /**
  * Core system TypedError using core component strings with full i18n support.
- * 
+ *
  * **Supported i18n Features** (via CoreStringKey translations):
  * - ICU MessageFormat: plural, select, selectordinal
  * - Pluralization: 37 languages with CLDR rules
  * - Gender support: male, female, neutral, other
  * - Number formatting: integer, currency, percent
  * - Nested messages: complex patterns
- * 
+ *
  * **Usage Example:**
  * ```typescript
  * // Define core error types
@@ -320,13 +322,13 @@ export abstract class ComponentTypedError<
  *   InvalidOperation = 'invalidOperation',
  *   ResourceNotFound = 'resourceNotFound'
  * }
- * 
+ *
  * // Core strings already registered with ICU features
  * const reasonMap: CompleteReasonMap<typeof CoreErrorType, CoreStringKey> = {
  *   [CoreErrorType.InvalidOperation]: CoreStringKey.Error_InvalidOperation,
  *   [CoreErrorType.ResourceNotFound]: CoreStringKey.Error_ResourceNotFound
  * };
- * 
+ *
  * // Use core typed error
  * throw new MyCoreError(CoreErrorType.ResourceNotFound, reasonMap, 'en-US', { resource: 'user', id: 123 });
  * ```
@@ -335,8 +337,8 @@ export abstract class CoreTypedError<
   TEnum extends Record<string, string>,
 > extends Error {
   constructor(
-    public readonly type: TEnum[keyof TEnum],
-    public readonly reasonMap: CompleteReasonMap<TEnum, CoreStringKey>,
+    public override readonly type: TEnum[keyof TEnum],
+    public override readonly reasonMap: CompleteReasonMap<TEnum, CoreStringKey>,
     public readonly language?: string,
     public readonly otherVars?: Record<string, string | number>,
   ) {
@@ -384,7 +386,14 @@ export function createPluginTypedError<
   language?: string,
   instanceKey?: string,
 ): Error {
-  return createComponentTypedError(componentId, type, reasonMap, otherVars, language, instanceKey);
+  return createComponentTypedError(
+    componentId,
+    type,
+    reasonMap,
+    otherVars,
+    language,
+    instanceKey,
+  );
 }
 
 /**
@@ -400,22 +409,23 @@ export function createComponentTypedError<
   otherVars?: Record<string, string | number>,
   language?: string,
   instanceKey?: string,
-): Error {
+): SimpleTypedError {
   // Get the engine to ensure it exists, but the error class will get it again
   const engine = I18nEngine.getInstance(instanceKey || 'default');
   const key = reasonMap[type];
-  
+
   if (!key) {
     throw new Error(`Missing key for type ${type} in reason map`);
   }
-  
+
   const message = engine.safeTranslate(componentId, key, otherVars, language);
-  const error = new Error(message);
-  (error as any).type = type;
-  (error as any).componentId = componentId;
-  (error as any).reasonMap = reasonMap;
+  const error = new SimpleTypedError(message, {
+    type,
+    componentId,
+    reasonMap,
+  });
   error.name = 'PluginTypedError';
-  
+
   return error;
 }
 
@@ -428,20 +438,27 @@ export function createCoreTypedError<TEnum extends Record<string, string>>(
   otherVars?: Record<string, string | number>,
   language?: string,
   instanceKey?: string,
-): Error {
+): SimpleTypedError {
   const engine = I18nEngine.getInstance(instanceKey || 'default');
   const key = reasonMap[type];
-  
+
   if (!key) {
     throw new Error(`Missing key for type ${type} in reason map`);
   }
-  
-  const message = engine.safeTranslate(CoreI18nComponentId, key, otherVars, language);
-  const error = new Error(message);
-  (error as any).type = type;
-  (error as any).reasonMap = reasonMap;
+
+  const message = engine.safeTranslate(
+    CoreI18nComponentId,
+    key,
+    otherVars,
+    language,
+  );
+  const error = new SimpleTypedError(message, {
+    type,
+    componentId: CoreI18nComponentId,
+    reasonMap,
+  });
   error.name = 'CoreTypedError';
-  
+
   return error;
 }
 
@@ -460,7 +477,7 @@ export function createTranslatedError<
   language?: string,
   metadata?: Record<string, any>,
   errorName?: string,
-): Error {
+): SimpleTypedError {
   const key = reasonMap[type];
   let message: string;
 
@@ -481,10 +498,12 @@ export function createTranslatedError<
     }`;
   }
 
-  const error = new Error(message);
+  const error = new SimpleTypedError(message, {
+    type,
+    componentId,
+    metadata,
+  });
   error.name = errorName || 'TranslatedError';
-  (error as any).type = type;
-  (error as any).metadata = metadata;
 
   return error;
 }

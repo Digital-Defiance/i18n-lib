@@ -1,24 +1,24 @@
 import { CoreI18nComponentId } from '../core-i18n';
 import { CoreStringKey } from '../core-string-key';
-import { HandleableError } from './handleable';
 import { IHandleable } from '../interfaces/handleable';
 import { HandleableErrorOptions } from '../interfaces/handleable-error-options';
+import { HandleableError } from './handleable';
 
-import { CompleteReasonMap } from './typed';
 import { I18nEngine } from '../core';
+import { CompleteReasonMap } from './typed';
 
 /**
  * TypedHandleableError with full i18n feature support.
- * 
+ *
  * Combines typed errors with handleable error patterns and full i18n capabilities.
- * 
+ *
  * **Supported i18n Features** (via translation strings):
  * - ICU MessageFormat: plural, select, selectordinal
  * - Pluralization: 37 languages with CLDR rules
  * - Gender support: male, female, neutral, other
  * - Number formatting: integer, currency, percent
  * - Nested messages: up to 4 levels deep
- * 
+ *
  * **Translation String Examples:**
  * ```typescript
  * // Define error types
@@ -26,7 +26,7 @@ import { I18nEngine } from '../core';
  *   Timeout = 'timeout',
  *   RateLimit = 'rateLimit'
  * }
- * 
+ *
  * // Register translations with ICU
  * engine.registerComponent({
  *   component: { id: 'network', stringKeys: ['timeout', 'rateLimit'] },
@@ -37,7 +37,7 @@ import { I18nEngine } from '../core';
  *     }
  *   }
  * });
- * 
+ *
  * // Use typed handleable error
  * try {
  *   await apiCall();
@@ -62,9 +62,9 @@ export class TypedHandleableError<
   extends HandleableError
   implements IHandleable
 {
-  public readonly componentId: string;
-  public readonly type: TEnum[keyof TEnum];
-  public readonly reasonMap: CompleteReasonMap<TEnum, TStringKey>;
+  public override readonly componentId: string;
+  public override readonly type: TEnum[keyof TEnum];
+  public override readonly reasonMap: CompleteReasonMap<TEnum, TStringKey>;
   public readonly language?: string;
   public readonly otherVars?: Record<string, string | number>;
 
@@ -95,7 +95,12 @@ export class TypedHandleableError<
     try {
       const keyString = key as TStringKey;
       const engine = I18nEngine.getInstance('default');
-      const translated = engine.translate(componentId, keyString, otherVars, language);
+      const translated = engine.translate(
+        componentId,
+        keyString,
+        otherVars,
+        language,
+      );
       message = String(translated || type);
     } catch (error) {
       message = String(type);
@@ -106,9 +111,11 @@ export class TypedHandleableError<
     if (source?.stack) {
       errorWithMessage.stack = source.stack;
     }
-    
+
     // Pass source as cause if not already specified in options
-    const finalOptions = options?.cause ? options : { ...options, cause: source };
+    const finalOptions = options?.cause
+      ? options
+      : { ...options, cause: source };
     super(errorWithMessage, finalOptions);
 
     this.componentId = componentId;

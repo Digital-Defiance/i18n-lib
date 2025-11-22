@@ -1,10 +1,9 @@
 import { I18nEngine } from '../core';
-import { PluralCategory } from '../pluralization/plural-categories';
 import { GenderCategory } from '../gender/gender-categories';
 
 /**
  * Generic translatable error that works with any plugin engine and component.
- * 
+ *
  * **Full i18n 3.0/3.5 Feature Support:**
  * - ICU MessageFormat (all formatters: plural, select, selectordinal)
  * - Pluralization for 37 languages with CLDR rules
@@ -13,32 +12,34 @@ import { GenderCategory } from '../gender/gender-categories';
  * - Date/Time formatting (short, medium, long, full)
  * - Nested messages up to 4 levels deep
  * - Context variable injection
- * 
+ *
  * **Usage Examples:**
  * ```typescript
  * // Plural-aware error
  * new TranslatableGenericError('component', 'errorKey', { count: 5 });
  * // Translation: \"{count, plural, one {# error} other {# errors}}\"
- * 
+ *
  * // Gender-aware error
  * new TranslatableGenericError('component', 'userError', { gender: 'female', name: 'Alice' });
  * // Translation: \"{gender, select, male {He} female {She}} {name} caused an error\"
- * 
+ *
  * // Number formatting
  * new TranslatableGenericError('component', 'thresholdError', { value: 1500.50, limit: 1000 });
  * // Translation: \"Value {value, number, currency} exceeds {limit, number, currency}\"
- * 
+ *
  * // SelectOrdinal
  * new TranslatableGenericError('component', 'stepError', { step: 3 });
  * // Translation: \"Failed at {step, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} step\"
  * ```
  */
-export class TranslatableGenericError<TStringKey extends string = string> extends Error {
+export class TranslatableGenericError<
+  TStringKey extends string = string,
+> extends Error {
   public readonly stringKey: TStringKey;
-  public readonly componentId: string;
+  public override readonly componentId: string;
   public readonly language?: string;
   public readonly variables?: Record<string, string | number>;
-  public readonly metadata?: Record<string, any>;
+  public override readonly metadata?: Record<string, any>;
 
   /**
    * Create a translatable error

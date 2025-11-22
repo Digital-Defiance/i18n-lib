@@ -65,7 +65,7 @@ export class I18nError extends Error {
   constructor(
     public readonly code: I18nErrorCode,
     message: string,
-    public readonly metadata?: Record<string, any>,
+    public override readonly metadata?: Record<string, any>,
   ) {
     super(message);
     this.name = 'I18nError';
@@ -81,15 +81,13 @@ export class I18nError extends Error {
   static componentNotFound(componentId: string, language = 'en-US'): I18nError {
     const hasNamespace = componentId.includes('.');
     const message = formatICUMessage(
-      "{hasNamespace, select, true {Namespaced component {componentId}} other {Component {componentId}}} not found in registry",
+      '{hasNamespace, select, true {Namespaced component {componentId}} other {Component {componentId}}} not found in registry',
       { componentId, hasNamespace: hasNamespace ? 'true' : 'false' },
-      language
+      language,
     );
-    return new I18nError(
-      I18nErrorCode.COMPONENT_NOT_FOUND,
-      message,
-      { componentId },
-    );
+    return new I18nError(I18nErrorCode.COMPONENT_NOT_FOUND, message, {
+      componentId,
+    });
   }
 
   /**
@@ -99,19 +97,22 @@ export class I18nError extends Error {
    * @param language - Optional language code for message formatting
    * @returns An I18nError instance
    */
-  static stringKeyNotFound(componentId: string, stringKey: string, language = 'en-US'): I18nError {
+  static stringKeyNotFound(
+    componentId: string,
+    stringKey: string,
+    language = 'en-US',
+  ): I18nError {
     const depth = stringKey.split('.').length;
     const isNested = depth > 1;
     const message = formatICUMessage(
-      "{isNested, select, true {Nested string key at {depth, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} level {stringKey}} other {String key {stringKey}}} not found in component {componentId}",
+      '{isNested, select, true {Nested string key at {depth, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} level {stringKey}} other {String key {stringKey}}} not found in component {componentId}',
       { componentId, stringKey, depth, isNested: isNested ? 'true' : 'false' },
-      language
+      language,
     );
-    return new I18nError(
-      I18nErrorCode.STRING_KEY_NOT_FOUND,
-      message,
-      { componentId, stringKey },
-    );
+    return new I18nError(I18nErrorCode.STRING_KEY_NOT_FOUND, message, {
+      componentId,
+      stringKey,
+    });
   }
 
   /**
@@ -120,17 +121,18 @@ export class I18nError extends Error {
    * @param messageLanguage - Optional language code for error message formatting
    * @returns An I18nError instance
    */
-  static languageNotFound(language: string, messageLanguage = 'en-US'): I18nError {
+  static languageNotFound(
+    language: string,
+    messageLanguage = 'en-US',
+  ): I18nError {
     const message = formatICUMessage(
-      "Language {language} not found",
+      'Language {language} not found',
       { language },
-      messageLanguage
+      messageLanguage,
     );
-    return new I18nError(
-      I18nErrorCode.LANGUAGE_NOT_FOUND,
-      message,
-      { language },
-    );
+    return new I18nError(I18nErrorCode.LANGUAGE_NOT_FOUND, message, {
+      language,
+    });
   }
 
   /**
@@ -149,15 +151,20 @@ export class I18nError extends Error {
   ): I18nError {
     const hasNestedKey = stringKey.includes('.');
     const message = formatICUMessage(
-      "Translation missing: {hasNested, select, true {nested path} other {key}} {componentId}.{stringKey} not found in language {language}",
-      { componentId, stringKey, language, hasNested: hasNestedKey ? 'true' : 'false' },
-      messageLanguage
+      'Translation missing: {hasNested, select, true {nested path} other {key}} {componentId}.{stringKey} not found in language {language}',
+      {
+        componentId,
+        stringKey,
+        language,
+        hasNested: hasNestedKey ? 'true' : 'false',
+      },
+      messageLanguage,
     );
-    return new I18nError(
-      I18nErrorCode.TRANSLATION_MISSING,
-      message,
-      { componentId, stringKey, language },
-    );
+    return new I18nError(I18nErrorCode.TRANSLATION_MISSING, message, {
+      componentId,
+      stringKey,
+      language,
+    });
   }
 
   /**
@@ -175,18 +182,19 @@ export class I18nError extends Error {
    * @param language - Optional language code for message formatting
    * @returns An I18nError instance
    */
-  static duplicateComponent(componentId: string, language = 'en-US'): I18nError {
+  static duplicateComponent(
+    componentId: string,
+    language = 'en-US',
+  ): I18nError {
     const hasNamespace = componentId.includes('.');
     const message = formatICUMessage(
-      "{hasNamespace, select, true {Namespaced component {componentId}} other {Component {componentId}}} is already registered {hasNamespace, select, true {in this namespace} other {in the registry}}",
+      '{hasNamespace, select, true {Namespaced component {componentId}} other {Component {componentId}}} is already registered {hasNamespace, select, true {in this namespace} other {in the registry}}',
       { componentId, hasNamespace: hasNamespace ? 'true' : 'false' },
-      language
+      language,
     );
-    return new I18nError(
-      I18nErrorCode.DUPLICATE_COMPONENT,
-      message,
-      { componentId },
-    );
+    return new I18nError(I18nErrorCode.DUPLICATE_COMPONENT, message, {
+      componentId,
+    });
   }
 
   /**
@@ -195,13 +203,14 @@ export class I18nError extends Error {
    * @param messageLanguage - Optional language code for error message formatting
    * @returns An I18nError instance
    */
-  static duplicateLanguage(language: string, messageLanguage = 'en-US'): I18nError {
+  static duplicateLanguage(
+    language: string,
+    messageLanguage = 'en-US',
+  ): I18nError {
     const message = `Language '${language}' already registered`;
-    return new I18nError(
-      I18nErrorCode.DUPLICATE_LANGUAGE,
-      message,
-      { language },
-    );
+    return new I18nError(I18nErrorCode.DUPLICATE_LANGUAGE, message, {
+      language,
+    });
   }
 
   /**
@@ -214,13 +223,12 @@ export class I18nError extends Error {
     const message = formatICUMessage(
       'Validation failed with {count, plural, one {{count, number, integer} error} other {{count, number, integer} errors}}: {details}',
       { count: errors.length, details: errors.join(', ') },
-      language
+      language,
     );
-    return new I18nError(
-      I18nErrorCode.VALIDATION_FAILED,
-      message,
-      { errors, count: errors.length },
-    );
+    return new I18nError(I18nErrorCode.VALIDATION_FAILED, message, {
+      errors,
+      count: errors.length,
+    });
   }
 
   /**
@@ -232,15 +240,11 @@ export class I18nError extends Error {
   static instanceNotFound(key: string, language = 'en-US'): I18nError {
     const isDefault = key === 'default' || key === '';
     const message = formatICUMessage(
-      "{isDefault, select, true {Default i18n instance not found} other {I18n instance {key} not found}} in registry",
+      '{isDefault, select, true {Default i18n instance not found} other {I18n instance {key} not found}} in registry',
       { key, isDefault: isDefault ? 'true' : 'false' },
-      language
+      language,
     );
-    return new I18nError(
-      I18nErrorCode.INSTANCE_NOT_FOUND,
-      message,
-      { key },
-    );
+    return new I18nError(I18nErrorCode.INSTANCE_NOT_FOUND, message, { key });
   }
 
   /**
@@ -254,13 +258,9 @@ export class I18nError extends Error {
     const message = formatICUMessage(
       "{isDefault, select, true {Default i18n instance 'default' already exists. Use a different key or remove the existing instance first.} other {I18n instance {key} already exists in registry}}",
       { key, isDefault: isDefault ? 'true' : 'false' },
-      language
+      language,
     );
-    return new I18nError(
-      I18nErrorCode.INSTANCE_EXISTS,
-      message,
-      { key },
-    );
+    return new I18nError(I18nErrorCode.INSTANCE_EXISTS, message, { key });
   }
 
   /**
@@ -271,15 +271,13 @@ export class I18nError extends Error {
    */
   static invalidContext(contextKey: string, language = 'en-US'): I18nError {
     const message = formatICUMessage(
-      "Invalid context key {contextKey}",
+      'Invalid context key {contextKey}',
       { contextKey },
-      language
+      language,
     );
-    return new I18nError(
-      I18nErrorCode.INVALID_CONTEXT,
-      message,
-      { contextKey },
-    );
+    return new I18nError(I18nErrorCode.INVALID_CONTEXT, message, {
+      contextKey,
+    });
   }
 
   /**
@@ -298,22 +296,24 @@ export class I18nError extends Error {
   ): I18nError {
     const formCount = availableForms.length;
     const message = formatICUMessage(
-      "Plural form {category} not found for language {language}{hasKey, select, true { in key {keyName}} other {}}. {formCount, plural, one {Available form} other {Available forms}} ({formCount, number, integer}): {forms}",
-      { 
-        category, 
-        language, 
+      'Plural form {category} not found for language {language}{hasKey, select, true { in key {keyName}} other {}}. {formCount, plural, one {Available form} other {Available forms}} ({formCount, number, integer}): {forms}',
+      {
+        category,
+        language,
         keyName: key,
         hasKey: key ? 'true' : 'false',
         forms: availableForms.join(', '),
-        formCount
+        formCount,
       },
-      language
+      language,
     );
-    return new I18nError(
-      I18nErrorCode.PLURAL_FORM_NOT_FOUND,
-      message,
-      { category, language, key, availableForms, formCount },
-    );
+    return new I18nError(I18nErrorCode.PLURAL_FORM_NOT_FOUND, message, {
+      category,
+      language,
+      key,
+      availableForms,
+      formCount,
+    });
   }
 
   /**
@@ -323,22 +323,26 @@ export class I18nError extends Error {
    * @param language - Optional language code for message formatting
    * @returns An I18nError instance
    */
-  static invalidPluralCategory(category: string, validCategories: string[], language = 'en-US'): I18nError {
+  static invalidPluralCategory(
+    category: string,
+    validCategories: string[],
+    language = 'en-US',
+  ): I18nError {
     const count = validCategories.length;
     const message = formatICUMessage(
-      "Invalid plural category {category}. {count, plural, one {Valid category ({count, number, integer})} other {Valid categories ({count, number, integer})}}: {categories}",
-      { 
-        category, 
+      'Invalid plural category {category}. {count, plural, one {Valid category ({count, number, integer})} other {Valid categories ({count, number, integer})}}: {categories}',
+      {
+        category,
         categories: validCategories.join(', '),
-        count
+        count,
       },
-      language
+      language,
     );
-    return new I18nError(
-      I18nErrorCode.INVALID_PLURAL_CATEGORY,
-      message,
-      { category, validCategories, count },
-    );
+    return new I18nError(I18nErrorCode.INVALID_PLURAL_CATEGORY, message, {
+      category,
+      validCategories,
+      count,
+    });
   }
 
   /**
@@ -351,13 +355,11 @@ export class I18nError extends Error {
     const message = formatICUMessage(
       "Plural forms used in key {key} but no 'count' variable provided",
       { key },
-      language
+      language,
     );
-    return new I18nError(
-      I18nErrorCode.MISSING_COUNT_VARIABLE,
-      message,
-      { key },
-    );
+    return new I18nError(I18nErrorCode.MISSING_COUNT_VARIABLE, message, {
+      key,
+    });
   }
 
   /**
@@ -378,15 +380,20 @@ export class I18nError extends Error {
     language = 'en-US',
   ): I18nError {
     const message = formatICUMessage(
-      "Validation failed for {fieldName}: value {value, number, " + thresholdType + "} exceeds maximum threshold of {threshold, number, " + thresholdType + "}",
+      'Validation failed for {fieldName}: value {value, number, ' +
+        thresholdType +
+        '} exceeds maximum threshold of {threshold, number, ' +
+        thresholdType +
+        '}',
       { fieldName, value, threshold },
-      language
+      language,
     );
-    return new I18nError(
-      I18nErrorCode.VALIDATION_THRESHOLD_EXCEEDED,
-      message,
-      { fieldName, value, threshold, thresholdType },
-    );
+    return new I18nError(I18nErrorCode.VALIDATION_THRESHOLD_EXCEEDED, message, {
+      fieldName,
+      value,
+      threshold,
+      thresholdType,
+    });
   }
 
   /**
@@ -405,15 +412,15 @@ export class I18nError extends Error {
     language = 'en-US',
   ): I18nError {
     const message = formatICUMessage(
-      "Operation {operationName} failed at {stepNumber, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} step: {reason}",
+      'Operation {operationName} failed at {stepNumber, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} step: {reason}',
       { stepNumber, operationName, reason },
-      language
+      language,
     );
-    return new I18nError(
-      I18nErrorCode.OPERATION_STEP_FAILED,
-      message,
-      { stepNumber, operationName, reason },
-    );
+    return new I18nError(I18nErrorCode.OPERATION_STEP_FAILED, message, {
+      stepNumber,
+      operationName,
+      reason,
+    });
   }
 
   /**
@@ -434,15 +441,22 @@ export class I18nError extends Error {
     language = 'en-US',
   ): I18nError {
     const message = formatICUMessage(
-      "Rate limit exceeded: {requestCount, plural, one {# request} other {# requests}} made, exceeding limit of {limit, number, integer} {limit, plural, one {request} other {requests}} per {windowSeconds, number, integer} {windowSeconds, plural, one {second} other {seconds}}. {hasRetry, select, true {Retry after {retryAfterSeconds, number, integer} {retryAfterSeconds, plural, one {second} other {seconds}}.} other {Retry immediately.}}",
-      { requestCount, limit, windowSeconds, retryAfterSeconds, hasRetry: retryAfterSeconds > 0 ? 'true' : 'false' },
-      language
+      'Rate limit exceeded: {requestCount, plural, one {# request} other {# requests}} made, exceeding limit of {limit, number, integer} {limit, plural, one {request} other {requests}} per {windowSeconds, number, integer} {windowSeconds, plural, one {second} other {seconds}}. {hasRetry, select, true {Retry after {retryAfterSeconds, number, integer} {retryAfterSeconds, plural, one {second} other {seconds}}.} other {Retry immediately.}}',
+      {
+        requestCount,
+        limit,
+        windowSeconds,
+        retryAfterSeconds,
+        hasRetry: retryAfterSeconds > 0 ? 'true' : 'false',
+      },
+      language,
     );
-    return new I18nError(
-      I18nErrorCode.RATE_LIMIT_EXCEEDED,
-      message,
-      { requestCount, limit, windowSeconds, retryAfterSeconds },
-    );
+    return new I18nError(I18nErrorCode.RATE_LIMIT_EXCEEDED, message, {
+      requestCount,
+      limit,
+      windowSeconds,
+      retryAfterSeconds,
+    });
   }
 
   /**
@@ -465,14 +479,16 @@ export class I18nError extends Error {
     language = 'en-US',
   ): I18nError {
     const message = formatICUMessage(
-      "Validation error in component {componentId}: {severity, select, low {Minor issue} medium {Moderate issue} high {Serious issue} critical {Critical issue} other {Issue}} detected in nested field {fieldPath} - {errorType, select, type {Type mismatch} range {Value out of range} format {Invalid format} required {Required field missing} other {Validation error}} with {errorCount, plural, one {# occurrence} other {# occurrences}}",
+      'Validation error in component {componentId}: {severity, select, low {Minor issue} medium {Moderate issue} high {Serious issue} critical {Critical issue} other {Issue}} detected in nested field {fieldPath} - {errorType, select, type {Type mismatch} range {Value out of range} format {Invalid format} required {Required field missing} other {Validation error}} with {errorCount, plural, one {# occurrence} other {# occurrences}}',
       { componentId, fieldPath, errorCount, errorType, severity },
-      language
+      language,
     );
-    return new I18nError(
-      I18nErrorCode.NESTED_VALIDATION_ERROR,
-      message,
-      { componentId, fieldPath, errorCount, errorType, severity },
-    );
+    return new I18nError(I18nErrorCode.NESTED_VALIDATION_ERROR, message, {
+      componentId,
+      fieldPath,
+      errorCount,
+      errorType,
+      severity,
+    });
   }
 }

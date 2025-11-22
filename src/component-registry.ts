@@ -225,7 +225,11 @@ export class ComponentRegistry<TLanguages extends string> {
     // Process variables if the string key indicates it's a template
     let processedTranslation: string = translation;
     if (isTemplate(stringKey)) {
-      processedTranslation = replaceVariables(translation, variables, this.constants);
+      processedTranslation = replaceVariables(
+        translation,
+        variables,
+        this.constants,
+      );
     }
 
     return {
@@ -350,8 +354,9 @@ export class ComponentRegistry<TLanguages extends string> {
     component: ComponentDefinition<TStringKeys>,
     strings: PartialComponentLanguageStrings<TStringKeys, TLanguages>,
   ): ComponentLanguageStrings<TStringKeys, TLanguages> {
-    const result: { [L in TLanguages]: ComponentStrings<TStringKeys> } =
-      {} as any;
+    const result: Partial<{
+      [L in TLanguages]: ComponentStrings<TStringKeys>;
+    }> = {};
     const fallbackLanguage = this.validationConfig
       .fallbackLanguageId as TLanguages;
     const fallbackStrings = strings[fallbackLanguage];
@@ -360,7 +365,7 @@ export class ComponentRegistry<TLanguages extends string> {
     for (const languageId of this.registeredLanguages) {
       const existingLanguageStrings =
         strings[languageId] || ({} as PartialComponentStrings<TStringKeys>);
-      const languageStrings: { [K in TStringKeys]: string } = {} as any;
+      const languageStrings: Partial<{ [K in TStringKeys]: string }> = {};
 
       for (const stringKey of component.stringKeys) {
         if (existingLanguageStrings[stringKey]) {
@@ -374,10 +379,10 @@ export class ComponentRegistry<TLanguages extends string> {
         }
       }
 
-      result[languageId] = languageStrings;
+      result[languageId] = languageStrings as ComponentStrings<TStringKeys>;
     }
 
-    return result;
+    return result as ComponentLanguageStrings<TStringKeys, TLanguages>;
   }
 
   /**

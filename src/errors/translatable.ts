@@ -1,10 +1,9 @@
 import { I18nEngine } from '../core/i18n-engine';
-import { PluralCategory } from '../pluralization/plural-categories';
 import { GenderCategory } from '../gender/gender-categories';
 
 /**
  * Translatable error class with full i18n 3.0/3.5 feature support.
- * 
+ *
  * **Supported Features:**
  * - ICU MessageFormat (variables, plural, select, selectordinal)
  * - Pluralization (37 languages, CLDR rules)
@@ -13,27 +12,29 @@ import { GenderCategory } from '../gender/gender-categories';
  * - Date/Time formatting
  * - Nested messages (4 levels deep)
  * - Context variables
- * 
+ *
  * **Translation String Examples:**
  * ```typescript
  * // ICU plural
  * "{count, plural, one {# error occurred} other {# errors occurred}}"
- * 
+ *
  * // ICU select + gender
  * "{gender, select, male {He encountered} female {She encountered}} an error"
- * 
+ *
  * // Number formatting
  * "Threshold {limit, number, integer} exceeded by {value, number, percent}"
- * 
+ *
  * // SelectOrdinal
  * "Failed at {step, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} step"
- * 
+ *
  * // Nested messages
  * "{severity, select, low {Minor: {count, plural, one {# issue} other {# issues}}} high {Critical error}}"
  * ```
  */
-export class TranslatableError<TStringKey extends string = string> extends Error {
-  public readonly componentId: string;
+export class TranslatableError<
+  TStringKey extends string = string,
+> extends Error {
+  public override readonly componentId: string;
   public readonly stringKey: TStringKey;
   public readonly variables?: Record<string, string | number>;
   public readonly language?: string;

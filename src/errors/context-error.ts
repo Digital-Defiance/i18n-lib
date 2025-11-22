@@ -6,32 +6,32 @@ import { EnhancedErrorHelper } from './enhanced-error-base';
 /**
  * Error class for context-related failures in the i18n system.
  * Thrown when attempting to access or manipulate an invalid or non-existent context.
- * 
+ *
  * **i18n Feature Support:**
  * - ICU MessageFormat variable substitution
  * - Nested message paths detection
  * - Number formatting for context depths/positions
  * - SelectOrdinal for context priority levels
- * 
+ *
  * **Translation String Examples:**
  * ```typescript
  * // ICU plural
  * "Context has {count, plural, one {# issue} other {# issues}}"
- * 
+ *
  * // ICU select + nested
  * "{severity, select, low {Minor context issue} high {Critical context error}}"
- * 
+ *
  * // Number formatting
  * "Context exceeded {limit, number, integer} maximum depth"
  * ```
  */
 export class ContextError extends Error {
   /** The type of context error */
-  public readonly type: ContextErrorType;
+  public override readonly type: ContextErrorType;
   /** The context key that caused the error, if applicable */
   public readonly contextKey?: string;
   /** Additional context metadata */
-  public readonly metadata?: Record<string, any>;
+  public override readonly metadata?: Record<string, any>;
 
   /**
    * Creates a new ContextError instance.
@@ -49,8 +49,18 @@ export class ContextError extends Error {
     const engine = getCoreI18nEngine();
     const allVars = { ...variables, contextKey: contextKey || '' };
     const message = contextKey
-      ? engine.safeTranslate(CoreI18nComponentId, CoreStringKey.Error_InvalidContextTemplate, allVars, language)
-      : engine.safeTranslate(CoreI18nComponentId, CoreStringKey.Error_InvalidContext, allVars, language);
+      ? engine.safeTranslate(
+          CoreI18nComponentId,
+          CoreStringKey.Error_InvalidContextTemplate,
+          allVars,
+          language,
+        )
+      : engine.safeTranslate(
+          CoreI18nComponentId,
+          CoreStringKey.Error_InvalidContext,
+          allVars,
+          language,
+        );
     super(message);
     this.name = 'ContextError';
     this.type = type;
@@ -89,11 +99,6 @@ export class ContextError extends Error {
     count: number,
     language = 'en-US',
   ): ContextError {
-    return new ContextError(
-      type,
-      contextKey,
-      { count },
-      language,
-    );
+    return new ContextError(type, contextKey, { count }, language);
   }
 }

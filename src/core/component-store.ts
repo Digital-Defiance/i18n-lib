@@ -4,9 +4,9 @@
 
 import { I18nError } from '../errors';
 import { ComponentConfig, ValidationResult } from '../interfaces';
-import { replaceVariables } from '../utils';
-import { PluralString, isPluralString, resolvePluralString } from '../types/plural-types';
 import { getPluralCategory } from '../pluralization/language-plural-map';
+import { PluralString, resolvePluralString } from '../types/plural-types';
+import { replaceVariables } from '../utils';
 
 /**
  * Class representing a storage for component configurations and translations.
@@ -55,7 +55,10 @@ export class ComponentStore {
    * @returns ValidationResult indicating the result of the update.
    * @throws {I18nError} If the component is not found.
    */
-  update(componentId: string, strings: Record<string, Record<string, string>>): ValidationResult {
+  update(
+    componentId: string,
+    strings: Record<string, Record<string, string>>,
+  ): ValidationResult {
     const existing = this.components.get(componentId);
     if (!existing) {
       throw I18nError.componentNotFound(componentId);
@@ -132,7 +135,7 @@ export class ComponentStore {
 
     // Resolve plural form if needed
     const translation = this.resolvePluralForm(value, variables?.count, lang);
-    
+
     return replaceVariables(translation, variables, this.constants);
   }
 
@@ -146,7 +149,7 @@ export class ComponentStore {
   private resolvePluralForm(
     value: string | PluralString,
     count: number | undefined,
-    language: string
+    language: string,
   ): string {
     // If it's a simple string, return as-is
     if (typeof value === 'string') {
@@ -159,8 +162,8 @@ export class ComponentStore {
     }
 
     // Get the appropriate plural category for this count and language
-    const category = getPluralCategory(language, count) as any;
-    
+    const category = getPluralCategory(language, count);
+
     // Resolve the plural form with fallback logic
     return resolvePluralString(value, category) || '';
   }
@@ -206,7 +209,9 @@ export class ComponentStore {
     for (const [lang, langStrings] of Object.entries(config.strings)) {
       for (const key of allKeys) {
         if (!langStrings[key]) {
-          warnings.push(`Missing key '${key}' for language '${lang}' in component '${config.id}'`);
+          warnings.push(
+            `Missing key '${key}' for language '${lang}' in component '${config.id}'`,
+          );
         }
       }
     }
