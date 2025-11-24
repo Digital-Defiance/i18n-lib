@@ -1,7 +1,10 @@
 import { ContextErrorType } from '../context-error-type';
-import { CoreI18nComponentId, getCoreI18nEngine } from '../core-i18n';
+import { CoreI18nComponentId } from '../core-component-id';
 import { CoreStringKey } from '../core-string-key';
 import { EnhancedErrorHelper } from './enhanced-error-base';
+
+// Lazy reference to I18nEngine to avoid circular dependencies
+let engineGetter: (() => any) | undefined;
 
 /**
  * Error class for context-related failures in the i18n system.
@@ -46,21 +49,36 @@ export class ContextError extends Error {
     variables?: Record<string, string | number>,
     language?: string,
   ) {
-    const engine = getCoreI18nEngine();
-    const allVars = { ...variables, contextKey: contextKey || '' };
-    const message = contextKey
-      ? engine.safeTranslate(
-          CoreI18nComponentId,
-          CoreStringKey.Error_InvalidContextTemplate,
-          allVars,
-          language,
-        )
-      : engine.safeTranslate(
-          CoreI18nComponentId,
-          CoreStringKey.Error_InvalidContext,
-          allVars,
-          language,
-        );
+    // Lazy initialization: get engine instance at runtime to avoid circular dependencies
+    let message: string;
+    try {
+      // Lazy load I18nEngine to break circular dependency
+      if (!engineGetter) {
+        // Dynamically import at runtime
+        const coreModule = eval('require')('../core');
+        engineGetter = () => coreModule.I18nEngine.getInstance('default');
+      }
+      const engine = engineGetter();
+      const allVars = { ...variables, contextKey: contextKey || '' };
+      message = contextKey
+        ? engine.safeTranslate(
+            CoreI18nComponentId,
+            CoreStringKey.Error_InvalidContextTemplate,
+            allVars,
+            language,
+          )
+        : engine.safeTranslate(
+            CoreI18nComponentId,
+            CoreStringKey.Error_InvalidContext,
+            allVars,
+            language,
+          );
+    } catch {
+      // Fallback if engine not available
+      message = contextKey
+        ? `Invalid context: ${contextKey}`
+        : 'Invalid context';
+    }
     super(message);
     this.name = 'ContextError';
     this.type = type;

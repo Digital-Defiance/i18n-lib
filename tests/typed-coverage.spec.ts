@@ -1,6 +1,7 @@
 import { CoreI18nComponentId, CoreStringKey } from '../src';
 import { I18nEngine } from '../src/core';
 import {
+  AbstractTypedError,
   BaseTypedError,
   CompleteReasonMap,
   ComponentTypedError,

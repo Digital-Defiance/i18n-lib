@@ -2,7 +2,7 @@
  * Component storage (no generics)
  */
 
-import { I18nError } from '../errors';
+import { I18nError } from '../errors/i18n-error';
 import { ComponentConfig, ValidationResult } from '../interfaces';
 import { getPluralCategory } from '../pluralization/language-plural-map';
 import { PluralString, resolvePluralString } from '../types/plural-types';

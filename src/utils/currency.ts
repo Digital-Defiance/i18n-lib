@@ -3,8 +3,6 @@
  */
 
 import { codes, data } from 'currency-codes';
-import { TranslatableError } from '../errors/translatable';
-import { CoreStringKey } from '../core-string-key';
 
 /**
  * Position of the currency symbol relative to the amount.
@@ -50,15 +48,11 @@ export class CurrencyCode {
   /**
    * Creates a new CurrencyCode instance.
    * @param value - The ISO 4217 currency code (defaults to 'USD')
-   * @throws {TranslatableError} If the currency code is invalid
+   * @throws {Error} If the currency code is invalid
    */
   constructor(value: string = 'USD') {
     if (!CurrencyCode.isValid(value)) {
-      throw new TranslatableError<CoreStringKey>(
-        'core',
-        CoreStringKey.Error_InvalidCurrencyCodeTemplate,
-        { value },
-      );
+      throw new Error(`Invalid currency code: ${value}`);
     }
     this._value = value;
   }
@@ -111,7 +105,10 @@ export class CurrencyCode {
  * @param currencyCode - The ISO 4217 currency code
  * @returns Currency format configuration including symbol, position, and separators
  */
-export function getCurrencyFormat(locale: string, currencyCode: string): CurrencyFormat {
+export function getCurrencyFormat(
+  locale: string,
+  currencyCode: string,
+): CurrencyFormat {
   const formatter = new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currencyCode,
@@ -138,6 +135,7 @@ export function getCurrencyFormat(locale: string, currencyCode: string): Currenc
     symbol,
     position,
     groupSeparator: parts.find((part) => part.type === 'group')?.value || ',',
-    decimalSeparator: parts.find((part) => part.type === 'decimal')?.value || '.',
+    decimalSeparator:
+      parts.find((part) => part.type === 'decimal')?.value || '.',
   };
 }

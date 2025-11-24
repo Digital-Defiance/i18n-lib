@@ -37,6 +37,15 @@
           "packages/digitaldefiance-i18n-lib/tests/**/*.ts"
         ]
       }
+    },
+    "check-circular-deps": {
+      "executor": "@nx/jest:jest",
+      "outputs": [],
+      "options": {
+        "jestConfig": "packages/digitaldefiance-i18n-lib/jest.config.js",
+        "testPathPattern": "circular-dependencies.spec.ts",
+        "runInBand": true
+      }
     }
   }
 }

@@ -2,13 +2,13 @@
  * Fluent builder for I18n Engine
  */
 
-import { EngineConfig, LanguageDefinition } from '../interfaces';
 import { I18nEngine } from '../core/i18n-engine';
+import { EngineConfig, LanguageDefinition } from '../interfaces';
 
 export class I18nBuilder {
   private languages: LanguageDefinition[] = [];
   private config: EngineConfig = {};
-  private instanceKey?: string;
+  private instanceKey = 'default';
   private registerInstance = true;
   private setAsDefault = true;
 

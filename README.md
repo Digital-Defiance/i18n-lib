@@ -853,6 +853,85 @@ const error = new TypedError('Error message', {
 
 None - This release maintains full backward compatibility while improving internal type safety.
 
+### Version 3.8.0
+
+**Internal Refactoring Release** - Circular Dependency Elimination
+
+This release eliminates all circular dependencies from the codebase through internal architectural improvements. All changes are non-breaking and maintain full backward compatibility.
+
+**Internal Improvements:**
+
+- **Zero Circular Dependencies**: Eliminated all 15 circular dependencies that existed in the codebase
+  - Broke core/i18n-engine ↔ core-i18n cycle
+  - Broke errors/translatable → core/i18n-engine → errors/index cycle
+  - Broke core-i18n ↔ plugin-i18n-engine cycle
+  - Broke context-related cycles
+  - Broke registry-error cycles
+  - Optimized barrel exports with type-only exports
+
+- **Lazy Initialization Pattern**: Error classes and core modules now use lazy initialization to avoid circular dependencies
+  - `TranslatableError` uses `getInstance()` at construction time instead of module load
+  - `TypedError` and related classes use lazy engine lookup
+  - Registry errors use lazy initialization for core dependencies
+  - Fallback behavior if engine not initialized
+
+- **Factory Pattern**: Introduced `core-plugin-factory.ts` to break plugin engine cycles
+  - `createCorePluginI18nEngine()` moved to factory file
+  - Factory imports both core-i18n and plugin-i18n-engine
+  - Breaks circular dependency between these modules
+
+- **Type-Only Exports**: Optimized barrel exports to eliminate runtime dependencies
+  - `src/interfaces/index.ts` uses `export type` for all type exports
+  - `src/errors/index.ts` split into base.ts and translatable-exports.ts
+  - `src/core/index.ts` uses type-only exports where appropriate
+
+- **Module Organization**: Established clear dependency hierarchy
+  - Interfaces & Types (no implementation dependencies)
+  - Error Classes (lazy initialization for i18n)
+  - Core Modules (clear hierarchy, no cycles)
+  - High-Level Modules (core-i18n, plugin-i18n-engine)
+
+**Testing & Quality:**
+
+- **Automated Circular Dependency Detection**: Added test that fails if circular dependencies are introduced
+- **Module Independence Tests**: Verify modules can be imported independently
+- **All Tests Passing**: 1,779 tests passing with no regressions
+- **Zero Breaking Changes**: Public API remains completely unchanged
+
+**Documentation:**
+
+- **[CIRCULAR_DEPENDENCY_FIXES.md](docs/CIRCULAR_DEPENDENCY_FIXES.md)** - Comprehensive internal documentation
+  - Detailed explanation of all patterns used
+  - Best practices for maintaining zero circular dependencies
+  - Examples of lazy initialization, factory pattern, and type-only exports
+  - Guidelines for adding new modules without creating cycles
+
+**Files Modified:**
+
+- `src/core-plugin-factory.ts` - New factory file for plugin engine creation
+- `src/core-i18n.ts` - Lazy initialization with Proxy pattern
+- `src/errors/*.ts` - Lazy initialization in error constructors
+- `src/errors/index.ts` - Split into separate barrel files
+- `src/interfaces/index.ts` - Type-only exports
+- `src/core/index.ts` - Optimized barrel exports
+- `src/registry-error.ts` - Lazy initialization for core dependencies
+- `tests/circular-dependencies.spec.ts` - Automated detection test
+
+**Breaking Changes:**
+
+None - This release is fully backward compatible. All changes are internal refactoring only.
+
+**Migration:**
+
+No migration required! Your existing code works unchanged. The improvements are entirely internal.
+
+**Benefits:**
+
+- **Improved Maintainability**: Clearer module structure and dependencies
+- **Better Tree-Shaking**: Reduced runtime dependencies improve bundle optimization
+- **Predictable Initialization**: No more initialization order issues
+- **Future-Proof**: Established patterns prevent circular dependencies from being reintroduced
+
 ### Version 3.7.2
 
 - Minor version bump to fix an export

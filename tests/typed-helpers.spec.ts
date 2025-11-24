@@ -2,30 +2,32 @@
  * Comprehensive tests for typed.ts helper functions and classes
  */
 
+import { CoreI18nComponentId, CoreStringKey } from '../src';
+import { I18nEngine } from '../src/core/i18n-engine';
 import {
   BaseTypedError,
-  PluginTypedError,
-  ComponentTypedError,
+  CompleteReasonMap,
   CoreTypedError,
-  createPluginTypedError,
   createComponentTypedError,
   createCoreTypedError,
   createTranslatedError,
-  CompleteReasonMap,
+  PluginTypedError,
   TranslationEngine,
 } from '../src/errors/typed';
-import { I18nEngine } from '../src/core/i18n-engine';
-import { CoreI18nComponentId, CoreStringKey } from '../src';
 
 describe('Typed Error Helpers', () => {
   let engine: I18nEngine;
 
   beforeEach(() => {
     I18nEngine.resetAll();
-    engine = new I18nEngine([
-      { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
-      { id: 'fr', name: 'French', code: 'fr' },
-    ]);
+    engine = new I18nEngine(
+      [
+        { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        { id: 'fr', name: 'French', code: 'fr' },
+      ],
+      {},
+      { instanceKey: 'default' },
+    );
 
     engine.register({
       id: CoreI18nComponentId,
@@ -69,7 +71,11 @@ describe('Typed Error Helpers', () => {
     }
 
     class TestBaseError extends BaseTypedError<typeof TestType> {
-      constructor(type: TestType, message: string, metadata?: Record<string, any>) {
+      constructor(
+        type: TestType,
+        message: string,
+        metadata?: Record<string, any>,
+      ) {
         super(type, message, metadata);
       }
     }
@@ -83,7 +89,11 @@ describe('Typed Error Helpers', () => {
 
     it('should create error with metadata', () => {
       const metadata = { userId: 123, action: 'login' };
-      const error = new TestBaseError(TestType.Complex, 'Complex error', metadata);
+      const error = new TestBaseError(
+        TestType.Complex,
+        'Complex error',
+        metadata,
+      );
       expect(error.metadata).toEqual(metadata);
     });
 
@@ -155,7 +165,10 @@ describe('Typed Error Helpers', () => {
       [TestErrorType.Template]: 'templateError',
     };
 
-    class TestPluginError extends PluginTypedError<typeof TestErrorType, string> {
+    class TestPluginError extends PluginTypedError<
+      typeof TestErrorType,
+      string
+    > {
       constructor(
         type: TestErrorType,
         language?: string,
@@ -186,7 +199,7 @@ describe('Typed Error Helpers', () => {
 
     it('should throw when key not found in reason map', () => {
       const badReasonMap: any = {};
-      
+
       expect(() => {
         new (class extends PluginTypedError<typeof TestErrorType, string> {
           constructor() {
@@ -233,7 +246,7 @@ describe('Typed Error Helpers', () => {
 
     it('should throw when key not found in reason map', () => {
       const badReasonMap: any = {};
-      
+
       expect(() => {
         new (class extends CoreTypedError<typeof CoreErrorType> {
           constructor() {
@@ -332,7 +345,12 @@ describe('Typed Error Helpers', () => {
     });
 
     it('should create core error in different language', () => {
-      const error = createCoreTypedError(CoreErrorType.Network, reasonMap, {}, 'fr');
+      const error = createCoreTypedError(
+        CoreErrorType.Network,
+        reasonMap,
+        {},
+        'fr',
+      );
       expect(error.message).toBe('Erreur réseau');
     });
 

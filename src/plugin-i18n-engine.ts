@@ -2,23 +2,23 @@
  * Plugin-based internationalization engine with component and language registration
  */
 
-import { IActiveContext } from './active-context';
 import { ComponentDefinition } from './component-definition';
 import { ComponentRegistration } from './component-registration';
 import { ComponentRegistry } from './component-registry';
-import { CoreI18nComponentId } from './core-i18n';
-import { CurrencyCode } from './utils/currency';
+import { CoreI18nComponentId } from './core-component-id';
+import { LanguageRegistry } from './core/language-registry';
 import { EnumTranslationRegistry } from './enum-registry';
 import { GlobalActiveContext } from './global-active-context';
+import type { IActiveContext } from './interfaces/active-context.interface';
 import { LanguageDefinition } from './language-definition';
-import { LanguageRegistry } from './core/language-registry';
 import { RegistryConfig } from './registry-config';
 import { RegistryError } from './registry-error';
 import { RegistryErrorType } from './registry-error-type';
-import { Timezone } from './utils/timezone';
 import { TranslationRequest } from './translation-request';
 import { TranslationResponse } from './translation-response';
 import { EnumLanguageTranslation } from './types';
+import { CurrencyCode } from './utils/currency';
+import { Timezone } from './utils/timezone';
 
 /**
  * Plugin-based I18n Engine with registration capabilities
@@ -148,9 +148,15 @@ export class PluginI18nEngine<TLanguages extends string> {
       // Step 2: Get context variables (timezone, currency, language)
       const context = this.getContext();
       const contextVars: Record<string, string | number> = {
-        timezone: context.currentContext === 'admin' ? context.adminTimezone.value : context.timezone.value,
+        timezone:
+          context.currentContext === 'admin'
+            ? context.adminTimezone.value
+            : context.timezone.value,
         currencyCode: context.currencyCode.value,
-        language: context.currentContext === 'admin' ? context.adminLanguage : context.language,
+        language:
+          context.currentContext === 'admin'
+            ? context.adminLanguage
+            : context.language,
         userTimezone: context.timezone.value,
         adminTimezone: context.adminTimezone.value,
         userLanguage: context.language,

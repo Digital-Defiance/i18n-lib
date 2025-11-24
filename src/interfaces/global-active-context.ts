@@ -1,7 +1,7 @@
-import { IActiveContext } from '../active-context';
-import { CurrencyCode } from '../utils/currency';
-import { Timezone } from '../utils/timezone';
-import { LanguageContextSpace } from '../types';
+import type { LanguageContextSpace } from '../types';
+import type { CurrencyCode } from '../utils/currency';
+import type { Timezone } from '../utils/timezone';
+import type { IActiveContext } from './active-context.interface';
 
 export interface IGlobalActiveContext<
   TLanguage extends string,

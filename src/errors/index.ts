@@ -1,14 +1,15 @@
 /**
  * Error exports
+ *
+ * This barrel export is split into separate files to avoid circular dependencies:
+ * - base.ts: Base error classes without core dependencies
+ * - translatable-exports.ts: Errors that use lazy initialization with core modules
+ *
+ * Import from specific files when possible to minimize module loading.
  */
 
-export * from './context-error';
-export * from './enhanced-error-base';
-export * from './handleable';
-export * from './i18n-error';
-export * from './simple-typed-error';
-export * from './translatable';
-export * from './translatable-generic';
-export * from './translatable-handleable-generic';
-export * from './typed';
-export * from './typed-handleable';
+// Re-export from base (no core dependencies)
+export * from './base';
+
+// Re-export from translatable (uses lazy initialization)
+export * from './translatable-exports';

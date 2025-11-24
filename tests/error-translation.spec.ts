@@ -9,7 +9,7 @@ import { I18nEngine } from '../src/core/i18n-engine';
 import { I18nError, I18nErrorCode } from '../src/errors/i18n-error';
 import { TranslatableError } from '../src/errors/translatable';
 import { TranslatableGenericError } from '../src/errors/translatable-generic';
-import { CompleteReasonMap } from '../src/errors/typed';
+import { AbstractTypedError, CompleteReasonMap } from '../src/errors/typed';
 import { TypedHandleableError } from '../src/errors/typed-handleable';
 import { HandleableErrorOptions } from '../src/interfaces/handleable-error-options';
 

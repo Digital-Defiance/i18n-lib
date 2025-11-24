@@ -1,8 +1,11 @@
-import { I18nEngine } from '../core';
+import { I18nEngine } from '../core/i18n-engine';
 import { GenderCategory } from '../gender/gender-categories';
 
 /**
  * Generic translatable error that works with any plugin engine and component.
+ *
+ * Uses lazy initialization to avoid circular dependencies with core modules.
+ * The I18nEngine is only accessed when the error is constructed, not at module load time.
  *
  * **Full i18n 3.0/3.5 Feature Support:**
  * - ICU MessageFormat (all formatters: plural, select, selectordinal)
@@ -58,8 +61,8 @@ export class TranslatableGenericError<
     metadata?: Record<string, any>,
     instanceKey?: string,
   ) {
+    // Lazy initialization: getInstance() is only called when error is constructed
     let translatedMessage: string;
-
     try {
       const engine = I18nEngine.getInstance(instanceKey);
       translatedMessage = engine.safeTranslate(
@@ -69,7 +72,7 @@ export class TranslatableGenericError<
         language,
       );
     } catch (error) {
-      // If engine not found or translation fails, use fallback format
+      // Fallback if engine not found - TranslatableGenericError is designed to be flexible
       translatedMessage = `[${componentId}.${stringKey}]`;
     }
 
@@ -126,6 +129,7 @@ export class TranslatableGenericError<
         language,
       );
     } catch (error) {
+      // Fallback if engine not found
       return `[${this.componentId}.${this.stringKey}]`;
     }
   }

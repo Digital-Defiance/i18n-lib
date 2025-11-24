@@ -2,6 +2,7 @@ import { CoreI18nComponentId, LanguageCodes } from '../src';
 import { CoreStringKey } from '../src/core-string-key';
 import { I18nEngine } from '../src/core/i18n-engine';
 import {
+  AbstractTypedError,
   BaseTypedError,
   CompleteReasonMap,
   TranslationEngine,
@@ -40,15 +41,19 @@ describe('TypedError', () => {
   beforeEach(() => {
     // Clear singleton instances before each test
     I18nEngine.resetAll();
-    const engine = new I18nEngine([
-      {
-        id: LanguageCodes.EN_US,
-        name: 'English (US)',
-        code: 'en-US',
-        isDefault: true,
-      },
-      { id: LanguageCodes.FR, name: 'Français', code: 'fr' },
-    ]);
+    const engine = new I18nEngine(
+      [
+        {
+          id: LanguageCodes.EN_US,
+          name: 'English (US)',
+          code: 'en-US',
+          isDefault: true,
+        },
+        { id: LanguageCodes.FR, name: 'Français', code: 'fr' },
+      ],
+      {},
+      { instanceKey: 'default' },
+    );
     engine.register({
       id: CoreI18nComponentId,
       strings: {

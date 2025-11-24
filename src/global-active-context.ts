@@ -1,7 +1,7 @@
-import { IActiveContext } from './active-context';
 import { ContextErrorType } from './context-error-type';
 import { ContextError } from './errors/context-error';
-import { IGlobalActiveContext } from './interfaces/global-active-context';
+import type { IActiveContext } from './interfaces/active-context.interface';
+import type { IGlobalActiveContext } from './interfaces/global-active-context';
 import {
   DefaultCurrencyCode,
   DefaultTimezone,

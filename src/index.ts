@@ -2,24 +2,31 @@
 export * from './builders';
 export * from './core';
 export * from './errors';
-export * from './interfaces';
-export * from './utils';
-export * from './types';
-export * from './pluralization';
 export * from './gender';
+export * from './interfaces';
+export * from './pluralization';
+export * from './types';
+export * from './utils';
 export * from './validation';
 
 // Explicit exports for type safety
-export { Timezone, isValidTimezone } from './utils/timezone';
-export { CurrencyCode, getCurrencyFormat } from './utils/currency';
-export type { CurrencyData, CurrencyFormat, CurrencyPosition } from './utils/currency';
-export { createPluralString, createGenderedString } from './utils/plural-helpers';
-export type { PluralString } from './types/plural-types';
 export type { GenderedString } from './gender/gender-categories';
+export type { PluralString } from './types/plural-types';
+export { CurrencyCode, getCurrencyFormat } from './utils/currency';
+export type {
+  CurrencyData,
+  CurrencyFormat,
+  CurrencyPosition,
+} from './utils/currency';
+export {
+  createGenderedString,
+  createPluralString,
+} from './utils/plural-helpers';
+export { isValidTimezone, Timezone } from './utils/timezone';
 
 // Convenience aliases
-export { I18nEngine as I18n } from './core/i18n-engine';
 export { I18nBuilder as Builder } from './builders/i18n-builder';
+export { I18nEngine as I18n } from './core/i18n-engine';
 
 // Reset utility
 import { I18nEngine } from './core/i18n-engine';
@@ -54,8 +61,14 @@ export * from './types';
 export * from './validation-config';
 
 // Legacy convenience exports
-export { createCorePluginI18nEngine as createCoreI18n, createCorePluginI18nEngine as createCoreI18nEngine } from './core-i18n';
-export { getCorePluginTranslation as getCoreTranslation, safeCorePluginTranslation as safeCoreTranslation } from './core-i18n';
+export {
+  createCorePluginI18nEngine as createCoreI18n,
+  createCorePluginI18nEngine as createCoreI18nEngine,
+  getCorePluginTranslation as getCoreTranslation,
+  safeCorePluginTranslation as safeCoreTranslation,
+} from './core-plugin-factory';
+// Export core plugin factory functions
+export * from './core-plugin-factory';
 export { PluginI18nEngine as PluginI18n } from './plugin-i18n-engine';
 
 // Legacy testing utilities

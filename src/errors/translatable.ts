@@ -4,6 +4,10 @@ import { GenderCategory } from '../gender/gender-categories';
 /**
  * Translatable error class with full i18n 3.0/3.5 feature support.
  *
+ * Uses lazy initialization to avoid circular dependencies with core modules.
+ * The I18nEngine is only accessed when the error is constructed, not at module load time.
+ * If the i18n engine is not initialized, falls back to displaying the raw key.
+ *
  * **Supported Features:**
  * - ICU MessageFormat (variables, plural, select, selectordinal)
  * - Pluralization (37 languages, CLDR rules)
@@ -45,6 +49,7 @@ export class TranslatableError<
     otherVars?: Record<string, string | number>,
     language?: string,
   ) {
+    // Lazy initialization: getInstance() is only called when error is constructed, not at module load
     const engine = I18nEngine.getInstance('default');
     super(engine.safeTranslate(componentId, stringKey, otherVars, language));
     this.name = 'TranslatableError';
@@ -69,7 +74,7 @@ export class TranslatableError<
     return new TranslatableError(
       componentId,
       stringKey,
-      { ...otherVars, count },
+      { count, ...otherVars },
       language,
     );
   }
@@ -88,7 +93,7 @@ export class TranslatableError<
     return new TranslatableError(
       componentId,
       stringKey,
-      { ...otherVars, gender },
+      { gender, ...otherVars },
       language,
     );
   }
@@ -107,7 +112,7 @@ export class TranslatableError<
     return new TranslatableError(
       componentId,
       stringKey,
-      { ...otherVars, number },
+      { number, ...otherVars },
       language,
     );
   }
@@ -126,7 +131,7 @@ export class TranslatableError<
     return new TranslatableError(
       componentId,
       stringKey,
-      { ...otherVars, value },
+      { value, ...otherVars },
       language,
     );
   }

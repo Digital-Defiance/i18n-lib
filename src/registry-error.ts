@@ -1,8 +1,19 @@
 // CoreLanguageCode is deprecated - using string
-import { CoreI18nComponentId } from './core-i18n';
+import { CoreI18nComponentId } from './core-component-id';
 import { CoreStringKey } from './core-string-key';
-import { TranslationEngine, createTranslatedError } from './errors/typed';
 import { RegistryErrorType } from './registry-error-type';
+
+/**
+ * Minimal translation engine interface to avoid circular dependencies
+ */
+export interface RegistryTranslationEngine {
+  safeTranslate(
+    componentId: string,
+    key: string,
+    variables?: Record<string, string | number>,
+    language?: string,
+  ): string;
+}
 
 /**
  * Reason map for registry errors
@@ -39,27 +50,41 @@ export class RegistryError extends Error {
 
   /**
    * Create a registry error with translation support
+   * Uses lazy initialization to avoid circular dependencies
    */
   static createWithEngine(
-    engine: TranslationEngine,
+    engine: RegistryTranslationEngine,
     type: RegistryErrorType,
     variables?: Record<string, string | number>,
     language?: string,
     metadata?: Record<string, any>,
   ): RegistryError {
-    const error = createTranslatedError(
-      engine,
-      CoreI18nComponentId,
-      type,
-      REGISTRY_ERROR_REASON_MAP,
-      variables,
-      language,
-      metadata,
-      'RegistryError',
-    );
+    const key = REGISTRY_ERROR_REASON_MAP[type];
+    let message: string;
 
-    // Convert to RegistryError instance
-    return new RegistryError(type, error.message, metadata);
+    if (key && engine) {
+      try {
+        // Try to translate the error message using the engine
+        message = engine.safeTranslate(
+          CoreI18nComponentId,
+          key,
+          variables,
+          language,
+        );
+      } catch (translationError) {
+        // Fallback if translation fails
+        message = `Error: ${type}${
+          metadata ? ` - ${JSON.stringify(metadata)}` : ''
+        }`;
+      }
+    } else {
+      // Fallback to a basic English message
+      message = `Error: ${type}${
+        metadata ? ` - ${JSON.stringify(metadata)}` : ''
+      }`;
+    }
+
+    return new RegistryError(type, message, metadata);
   }
 
   /**

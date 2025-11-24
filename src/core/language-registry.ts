@@ -2,7 +2,7 @@
  * Static language registry (no generics)
  */
 
-import { I18nError } from '../errors';
+import { I18nError } from '../errors/i18n-error';
 import { LanguageDefinition } from '../interfaces';
 
 /**
@@ -86,7 +86,10 @@ export class LanguageRegistry {
    * @returns An array of objects with code and label properties.
    */
   static getCodeLabelMap(): { code: string; label: string }[] {
-    return Array.from(this.languages.values()).map((l) => ({ code: l.code, label: l.name }));
+    return Array.from(this.languages.values()).map((l) => ({
+      code: l.code,
+      label: l.name,
+    }));
   }
 
   /**
@@ -122,7 +125,7 @@ export class LanguageRegistry {
   ): string {
     const trimmedRequested = requestedCode?.trim();
     const trimmedUserDefault = userDefaultCode?.trim();
-    
+
     if (trimmedRequested && this.getByCode(trimmedRequested)) {
       return trimmedRequested;
     }
@@ -168,7 +171,7 @@ export class LanguageRegistry {
    * @param languages - An array of language definitions to register.
    */
   static registerLanguages(languages: readonly LanguageDefinition[]): void {
-    languages.forEach(lang => this.register(lang));
+    languages.forEach((lang) => this.register(lang));
   }
 
   /**
@@ -310,7 +313,9 @@ export class LanguageRegistry {
    * @param partialName - The partial name to search for.
    * @returns An array of matching language definitions.
    */
-  static findLanguagesByName(partialName: string): readonly LanguageDefinition[] {
+  static findLanguagesByName(
+    partialName: string,
+  ): readonly LanguageDefinition[] {
     const searchTerm = partialName.toLowerCase();
     return Array.from(this.languages.values()).filter((language) =>
       language.name.toLowerCase().includes(searchTerm),

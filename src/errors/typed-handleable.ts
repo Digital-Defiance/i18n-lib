@@ -1,10 +1,9 @@
-import { CoreI18nComponentId } from '../core-i18n';
+import { CoreI18nComponentId } from '../core-component-id';
 import { CoreStringKey } from '../core-string-key';
+import { I18nEngine } from '../core/i18n-engine';
 import { IHandleable } from '../interfaces/handleable';
 import { HandleableErrorOptions } from '../interfaces/handleable-error-options';
 import { HandleableError } from './handleable';
-
-import { I18nEngine } from '../core';
 import { CompleteReasonMap } from './typed';
 
 /**
@@ -78,21 +77,23 @@ export class TypedHandleableError<
     otherVars?: Record<string, string | number>,
   ) {
     const key = reasonMap[type];
-    if (!key) {
-      const coreEngine = I18nEngine.getInstance();
-      throw new Error(
-        coreEngine.translate(
-          CoreI18nComponentId,
-          CoreStringKey.Error_MissingTranslationKeyTemplate,
-          {
-            stringKey: key as string,
-          },
-        ),
-      );
-    }
 
+    // Lazy initialization: getInstance() is only called when error is constructed
     let message: string = String(type);
     try {
+      if (!key) {
+        const coreEngine = I18nEngine.getInstance();
+        throw new Error(
+          coreEngine.translate(
+            CoreI18nComponentId,
+            CoreStringKey.Error_MissingTranslationKeyTemplate,
+            {
+              stringKey: key as string,
+            },
+          ),
+        );
+      }
+
       const keyString = key as TStringKey;
       const engine = I18nEngine.getInstance('default');
       const translated = engine.translate(
@@ -103,7 +104,8 @@ export class TypedHandleableError<
       );
       message = String(translated || type);
     } catch (error) {
-      message = String(type);
+      // Fallback if engine not available
+      message = key ? `[${componentId}.${key}]` : String(type);
     }
 
     // Create a new error with the translated message

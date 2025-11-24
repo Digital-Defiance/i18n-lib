@@ -1,5 +1,4 @@
 import { ComponentDefinition } from './component-definition';
-import { ComponentRegistration } from './component-registration';
 import { LanguageDefinition } from './language-definition';
 
 /**
@@ -121,14 +120,6 @@ export type ExtractStringKeys<T> = T extends ComponentDefinition<infer K>
 export type ExtractLanguages<T> = T extends LanguageDefinition
   ? T['id']
   : never;
-
-/**
- * Type utility to create a strongly typed component registration
- */
-export type CreateComponentRegistration<
-  TComponent extends ComponentDefinition<any>,
-  TLanguages extends string,
-> = ComponentRegistration<ExtractStringKeys<TComponent>, TLanguages>;
 
 /**
  * Utility type to ensure all string keys are provided for all languages

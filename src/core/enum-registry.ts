@@ -2,7 +2,7 @@
  * Enum translation registry (v2 - no generics)
  */
 
-import { I18nError } from '../errors';
+import { I18nError } from '../errors/i18n-error';
 
 /**
  * Registry for managing translations of enum values across multiple languages.

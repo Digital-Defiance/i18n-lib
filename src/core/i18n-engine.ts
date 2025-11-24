@@ -2,8 +2,8 @@
  * Main I18n Engine (no generics)
  */
 
-import { CoreI18nComponentId } from '../core-i18n';
-import { I18nError } from '../errors';
+import { CoreI18nComponentId } from '../core-component-id';
+import { I18nError } from '../errors/i18n-error';
 import {
   ComponentConfig,
   EngineConfig,

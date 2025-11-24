@@ -1,8 +1,8 @@
 // New plugin architecture imports
 // CoreLanguageCode is deprecated - using string for flexibility
-import { I18nEngine } from '../core';
-import { CoreI18nComponentId } from '../core-i18n';
+import { CoreI18nComponentId } from '../core-component-id';
 import { CoreStringKey } from '../core-string-key';
+import { I18nEngine } from '../core/i18n-engine';
 import { TranslationEngine } from '../translation-engine';
 import { TypedError as SimpleTypedError } from './simple-typed-error';
 
@@ -163,8 +163,11 @@ export abstract class AbstractTypedError<
     public readonly otherVars?: Record<string, string | number>,
   ) {
     const key = reasonMap[type];
+
+    // Lazy initialization: getInstance() is only called when error is constructed
     const engine = I18nEngine.getInstance('default');
-    if (!key)
+
+    if (!key) {
       throw new Error(
         engine.safeTranslate(
           CoreI18nComponentId,
@@ -173,6 +176,7 @@ export abstract class AbstractTypedError<
           language,
         ),
       );
+    }
 
     // Use translate instead of safeTranslate to get actual translations
     let message: string;
@@ -204,7 +208,10 @@ export abstract class PluginTypedError<
     public readonly otherVars?: Record<string, string | number>,
   ) {
     const key = reasonMap[type];
+
+    // Lazy initialization: getInstance() is only called when error is constructed
     const engine = I18nEngine.getInstance('default');
+
     // If key is not found in the reason map, use core error message
     if (!key) {
       const errorMsg = engine.safeTranslate(
@@ -226,6 +233,7 @@ export abstract class PluginTypedError<
       otherVars,
       language,
     );
+
     super(translatedMessage);
     this.name = this.constructor.name;
   }
@@ -278,7 +286,10 @@ export abstract class ComponentTypedError<
     public readonly otherVars?: Record<string, string | number>,
   ) {
     const key = reasonMap[type];
+
+    // Lazy initialization: getInstance() is only called when error is constructed
     const engine = I18nEngine.getInstance('default');
+
     // If key is not found in the reason map, use core error message
     if (!key) {
       const errorMsg = engine.safeTranslate(
@@ -300,6 +311,7 @@ export abstract class ComponentTypedError<
       otherVars,
       language,
     );
+
     super(translatedMessage);
     this.name = this.constructor.name;
   }
@@ -343,6 +355,8 @@ export abstract class CoreTypedError<
     public readonly otherVars?: Record<string, string | number>,
   ) {
     const key = reasonMap[type];
+
+    // Lazy initialization: getInstance() is only called when error is constructed
     const engine = I18nEngine.getInstance('default');
 
     // If key is not found in the reason map, use a fallback error
@@ -366,6 +380,7 @@ export abstract class CoreTypedError<
       otherVars,
       language,
     );
+
     super(translatedMessage);
     this.name = this.constructor.name;
   }
@@ -410,15 +425,16 @@ export function createComponentTypedError<
   language?: string,
   instanceKey?: string,
 ): SimpleTypedError {
-  // Get the engine to ensure it exists, but the error class will get it again
-  const engine = I18nEngine.getInstance(instanceKey || 'default');
   const key = reasonMap[type];
 
   if (!key) {
     throw new Error(`Missing key for type ${type} in reason map`);
   }
 
+  // Lazy initialization: getInstance() is only called when function is executed
+  const engine = I18nEngine.getInstance(instanceKey || 'default');
   const message = engine.safeTranslate(componentId, key, otherVars, language);
+
   const error = new SimpleTypedError(message, {
     type,
     componentId,
@@ -439,19 +455,21 @@ export function createCoreTypedError<TEnum extends Record<string, string>>(
   language?: string,
   instanceKey?: string,
 ): SimpleTypedError {
-  const engine = I18nEngine.getInstance(instanceKey || 'default');
   const key = reasonMap[type];
 
   if (!key) {
     throw new Error(`Missing key for type ${type} in reason map`);
   }
 
+  // Lazy initialization: getInstance() is only called when function is executed
+  const engine = I18nEngine.getInstance(instanceKey || 'default');
   const message = engine.safeTranslate(
     CoreI18nComponentId,
     key,
     otherVars,
     language,
   );
+
   const error = new SimpleTypedError(message, {
     type,
     componentId: CoreI18nComponentId,
