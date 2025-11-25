@@ -1754,6 +1754,188 @@ const registration: ComponentRegistration<MyStringKeys, MyLanguages> = {
 - Safari: Latest 2 versions
 - Node.js: 18+
 
+## Testing
+
+### Testing Approach
+
+The i18n-lib package uses a comprehensive testing strategy combining unit tests, integration tests, and property-based testing to ensure correctness across all features.
+
+**Test Framework**: Jest with TypeScript support  
+**Property-Based Testing**: fast-check for testing universal properties  
+**Coverage Target**: 90%+ statement coverage, 85%+ branch coverage
+
+### Test Structure
+
+```
+tests/
+  ├── unit/              # Unit tests for individual components
+  ├── integration/       # Integration tests for component interactions
+  ├── property/          # Property-based tests using fast-check
+  └── fixtures/          # Test data and mock translations
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run with coverage
+npm test -- --coverage
+
+# Run specific test file
+npm test -- plugin-i18n-engine.spec.ts
+
+# Run in watch mode
+npm test -- --watch
+```
+
+### Test Patterns
+
+#### Testing Translation Registration
+
+```typescript
+import { PluginI18nEngine, LanguageCodes } from '@digitaldefiance/i18n-lib';
+
+describe('Component Registration', () => {
+  let engine: PluginI18nEngine;
+
+  beforeEach(() => {
+    PluginI18nEngine.resetAll();
+    engine = PluginI18nEngine.createInstance('test', [
+      { id: LanguageCodes.EN_US, name: 'English', code: 'en-US', isDefault: true }
+    ]);
+  });
+
+  afterEach(() => {
+    PluginI18nEngine.resetAll();
+  });
+
+  it('should register component with translations', () => {
+    engine.registerComponent({
+      component: {
+        id: 'test',
+        name: 'Test',
+        stringKeys: ['hello']
+      },
+      strings: {
+        [LanguageCodes.EN_US]: {
+          hello: 'Hello, {name}!'
+        }
+      }
+    });
+
+    expect(engine.translate('test', 'hello', { name: 'World' }))
+      .toBe('Hello, World!');
+  });
+});
+```
+
+#### Testing ICU MessageFormat
+
+```typescript
+import { formatICUMessage } from '@digitaldefiance/i18n-lib';
+
+describe('ICU MessageFormat', () => {
+  it('should format plural messages', () => {
+    const message = '{count, plural, one {# item} other {# items}}';
+    
+    expect(formatICUMessage(message, { count: 1 })).toBe('1 item');
+    expect(formatICUMessage(message, { count: 5 })).toBe('5 items');
+  });
+
+  it('should handle nested select and plural', () => {
+    const message = '{gender, select, male {He has} female {She has}} {count, plural, one {# item} other {# items}}';
+    
+    expect(formatICUMessage(message, { gender: 'female', count: 2 }))
+      .toBe('She has 2 items');
+  });
+});
+```
+
+#### Testing Error Handling
+
+```typescript
+import { RegistryError, RegistryErrorType } from '@digitaldefiance/i18n-lib';
+
+describe('Error Handling', () => {
+  it('should throw RegistryError for missing component', () => {
+    expect(() => {
+      engine.translate('missing', 'key');
+    }).toThrow(RegistryError);
+  });
+
+  it('should provide error metadata', () => {
+    try {
+      engine.translate('missing', 'key');
+    } catch (error) {
+      expect(error).toBeInstanceOf(RegistryError);
+      expect(error.type).toBe(RegistryErrorType.COMPONENT_NOT_FOUND);
+      expect(error.metadata).toEqual({ componentId: 'missing' });
+    }
+  });
+});
+```
+
+#### Property-Based Testing
+
+```typescript
+import * as fc from 'fast-check';
+import { createPluralString } from '@digitaldefiance/i18n-lib';
+
+describe('Pluralization Properties', () => {
+  it('should always return a string for any count', () => {
+    fc.assert(
+      fc.property(fc.integer(), (count) => {
+        const plural = createPluralString({
+          one: '{count} item',
+          other: '{count} items'
+        });
+        
+        const result = engine.translate('test', 'items', { count });
+        expect(typeof result).toBe('string');
+        expect(result.length).toBeGreaterThan(0);
+      })
+    );
+  });
+});
+```
+
+### Testing Best Practices
+
+1. **Always reset engine state** between tests using `PluginI18nEngine.resetAll()`
+2. **Test with multiple languages** to ensure translations work correctly
+3. **Test edge cases** like empty strings, special characters, and missing variables
+4. **Use property-based tests** for testing universal properties across many inputs
+5. **Mock external dependencies** when testing error conditions
+
+### Cross-Package Testing
+
+When testing packages that depend on i18n-lib:
+
+```typescript
+import { PluginI18nEngine } from '@digitaldefiance/i18n-lib';
+import { YourService } from 'your-package';
+
+describe('Service with i18n', () => {
+  beforeEach(() => {
+    // Set up i18n engine for your service
+    PluginI18nEngine.resetAll();
+    const engine = PluginI18nEngine.createInstance('test', languages);
+    // Register your component translations
+  });
+
+  afterEach(() => {
+    PluginI18nEngine.resetAll();
+  });
+
+  it('should use translated error messages', () => {
+    const service = new YourService();
+    expect(() => service.doSomething()).toThrow(/translated message/);
+  });
+});
+```
+
 ## License
 
 MIT License - See LICENSE file for details
