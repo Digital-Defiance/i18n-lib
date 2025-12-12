@@ -1,6 +1,6 @@
 {
   "name": "@digitaldefiance/i18n-lib",
-  "version": "3.8.2",
+  "version": "3.8.3",
   "description": "i18n library with enum translation support",
   "homepage": "https://github.com/Digital-Defiance/i18n-lib",
   "repository": {
@@ -24,7 +24,7 @@
     "format": "npx nx format:write --projects=digitaldefiance-i18n-lib",
     "format:check": "npx nx format:check --projects=digitaldefiance-i18n-lib",
     "prepublishOnly": "npx nx build digitaldefiance-i18n-lib",
-    "publish:public": "npm publish --access public"
+    "publish:public": "cd ../../dist/packages/digitaldefiance-i18n-lib && npm publish --access public"
   },
   "files": [
     "src",
