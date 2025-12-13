@@ -1,14 +1,14 @@
 {
   "name": "@digitaldefiance/i18n-lib",
-  "version": "3.8.3",
+  "version": "3.8.4",
   "description": "i18n library with enum translation support",
   "homepage": "https://github.com/Digital-Defiance/i18n-lib",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Digital-Defiance/i18n-lib.git"
   },
-  "main": "src/index.js",
-  "types": "src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "npx nx build digitaldefiance-i18n-lib",
     "build:stream": "npx nx build --outputStyle=stream digitaldefiance-i18n-lib",
