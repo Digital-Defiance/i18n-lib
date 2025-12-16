@@ -7,7 +7,12 @@ export * from './gender';
 export * from './interfaces';
 export * from './pluralization';
 export * from './types';
+export * from './types/plural-types'; // Export plural types
 export * from './utils';
+export {
+  createGenderedString,
+  createPluralString,
+} from './utils/plural-helpers'; // Export plural helpers (excluding getRequiredPluralForms to avoid conflict)
 export * from './validation';
 // Note: Most exports are handled by wildcard exports above
 // Only add explicit exports here if they need special handling
