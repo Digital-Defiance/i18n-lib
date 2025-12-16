@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 /**
  * Tests for advanced ICU MessageFormat features in I18nError
  * Tests number formatting, selectordinal, and nested messages
@@ -11,10 +13,10 @@ describe('I18nError - Advanced ICU Features', () => {
       it('should format currency values in English (US)', () => {
         const error = I18nError.validationThresholdExceeded(
           'amount',
-          1500.50,
-          1000.00,
+          1500.5,
+          1000.0,
           'currency',
-          'en-US'
+          'en-US',
         );
 
         expect(error.code).toBe(I18nErrorCode.VALIDATION_THRESHOLD_EXCEEDED);
@@ -23,19 +25,19 @@ describe('I18nError - Advanced ICU Features', () => {
         expect(error.message).toContain('$1,000.00');
         expect(error.metadata).toEqual({
           fieldName: 'amount',
-          value: 1500.50,
-          threshold: 1000.00,
-          thresholdType: 'currency'
+          value: 1500.5,
+          threshold: 1000.0,
+          thresholdType: 'currency',
         });
       });
 
       it('should format currency values in French', () => {
         const error = I18nError.validationThresholdExceeded(
           'montant',
-          1500.50,
-          1000.00,
+          1500.5,
+          1000.0,
           'currency',
-          'fr'
+          'fr',
         );
 
         expect(error.code).toBe(I18nErrorCode.VALIDATION_THRESHOLD_EXCEEDED);
@@ -47,10 +49,10 @@ describe('I18nError - Advanced ICU Features', () => {
       it('should format currency values in German', () => {
         const error = I18nError.validationThresholdExceeded(
           'betrag',
-          1500.50,
-          1000.00,
+          1500.5,
+          1000.0,
           'currency',
-          'de'
+          'de',
         );
 
         expect(error.code).toBe(I18nErrorCode.VALIDATION_THRESHOLD_EXCEEDED);
@@ -65,9 +67,9 @@ describe('I18nError - Advanced ICU Features', () => {
         const error = I18nError.validationThresholdExceeded(
           'successRate',
           0.95,
-          0.90,
+          0.9,
           'percent',
-          'en-US'
+          'en-US',
         );
 
         expect(error.code).toBe(I18nErrorCode.VALIDATION_THRESHOLD_EXCEEDED);
@@ -82,7 +84,7 @@ describe('I18nError - Advanced ICU Features', () => {
           0.0567,
           0.05,
           'percent',
-          'en-US'
+          'en-US',
         );
 
         expect(error.message).toMatch(/5[.,]67%/);
@@ -97,7 +99,7 @@ describe('I18nError - Advanced ICU Features', () => {
           1500000,
           1000000,
           'integer',
-          'en-US'
+          'en-US',
         );
 
         expect(error.code).toBe(I18nErrorCode.VALIDATION_THRESHOLD_EXCEEDED);
@@ -112,7 +114,7 @@ describe('I18nError - Advanced ICU Features', () => {
           150,
           100,
           'integer',
-          'en-US'
+          'en-US',
         );
 
         expect(error.message).toContain('150');
@@ -123,7 +125,7 @@ describe('I18nError - Advanced ICU Features', () => {
         const error = I18nError.validationThresholdExceeded(
           'items',
           1500,
-          1000
+          1000,
         );
 
         expect(error.message).toContain('1,500');
@@ -139,7 +141,7 @@ describe('I18nError - Advanced ICU Features', () => {
         1,
         'deployment',
         'network timeout',
-        'en-US'
+        'en-US',
       );
 
       expect(error.code).toBe(I18nErrorCode.OPERATION_STEP_FAILED);
@@ -149,7 +151,7 @@ describe('I18nError - Advanced ICU Features', () => {
       expect(error.metadata).toEqual({
         stepNumber: 1,
         operationName: 'deployment',
-        reason: 'network timeout'
+        reason: 'network timeout',
       });
     });
 
@@ -158,7 +160,7 @@ describe('I18nError - Advanced ICU Features', () => {
         2,
         'validation',
         'schema mismatch',
-        'en-US'
+        'en-US',
       );
 
       expect(error.message).toContain('2nd');
@@ -170,7 +172,7 @@ describe('I18nError - Advanced ICU Features', () => {
         3,
         'compilation',
         'syntax error',
-        'en-US'
+        'en-US',
       );
 
       expect(error.message).toContain('3rd');
@@ -182,7 +184,7 @@ describe('I18nError - Advanced ICU Features', () => {
         4,
         'testing',
         'assertion failed',
-        'en-US'
+        'en-US',
       );
 
       expect(error.message).toContain('4th');
@@ -194,7 +196,7 @@ describe('I18nError - Advanced ICU Features', () => {
         21,
         'processing',
         'timeout',
-        'en-US'
+        'en-US',
       );
 
       expect(error.message).toContain('21st');
@@ -205,7 +207,7 @@ describe('I18nError - Advanced ICU Features', () => {
         22,
         'optimization',
         'memory limit',
-        'en-US'
+        'en-US',
       );
 
       expect(error.message).toContain('22nd');
@@ -216,7 +218,7 @@ describe('I18nError - Advanced ICU Features', () => {
         23,
         'finalization',
         'resource cleanup',
-        'en-US'
+        'en-US',
       );
 
       expect(error.message).toContain('23rd');
@@ -227,7 +229,7 @@ describe('I18nError - Advanced ICU Features', () => {
         11,
         'initialization',
         'config error',
-        'en-US'
+        'en-US',
       );
 
       expect(error.message).toContain('11th');
@@ -238,7 +240,7 @@ describe('I18nError - Advanced ICU Features', () => {
         100,
         'final verification',
         'checksum mismatch',
-        'en-US'
+        'en-US',
       );
 
       expect(error.message).toContain('100th');
@@ -249,7 +251,7 @@ describe('I18nError - Advanced ICU Features', () => {
         1,
         'déploiement',
         'délai dépassé',
-        'fr'
+        'fr',
       );
 
       expect(error.message).toContain('déploiement');
@@ -259,13 +261,7 @@ describe('I18nError - Advanced ICU Features', () => {
 
   describe('rateLimitExceeded - Nested ICU Messages', () => {
     it('should format rate limit error with nested plural and number formatting', () => {
-      const error = I18nError.rateLimitExceeded(
-        150,
-        100,
-        60,
-        30,
-        'en-US'
-      );
+      const error = I18nError.rateLimitExceeded(150, 100, 60, 30, 'en-US');
 
       expect(error.code).toBe(I18nErrorCode.RATE_LIMIT_EXCEEDED);
       expect(error.message).toContain('150 requests');
@@ -276,18 +272,12 @@ describe('I18nError - Advanced ICU Features', () => {
         requestCount: 150,
         limit: 100,
         windowSeconds: 60,
-        retryAfterSeconds: 30
+        retryAfterSeconds: 30,
       });
     });
 
     it('should handle singular forms correctly', () => {
-      const error = I18nError.rateLimitExceeded(
-        1,
-        1,
-        1,
-        1,
-        'en-US'
-      );
+      const error = I18nError.rateLimitExceeded(1, 1, 1, 1, 'en-US');
 
       expect(error.message).toContain('1 request');
       expect(error.message).not.toContain('1 requests');
@@ -295,26 +285,14 @@ describe('I18nError - Advanced ICU Features', () => {
     });
 
     it('should handle immediate retry (0 seconds)', () => {
-      const error = I18nError.rateLimitExceeded(
-        150,
-        100,
-        60,
-        0,
-        'en-US'
-      );
+      const error = I18nError.rateLimitExceeded(150, 100, 60, 0, 'en-US');
 
       expect(error.message).toContain('Retry immediately');
       expect(error.message).not.toContain('Retry after');
     });
 
     it('should format large numbers with separators', () => {
-      const error = I18nError.rateLimitExceeded(
-        1500,
-        1000,
-        3600,
-        300,
-        'en-US'
-      );
+      const error = I18nError.rateLimitExceeded(1500, 1000, 3600, 300, 'en-US');
 
       expect(error.message).toContain('1,500');
       expect(error.message).toContain('1,000');
@@ -323,13 +301,7 @@ describe('I18nError - Advanced ICU Features', () => {
     });
 
     it('should work with different languages (French)', () => {
-      const error = I18nError.rateLimitExceeded(
-        150,
-        100,
-        60,
-        30,
-        'fr'
-      );
+      const error = I18nError.rateLimitExceeded(150, 100, 60, 30, 'fr');
 
       expect(error.code).toBe(I18nErrorCode.RATE_LIMIT_EXCEEDED);
       expect(error.message).toBeTruthy();
@@ -345,7 +317,7 @@ describe('I18nError - Advanced ICU Features', () => {
           1,
           'type',
           'high',
-          'en-US'
+          'en-US',
         );
 
         expect(error.code).toBe(I18nErrorCode.NESTED_VALIDATION_ERROR);
@@ -359,7 +331,7 @@ describe('I18nError - Advanced ICU Features', () => {
           fieldPath: 'user.profile.settings.theme',
           errorCount: 1,
           errorType: 'type',
-          severity: 'high'
+          severity: 'high',
         });
       });
 
@@ -370,7 +342,7 @@ describe('I18nError - Advanced ICU Features', () => {
           3,
           'range',
           'medium',
-          'en-US'
+          'en-US',
         );
 
         expect(error.message).toContain('Value out of range');
@@ -385,7 +357,7 @@ describe('I18nError - Advanced ICU Features', () => {
           2,
           'format',
           'low',
-          'en-US'
+          'en-US',
         );
 
         expect(error.message).toContain('Invalid format');
@@ -400,7 +372,7 @@ describe('I18nError - Advanced ICU Features', () => {
           1,
           'required',
           'critical',
-          'en-US'
+          'en-US',
         );
 
         expect(error.message).toContain('Required field missing');
@@ -417,7 +389,7 @@ describe('I18nError - Advanced ICU Features', () => {
           1,
           'format',
           'low',
-          'en-US'
+          'en-US',
         );
 
         expect(error.message).toContain('Minor issue');
@@ -430,7 +402,7 @@ describe('I18nError - Advanced ICU Features', () => {
           1,
           'format',
           'medium',
-          'en-US'
+          'en-US',
         );
 
         expect(error.message).toContain('Moderate issue');
@@ -443,7 +415,7 @@ describe('I18nError - Advanced ICU Features', () => {
           1,
           'format',
           'high',
-          'en-US'
+          'en-US',
         );
 
         expect(error.message).toContain('Serious issue');
@@ -456,7 +428,7 @@ describe('I18nError - Advanced ICU Features', () => {
           1,
           'format',
           'critical',
-          'en-US'
+          'en-US',
         );
 
         expect(error.message).toContain('Critical issue');
@@ -471,7 +443,7 @@ describe('I18nError - Advanced ICU Features', () => {
           1,
           'type',
           'medium',
-          'en-US'
+          'en-US',
         );
 
         expect(error.message).toContain('1 occurrence');
@@ -485,7 +457,7 @@ describe('I18nError - Advanced ICU Features', () => {
           5,
           'type',
           'medium',
-          'en-US'
+          'en-US',
         );
 
         expect(error.message).toContain('5 occurrences');
@@ -500,11 +472,13 @@ describe('I18nError - Advanced ICU Features', () => {
           2,
           'range',
           'high',
-          'en-US'
+          'en-US',
         );
 
         expect(error.message).toContain('config.database.pool.connections.max');
-        expect(error.metadata?.fieldPath).toBe('config.database.pool.connections.max');
+        expect(error.metadata?.fieldPath).toBe(
+          'config.database.pool.connections.max',
+        );
       });
 
       it('should handle array-like paths', () => {
@@ -514,10 +488,12 @@ describe('I18nError - Advanced ICU Features', () => {
           3,
           'required',
           'critical',
-          'en-US'
+          'en-US',
         );
 
-        expect(error.message).toContain('users[0].profile.settings.notifications');
+        expect(error.message).toContain(
+          'users[0].profile.settings.notifications',
+        );
       });
     });
 
@@ -529,7 +505,7 @@ describe('I18nError - Advanced ICU Features', () => {
           2,
           'type',
           'high',
-          'fr'
+          'fr',
         );
 
         expect(error.code).toBe(I18nErrorCode.NESTED_VALIDATION_ERROR);
@@ -544,7 +520,7 @@ describe('I18nError - Advanced ICU Features', () => {
           3,
           'range',
           'medium',
-          'es'
+          'es',
         );
 
         expect(error.message).toContain('configuración');
@@ -555,12 +531,26 @@ describe('I18nError - Advanced ICU Features', () => {
 
   describe('Advanced ICU Integration', () => {
     it('should combine all advanced features in error metadata', () => {
-      const thresholdError = I18nError.validationThresholdExceeded('price', 1500, 1000, 'currency');
+      const thresholdError = I18nError.validationThresholdExceeded(
+        'price',
+        1500,
+        1000,
+        'currency',
+      );
       const stepError = I18nError.operationStepFailed(3, 'deploy', 'timeout');
       const rateLimitError = I18nError.rateLimitExceeded(150, 100, 60, 30);
-      const nestedError = I18nError.nestedValidationError('comp', 'a.b.c', 5, 'type', 'high');
+      const nestedError = I18nError.nestedValidationError(
+        'comp',
+        'a.b.c',
+        5,
+        'type',
+        'high',
+      );
 
-      expect(thresholdError.metadata).toHaveProperty('thresholdType', 'currency');
+      expect(thresholdError.metadata).toHaveProperty(
+        'thresholdType',
+        'currency',
+      );
       expect(stepError.metadata).toHaveProperty('stepNumber', 3);
       expect(rateLimitError.metadata).toHaveProperty('requestCount', 150);
       expect(nestedError.metadata).toHaveProperty('errorCount', 5);
@@ -569,7 +559,10 @@ describe('I18nError - Advanced ICU Features', () => {
     it('should maintain backward compatibility with basic ICU methods', () => {
       const componentError = I18nError.componentNotFound('test');
       const validationError = I18nError.validationFailed(['error1', 'error2']);
-      const pluralError = I18nError.pluralFormNotFound('few', 'ru', 'items', ['one', 'other']);
+      const pluralError = I18nError.pluralFormNotFound('few', 'ru', 'items', [
+        'one',
+        'other',
+      ]);
 
       expect(componentError.code).toBe(I18nErrorCode.COMPONENT_NOT_FOUND);
       expect(validationError.code).toBe(I18nErrorCode.VALIDATION_FAILED);
@@ -579,13 +572,7 @@ describe('I18nError - Advanced ICU Features', () => {
 
   describe('Real-World Scenarios', () => {
     it('should format API rate limit error realistically', () => {
-      const error = I18nError.rateLimitExceeded(
-        1000,
-        100,
-        3600,
-        300,
-        'en-US'
-      );
+      const error = I18nError.rateLimitExceeded(1000, 100, 3600, 300, 'en-US');
 
       expect(error.message).toMatch(/1,000 requests/);
       expect(error.message).toMatch(/100 requests per 3,600 seconds/);
@@ -598,7 +585,7 @@ describe('I18nError - Advanced ICU Features', () => {
         10485760,
         5242880,
         'integer',
-        'en-US'
+        'en-US',
       );
 
       expect(error.message).toContain('10,485,760');
@@ -610,7 +597,7 @@ describe('I18nError - Advanced ICU Features', () => {
         5,
         'CI/CD pipeline',
         'Docker build failed: insufficient disk space',
-        'en-US'
+        'en-US',
       );
 
       expect(error.message).toContain('5th');
@@ -625,11 +612,13 @@ describe('I18nError - Advanced ICU Features', () => {
         1,
         'range',
         'critical',
-        'en-US'
+        'en-US',
       );
 
       expect(error.message).toContain('Critical issue');
-      expect(error.message).toContain('user.profile.preferences.notifications.email.frequency');
+      expect(error.message).toContain(
+        'user.profile.preferences.notifications.email.frequency',
+      );
       expect(error.message).toContain('Value out of range');
     });
   });

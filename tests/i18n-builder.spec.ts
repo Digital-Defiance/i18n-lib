@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 /**
  * Comprehensive tests for I18nBuilder
  */
@@ -88,7 +90,9 @@ describe('I18nBuilder', () => {
   describe('Constants Configuration', () => {
     it('should set constants', () => {
       const engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withConstants({ AppName: 'TestApp', Version: '1.0.0' })
         .build();
 
@@ -99,12 +103,16 @@ describe('I18nBuilder', () => {
         },
       });
 
-      expect(engine.translate('test', 'message')).toBe('Welcome to TestApp v1.0.0');
+      expect(engine.translate('test', 'message')).toBe(
+        'Welcome to TestApp v1.0.0',
+      );
     });
 
     it('should handle empty constants', () => {
       const engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withConstants({})
         .build();
 
@@ -115,7 +123,9 @@ describe('I18nBuilder', () => {
   describe('Validation Configuration', () => {
     it('should set validation options', () => {
       const engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withValidation({
           requireCompleteStrings: true,
           allowPartialRegistration: false,
@@ -127,7 +137,9 @@ describe('I18nBuilder', () => {
 
     it('should handle partial validation config', () => {
       const engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withValidation({ requireCompleteStrings: true })
         .build();
 
@@ -138,7 +150,9 @@ describe('I18nBuilder', () => {
   describe('Instance Configuration', () => {
     it('should set instance key', () => {
       const engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withInstanceKey('custom-instance')
         .build();
 
@@ -148,7 +162,9 @@ describe('I18nBuilder', () => {
 
     it('should register instance by default', () => {
       const engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .build();
 
       expect(I18nEngine.hasInstance('default')).toBe(true);
@@ -156,7 +172,9 @@ describe('I18nBuilder', () => {
 
     it('should not register instance if disabled', () => {
       I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withInstanceKey('no-register')
         .withRegisterInstance(false)
         .build();
@@ -166,7 +184,9 @@ describe('I18nBuilder', () => {
 
     it('should set as default instance', () => {
       const engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withInstanceKey('my-default')
         .withSetAsDefault(true)
         .build();
@@ -176,12 +196,16 @@ describe('I18nBuilder', () => {
 
     it('should not set as default if disabled', () => {
       const firstEngine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withInstanceKey('first')
         .build();
 
       I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withInstanceKey('second')
         .withSetAsDefault(false)
         .build();
@@ -212,7 +236,9 @@ describe('I18nBuilder', () => {
 
     it('should allow partial chaining', () => {
       const engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withConstants({ Version: '1.0.0' })
         .build();
 
@@ -223,13 +249,17 @@ describe('I18nBuilder', () => {
   describe('Multiple Instances', () => {
     it('should create multiple independent instances', () => {
       const engine1 = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withInstanceKey('instance1')
         .withConstants({ AppName: 'App1' })
         .build();
 
       const engine2 = I18nBuilder.create()
-        .withLanguages([{ id: 'fr', name: 'French', code: 'fr', isDefault: true }])
+        .withLanguages([
+          { id: 'fr', name: 'French', code: 'fr', isDefault: true },
+        ])
         .withInstanceKey('instance2')
         .withConstants({ AppName: 'App2' })
         .build();
@@ -243,7 +273,9 @@ describe('I18nBuilder', () => {
   describe('Edge Cases', () => {
     it('should handle single language', () => {
       const engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .build();
 
       expect(engine.getLanguages()).toHaveLength(1);
@@ -267,7 +299,9 @@ describe('I18nBuilder', () => {
 
     it('should handle complex constants', () => {
       const engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withConstants({
           string: 'value',
           number: 42,

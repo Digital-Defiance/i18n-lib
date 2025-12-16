@@ -1,7 +1,7 @@
 import { Formatter, FormatterContext } from './base-formatter';
 
 export class NumberFormatter implements Formatter {
-  format(value: any, style?: string, context?: FormatterContext): string {
+  format(value: unknown, style?: string, context?: FormatterContext): string {
     const num = Number(value);
     if (isNaN(num)) return String(value);
 
@@ -14,7 +14,7 @@ export class NumberFormatter implements Formatter {
         break;
       case 'currency':
         options.style = 'currency';
-        options.currency = context?.currency || 'USD';
+        options.currency = (context?.currency as string) || 'USD';
         break;
       case 'percent':
         options.style = 'percent';

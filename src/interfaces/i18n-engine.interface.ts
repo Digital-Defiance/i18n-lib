@@ -2,9 +2,10 @@
  * Core I18n Engine interface
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { ComponentConfig } from './component-config.interface';
 import { LanguageDefinition } from './language-definition.interface';
-import { TranslationOptions } from './translation-options.interface';
 import { ValidationResult } from './validation-result.interface';
 
 /**
@@ -17,7 +18,10 @@ export interface II18nEngine {
   /** Registers a component only if it doesn't already exist */
   registerIfNotExists(config: ComponentConfig): ValidationResult;
   /** Updates strings for an existing component */
-  updateStrings(componentId: string, strings: Record<string, Record<string, string>>): ValidationResult;
+  updateStrings(
+    componentId: string,
+    strings: Record<string, Record<string, string>>,
+  ): ValidationResult;
   /** Checks if a component is registered */
   hasComponent(componentId: string): boolean;
   /** Gets all registered components */
@@ -25,11 +29,28 @@ export interface II18nEngine {
 
   // Translation
   /** Translates a string key for a component */
-  translate(componentId: string, key: string, variables?: Record<string, any>, language?: string): string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  translate(
+    componentId: string,
+    key: string,
+    variables?: Record<string, any>,
+    language?: string,
+  ): string;
   /** Safely translates a string key, returning a fallback on error */
-  safeTranslate(componentId: string, key: string, variables?: Record<string, any>, language?: string): string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  safeTranslate(
+    componentId: string,
+    key: string,
+    variables?: Record<string, any>,
+    language?: string,
+  ): string;
   /** Template processor that handles embedded component.key patterns */
-  t(template: string, variables?: Record<string, any>, language?: string): string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  t(
+    template: string,
+    variables?: Record<string, any>,
+    language?: string,
+  ): string;
 
   // Language management
   /** Registers a new language */

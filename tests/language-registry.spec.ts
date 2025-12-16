@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { LanguageRegistry } from '../src/core/language-registry';
-import { LanguageDefinition } from '../src/language-definition';
 import { I18nError } from '../src/errors/i18n-error';
+import { LanguageDefinition } from '../src/language-definition';
 
 function createLanguageDefinition(
   id: string,
@@ -19,7 +21,9 @@ function createLanguageDefinitions(
     isDefault?: boolean;
   }>,
 ): LanguageDefinition[] {
-  return languages.map((lang) => createLanguageDefinition(lang.id, lang.name, lang.code, lang.isDefault));
+  return languages.map((lang) =>
+    createLanguageDefinition(lang.id, lang.name, lang.code, lang.isDefault),
+  );
 }
 
 describe('LanguageRegistry', () => {

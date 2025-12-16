@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { escapeHtml, safeStringify } from '../../src/utils/html-escape';
 import { replaceVariables } from '../../src/utils/string-utils';
 
@@ -21,8 +23,7 @@ describe('Security: XSS Prevention', () => {
     });
 
     it('should escape all dangerous characters', () => {
-      expect(escapeHtml('&<>"\'/'))
-        .toBe('&amp;&lt;&gt;&quot;&#x27;&#x2F;');
+      expect(escapeHtml('&<>"\'/')).toBe('&amp;&lt;&gt;&quot;&#x27;&#x2F;');
     });
   });
 
@@ -34,8 +35,9 @@ describe('Security: XSS Prevention', () => {
     });
 
     it('should escape HTML when option enabled', () => {
-      expect(safeStringify('<script>', { escapeHtml: true }))
-        .toBe('&lt;script&gt;');
+      expect(safeStringify('<script>', { escapeHtml: true })).toBe(
+        '&lt;script&gt;',
+      );
     });
 
     it('should return empty string for null/undefined', () => {
@@ -55,7 +57,7 @@ describe('Security: XSS Prevention', () => {
         'Hello {name}',
         { name: '<script>alert(1)</script>' },
         undefined,
-        { escapeHtml: true }
+        { escapeHtml: true },
       );
       expect(result).not.toContain('<script>');
       expect(result).toContain('&lt;script&gt;');
@@ -66,7 +68,7 @@ describe('Security: XSS Prevention', () => {
         'Hello {name}',
         { name: '<b>test</b>' },
         undefined,
-        { escapeHtml: false }
+        { escapeHtml: false },
       );
       expect(result).toBe('Hello <b>test</b>');
     });

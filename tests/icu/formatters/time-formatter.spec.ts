@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { TimeFormatter } from '../../../src/icu/formatters/time-formatter';
 
 describe('TimeFormatter', () => {
@@ -29,12 +31,16 @@ describe('TimeFormatter', () => {
   });
 
   it('should handle string dates', () => {
-    const result = formatter.format('2024-03-15T14:30:00Z', 'short', { locale: 'en-US' });
+    const result = formatter.format('2024-03-15T14:30:00Z', 'short', {
+      locale: 'en-US',
+    });
     expect(result).toMatch(/\d+:\d+/);
   });
 
   it('should handle invalid dates', () => {
-    expect(formatter.format('invalid', 'short', { locale: 'en-US' })).toBe('invalid');
+    expect(formatter.format('invalid', 'short', { locale: 'en-US' })).toBe(
+      'invalid',
+    );
   });
 
   it('should default to medium', () => {

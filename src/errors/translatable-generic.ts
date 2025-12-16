@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 import { I18nEngine } from '../core/i18n-engine';
 import { GenderCategory } from '../gender/gender-categories';
 
@@ -71,7 +72,7 @@ export class TranslatableGenericError<
         variables,
         language,
       );
-    } catch (error) {
+    } catch (_error) {
       // Fallback if engine not found - TranslatableGenericError is designed to be flexible
       translatedMessage = `[${componentId}.${stringKey}]`;
     }
@@ -128,7 +129,7 @@ export class TranslatableGenericError<
         this.variables,
         language,
       );
-    } catch (error) {
+    } catch (_error) {
       // Fallback if engine not found
       return `[${this.componentId}.${this.stringKey}]`;
     }

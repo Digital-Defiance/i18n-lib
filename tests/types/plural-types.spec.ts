@@ -1,8 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 /**
  * Tests for plural type definitions
  */
 
-import { PluralString, isPluralString, resolvePluralString } from '../../src/types/plural-types';
+import {
+  PluralString,
+  isPluralString,
+  resolvePluralString,
+} from '../../src/types/plural-types';
 
 describe('Plural Types', () => {
   describe('PluralString type', () => {
@@ -14,7 +20,7 @@ describe('Plural Types', () => {
     it('should accept plural object', () => {
       const value: PluralString = {
         one: '1 item',
-        other: '{count} items'
+        other: '{count} items',
       };
       expect(value).toHaveProperty('one');
       expect(value).toHaveProperty('other');
@@ -22,7 +28,7 @@ describe('Plural Types', () => {
 
     it('should accept partial plural object', () => {
       const value: PluralString = {
-        one: '1 item'
+        one: '1 item',
       };
       expect(value).toHaveProperty('one');
     });
@@ -88,7 +94,7 @@ describe('Plural Types', () => {
         two: 'Two',
         few: 'Few',
         many: 'Many',
-        other: 'Other'
+        other: 'Other',
       };
       expect(resolvePluralString(value, 'zero')).toBe('Zero');
       expect(resolvePluralString(value, 'one')).toBe('One');
@@ -119,9 +125,9 @@ describe('Plural Types', () => {
     it('should handle simple strings in mixed scenarios', () => {
       const strings: Record<string, PluralString> = {
         simple: 'Simple string',
-        plural: { one: 'One', other: 'Other' }
+        plural: { one: 'One', other: 'Other' },
       };
-      
+
       expect(resolvePluralString(strings.simple, 'one')).toBe('Simple string');
       expect(resolvePluralString(strings.plural, 'one')).toBe('One');
     });

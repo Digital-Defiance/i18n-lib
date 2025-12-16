@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 import { ContextErrorType } from '../context-error-type';
 import { CoreI18nComponentId } from '../core-component-id';
 import { CoreStringKey } from '../core-string-key';

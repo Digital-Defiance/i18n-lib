@@ -1,6 +1,7 @@
 /**
  * Component registry for managing internationalization components and their string translations
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { ComponentDefinition } from './component-definition';
 import { ComponentRegistration } from './component-registration';
@@ -22,10 +23,10 @@ import { ValidationResult } from './validation-result';
  * Registry for managing components and their translations
  */
 export class ComponentRegistry<TLanguages extends string> {
-  private readonly components = new Map<string, ComponentDefinition<any>>();
+  private readonly components = new Map<string, ComponentDefinition<string>>();
   private readonly componentStrings = new Map<
     string,
-    ComponentLanguageStrings<any, TLanguages>
+    ComponentLanguageStrings<string, TLanguages>
   >();
   private readonly validationConfig: ValidationConfig;
   private readonly registeredLanguages: Set<TLanguages>;
@@ -145,7 +146,7 @@ export class ComponentRegistry<TLanguages extends string> {
         ({} as ComponentLanguageStrings<TStringKeys, TLanguages>);
       const updatedStrings = this.mergeStrings(existingStrings, strings);
       const completeStrings = this.completeStringsWithFallbacks(
-        component,
+        component as ComponentDefinition<TStringKeys>,
         updatedStrings,
       );
 
@@ -243,7 +244,7 @@ export class ComponentRegistry<TLanguages extends string> {
    * Get all registered components.
    * @returns Array of all registered ComponentDefinition objects.
    */
-  public getComponents(): ReadonlyArray<ComponentDefinition<any>> {
+  public getComponents(): ReadonlyArray<ComponentDefinition<string>> {
     return Array.from(this.components.values());
   }
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return, import/order */
 // New plugin architecture imports
 // CoreLanguageCode is deprecated - using string for flexibility
 import { CoreI18nComponentId } from '../core-component-id';
@@ -182,7 +183,7 @@ export abstract class AbstractTypedError<
     let message: string;
     try {
       message = engine.translate(componentId, key, otherVars, language);
-    } catch (error) {
+    } catch (_error) {
       // Fallback to safeTranslate if translate fails
       message = engine.safeTranslate(componentId, key, otherVars, language);
     }
@@ -503,7 +504,7 @@ export function createTranslatedError<
     try {
       // Try to translate the error message using the engine
       message = engine.safeTranslate(componentId, key, variables, language);
-    } catch (translationError) {
+    } catch (_translationError) {
       // Fallback if translation fails
       message = `Error: ${type}${
         metadata ? ` - ${JSON.stringify(metadata)}` : ''

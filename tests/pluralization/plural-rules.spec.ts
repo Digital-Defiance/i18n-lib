@@ -1,29 +1,36 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 /**
  * Tests for CLDR Plural Rules
  */
 
 import {
-  pluralRuleEnglish,
-  pluralRuleRussian,
+  getAllPluralForms,
+  getPluralCategory,
+  getRequiredPluralForms,
+  hasPluralForm,
+} from '../../src/pluralization/language-plural-map';
+import {
   pluralRuleArabic,
-  pluralRulePolish,
-  pluralRuleFrench,
-  pluralRuleSpanish,
-  pluralRuleJapanese,
-  pluralRuleUkrainian,
-  pluralRuleChinese,
-  pluralRuleGerman,
-  pluralRuleScottishGaelic,
-  pluralRuleWelsh,
   pluralRuleBreton,
-  pluralRuleSlovenian,
+  pluralRuleChinese,
   pluralRuleCzech,
-  pluralRuleLithuanian,
-  pluralRuleLatvian,
+  pluralRuleEnglish,
+  pluralRuleFrench,
+  pluralRuleGerman,
   pluralRuleIrish,
+  pluralRuleJapanese,
+  pluralRuleLatvian,
+  pluralRuleLithuanian,
+  pluralRulePolish,
   pluralRuleRomanian,
+  pluralRuleRussian,
+  pluralRuleScottishGaelic,
+  pluralRuleSlovenian,
+  pluralRuleSpanish,
+  pluralRuleUkrainian,
+  pluralRuleWelsh,
 } from '../../src/pluralization/plural-rules';
-import { getPluralCategory, getRequiredPluralForms, getAllPluralForms, hasPluralForm } from '../../src/pluralization/language-plural-map';
 
 describe('Plural Rules', () => {
   describe('English (en-US, en-GB)', () => {

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 /**
  * Tests for plural support in I18nEngine
  */
@@ -10,7 +12,7 @@ describe('I18nEngine - Plural Support', () => {
   const languages: LanguageDefinition[] = [
     { id: 'en-US', name: 'English (US)', code: 'en-US', isDefault: true },
     { id: 'ru', name: 'Russian', code: 'ru' },
-    { id: 'ar', name: 'Arabic', code: 'ar' }
+    { id: 'ar', name: 'Arabic', code: 'ar' },
   ];
 
   beforeEach(() => {
@@ -30,29 +32,39 @@ describe('I18nEngine - Plural Support', () => {
           'en-US': {
             items: {
               one: '1 item',
-              other: '{count} items'
-            }
+              other: '{count} items',
+            },
           },
-          'ru': {
+          ru: {
             items: {
               one: '{count} товар',
               few: '{count} товара',
-              many: '{count} товаров'
-            }
-          }
-        }
+              many: '{count} товаров',
+            },
+          },
+        },
       });
     });
 
     it('should handle English plurals', () => {
-      expect(engine.translate('cart', 'items', { count: 1 }, 'en-US')).toBe('1 item');
-      expect(engine.translate('cart', 'items', { count: 5 }, 'en-US')).toBe('5 items');
+      expect(engine.translate('cart', 'items', { count: 1 }, 'en-US')).toBe(
+        '1 item',
+      );
+      expect(engine.translate('cart', 'items', { count: 5 }, 'en-US')).toBe(
+        '5 items',
+      );
     });
 
     it('should handle Russian plurals', () => {
-      expect(engine.translate('cart', 'items', { count: 1 }, 'ru')).toBe('1 товар');
-      expect(engine.translate('cart', 'items', { count: 2 }, 'ru')).toBe('2 товара');
-      expect(engine.translate('cart', 'items', { count: 5 }, 'ru')).toBe('5 товаров');
+      expect(engine.translate('cart', 'items', { count: 1 }, 'ru')).toBe(
+        '1 товар',
+      );
+      expect(engine.translate('cart', 'items', { count: 2 }, 'ru')).toBe(
+        '2 товара',
+      );
+      expect(engine.translate('cart', 'items', { count: 5 }, 'ru')).toBe(
+        '5 товаров',
+      );
     });
 
     it('should use current language when not specified', () => {
@@ -69,16 +81,20 @@ describe('I18nEngine - Plural Support', () => {
           'en-US': {
             items: {
               one: '1 item',
-              other: '{count} items'
-            }
-          }
-        }
+              other: '{count} items',
+            },
+          },
+        },
       });
     });
 
     it('should resolve plural in template', () => {
-      expect(engine.t('You have {{cart.items}}', { count: 1 }, 'en-US')).toBe('You have 1 item');
-      expect(engine.t('You have {{cart.items}}', { count: 5 }, 'en-US')).toBe('You have 5 items');
+      expect(engine.t('You have {{cart.items}}', { count: 1 }, 'en-US')).toBe(
+        'You have 1 item',
+      );
+      expect(engine.t('You have {{cart.items}}', { count: 5 }, 'en-US')).toBe(
+        'You have 5 items',
+      );
     });
 
     it('should handle multiple variables', () => {
@@ -86,13 +102,18 @@ describe('I18nEngine - Plural Support', () => {
         id: 'shop',
         strings: {
           'en-US': {
-            summary: 'Total: ${total}'
-          }
-        }
+            summary: 'Total: ${total}',
+          },
+        },
       });
 
-      expect(engine.t('{{cart.items}} - {{shop.summary}}', { count: 5, total: '99.99' }, 'en-US'))
-        .toBe('5 items - Total: $99.99');
+      expect(
+        engine.t(
+          '{{cart.items}} - {{shop.summary}}',
+          { count: 5, total: '99.99' },
+          'en-US',
+        ),
+      ).toBe('5 items - Total: $99.99');
     });
   });
 
@@ -104,19 +125,23 @@ describe('I18nEngine - Plural Support', () => {
           'en-US': {
             items: {
               one: '1 item',
-              other: '{count} items'
-            }
-          }
-        }
+              other: '{count} items',
+            },
+          },
+        },
       });
     });
 
     it('should handle plurals safely', () => {
-      expect(engine.safeTranslate('cart', 'items', { count: 5 }, 'en-US')).toBe('5 items');
+      expect(engine.safeTranslate('cart', 'items', { count: 5 }, 'en-US')).toBe(
+        '5 items',
+      );
     });
 
     it('should return fallback for missing keys', () => {
-      expect(engine.safeTranslate('cart', 'missing', { count: 5 }, 'en-US')).toBe('[cart.missing]');
+      expect(
+        engine.safeTranslate('cart', 'missing', { count: 5 }, 'en-US'),
+      ).toBe('[cart.missing]');
     });
   });
 
@@ -128,14 +153,14 @@ describe('I18nEngine - Plural Support', () => {
           'en-US': {
             items: {
               one: '1 item',
-              other: '{count} items'
+              other: '{count} items',
             },
             users: {
               one: '1 user',
-              other: '{userCount} users'
-            }
-          }
-        }
+              other: '{userCount} users',
+            },
+          },
+        },
       });
     });
 
@@ -143,7 +168,7 @@ describe('I18nEngine - Plural Support', () => {
       const result = engine.t(
         '{{summary.items}} from {{summary.users}}',
         { count: 5, userCount: 2 },
-        'en-US'
+        'en-US',
       );
       expect(result).toBe('5 items from 2 users');
     });
@@ -157,15 +182,19 @@ describe('I18nEngine - Plural Support', () => {
           'en-US': {
             items: {
               one: '1 item',
-              other: '{count} items'
-            }
-          }
-        }
+              other: '{count} items',
+            },
+          },
+        },
       });
     });
 
     it('should work with context variables', () => {
-      const result = engine.t('You have {{test.items}} in {currency}', { count: 5, currency: 'USD' }, 'en-US');
+      const result = engine.t(
+        'You have {{test.items}} in {currency}',
+        { count: 5, currency: 'USD' },
+        'en-US',
+      );
       expect(result).toContain('5 items');
       expect(result).toContain('USD');
     });
@@ -178,13 +207,15 @@ describe('I18nEngine - Plural Support', () => {
         strings: {
           'en-US': {
             title: 'My App',
-            greeting: 'Hello, {name}!'
-          }
-        }
+            greeting: 'Hello, {name}!',
+          },
+        },
       });
 
       expect(engine.translate('app', 'title', {}, 'en-US')).toBe('My App');
-      expect(engine.translate('app', 'greeting', { name: 'World' }, 'en-US')).toBe('Hello, World!');
+      expect(
+        engine.translate('app', 'greeting', { name: 'World' }, 'en-US'),
+      ).toBe('Hello, World!');
     });
 
     it('should handle mixed plural and simple strings', () => {
@@ -195,14 +226,18 @@ describe('I18nEngine - Plural Support', () => {
             title: 'Shopping Cart',
             items: {
               one: '1 item',
-              other: '{count} items'
-            }
-          }
-        }
+              other: '{count} items',
+            },
+          },
+        },
       });
 
-      expect(engine.translate('mixed', 'title', {}, 'en-US')).toBe('Shopping Cart');
-      expect(engine.translate('mixed', 'items', { count: 5 }, 'en-US')).toBe('5 items');
+      expect(engine.translate('mixed', 'title', {}, 'en-US')).toBe(
+        'Shopping Cart',
+      );
+      expect(engine.translate('mixed', 'items', { count: 5 }, 'en-US')).toBe(
+        '5 items',
+      );
     });
   });
 
@@ -214,17 +249,17 @@ describe('I18nEngine - Plural Support', () => {
           'en-US': {
             items: {
               one: '1 item',
-              other: '{count} items'
-            }
+              other: '{count} items',
+            },
           },
-          'ru': {
+          ru: {
             items: {
               one: '{count} товар',
               few: '{count} товара',
-              many: '{count} товаров'
-            }
-          }
-        }
+              many: '{count} товаров',
+            },
+          },
+        },
       });
     });
 

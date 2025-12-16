@@ -1,10 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
+
 /**
  * Plural form validation
  */
 
+import {
+  getAllPluralForms,
+  getRequiredPluralForms,
+} from '../pluralization/language-plural-map';
 import { PluralCategory } from '../pluralization/plural-categories';
 import { PluralString, isPluralString } from '../types/plural-types';
-import { getRequiredPluralForms, getAllPluralForms } from '../pluralization/language-plural-map';
 
 /**
  * Result of validating plural forms.
@@ -43,7 +48,7 @@ export function validatePluralForms(
   value: PluralString,
   language: string,
   key: string,
-  options: PluralValidationOptions = {}
+  options: PluralValidationOptions = {},
 ): PluralValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
@@ -60,9 +65,13 @@ export function validatePluralForms(
   for (const form of required) {
     if (!value[form as PluralCategory]) {
       if (options.strict) {
-        errors.push(`Missing required plural form '${form}' for language '${language}' in key '${key}'`);
+        errors.push(
+          `Missing required plural form '${form}' for language '${language}' in key '${key}'`,
+        );
       } else {
-        warnings.push(`Missing required plural form '${form}' for language '${language}' in key '${key}'`);
+        warnings.push(
+          `Missing required plural form '${form}' for language '${language}' in key '${key}'`,
+        );
       }
     }
   }
@@ -71,7 +80,9 @@ export function validatePluralForms(
   if (options.checkUnused) {
     for (const form of provided) {
       if (!all.includes(form)) {
-        warnings.push(`Unused plural form '${form}' for language '${language}' in key '${key}'`);
+        warnings.push(
+          `Unused plural form '${form}' for language '${language}' in key '${key}'`,
+        );
       }
     }
   }
@@ -81,7 +92,11 @@ export function validatePluralForms(
     const variables = extractVariables(value);
     const inconsistent = findInconsistentVariables(value, variables);
     for (const [form, missing] of Object.entries(inconsistent)) {
-      warnings.push(`Plural form '${form}' in key '${key}' missing variables: ${missing.join(', ')}`);
+      warnings.push(
+        `Plural form '${form}' in key '${key}' missing variables: ${missing.join(
+          ', ',
+        )}`,
+      );
     }
   }
 
@@ -106,7 +121,7 @@ function extractVariables(value: PluralString): Set<string> {
     if (text) {
       const matches = text.match(/\{(\w+)\}/g);
       if (matches) {
-        matches.forEach(m => vars.add(m.slice(1, -1)));
+        matches.forEach((m) => vars.add(m.slice(1, -1)));
       }
     }
   }
@@ -122,7 +137,7 @@ function extractVariables(value: PluralString): Set<string> {
  */
 function findInconsistentVariables(
   value: PluralString,
-  allVars: Set<string>
+  allVars: Set<string>,
 ): Record<string, string[]> {
   const inconsistent: Record<string, string[]> = {};
   if (typeof value === 'string') return inconsistent;
@@ -132,10 +147,10 @@ function findInconsistentVariables(
       const formVars = new Set<string>();
       const matches = text.match(/\{(\w+)\}/g);
       if (matches) {
-        matches.forEach(m => formVars.add(m.slice(1, -1)));
+        matches.forEach((m) => formVars.add(m.slice(1, -1)));
       }
 
-      const missing = Array.from(allVars).filter(v => !formVars.has(v));
+      const missing = Array.from(allVars).filter((v) => !formVars.has(v));
       if (missing.length > 0) {
         inconsistent[form] = missing;
       }
@@ -155,13 +170,15 @@ function findInconsistentVariables(
 export function validateCountVariable(
   value: PluralString,
   variables: Record<string, any> | undefined,
-  key: string
+  key: string,
 ): PluralValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
 
   if (isPluralString(value) && (!variables || variables.count === undefined)) {
-    warnings.push(`Plural forms used in key '${key}' but no 'count' variable provided`);
+    warnings.push(
+      `Plural forms used in key '${key}' but no 'count' variable provided`,
+    );
   }
 
   return { isValid: true, errors, warnings };

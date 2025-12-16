@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import {
   CoreI18nComponentId,
   CoreStringKey,
@@ -246,7 +248,10 @@ describe('core-i18n', () => {
 
   describe('bracket format consistency', () => {
     it('should match engine safeTranslate format', () => {
-      const engineResult = engine.safeTranslate(CoreI18nComponentId, 'NonExistent');
+      const engineResult = engine.safeTranslate(
+        CoreI18nComponentId,
+        'NonExistent',
+      );
       const coreResult = safeCoreTranslation(
         'NonExistent' as CoreStringKey,
         undefined,

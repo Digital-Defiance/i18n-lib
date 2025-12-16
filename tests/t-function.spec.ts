@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 /**
  * Comprehensive tests for the t() function
  * Tests all special parsing and resolution capabilities
  */
 
-import { I18nEngine } from '../src/core/i18n-engine';
 import { I18nBuilder } from '../src/builders/i18n-builder';
+import { I18nEngine } from '../src/core/i18n-engine';
 
 describe('t() Function - Comprehensive Tests', () => {
   let engine: I18nEngine;
@@ -47,15 +49,21 @@ describe('t() Function - Comprehensive Tests', () => {
     });
 
     it('should resolve multiple {{component.key}} patterns', () => {
-      expect(engine.t('{{app.welcome}} {{app.welcome}}')).toBe('Welcome! Welcome!');
+      expect(engine.t('{{app.welcome}} {{app.welcome}}')).toBe(
+        'Welcome! Welcome!',
+      );
     });
 
     it('should resolve {{component.key}} with variables', () => {
-      expect(engine.t('{{app.greeting}}', { name: 'John' })).toBe('Hello, John!');
+      expect(engine.t('{{app.greeting}}', { name: 'John' })).toBe(
+        'Hello, John!',
+      );
     });
 
     it('should resolve mixed text and {{component.key}}', () => {
-      expect(engine.t('Start: {{app.welcome}} End')).toBe('Start: Welcome! End');
+      expect(engine.t('Start: {{app.welcome}} End')).toBe(
+        'Start: Welcome! End',
+      );
     });
 
     it('should resolve {{component.key}} in different language', () => {
@@ -108,7 +116,9 @@ describe('t() Function - Comprehensive Tests', () => {
     });
 
     it('should resolve multiple aliases in same template', () => {
-      expect(engine.t('{{auth.login}} and {{AuthComponent.logout}}')).toBe('Login and Logout');
+      expect(engine.t('{{auth.login}} and {{AuthComponent.logout}}')).toBe(
+        'Login and Logout',
+      );
     });
 
     it('should resolve aliases in different languages', () => {
@@ -179,13 +189,15 @@ describe('t() Function - Comprehensive Tests', () => {
     });
 
     it('should substitute multiple variables', () => {
-      expect(engine.t('{greeting} {name}!', { greeting: 'Hello', name: 'John' })).toBe(
-        'Hello John!',
-      );
+      expect(
+        engine.t('{greeting} {name}!', { greeting: 'Hello', name: 'John' }),
+      ).toBe('Hello John!');
     });
 
     it('should substitute variables in {{component.key}} strings', () => {
-      expect(engine.t('{{app.greeting}}', { name: 'Alice' })).toBe('Hello, Alice!');
+      expect(engine.t('{{app.greeting}}', { name: 'Alice' })).toBe(
+        'Hello, Alice!',
+      );
     });
 
     it('should handle missing variables gracefully', () => {
@@ -203,14 +215,19 @@ describe('t() Function - Comprehensive Tests', () => {
         id: 'errors',
         strings: {
           'en-US': {
-            missingKeyTemplate: "Missing key '{key}' in component '{component}'",
+            missingKeyTemplate:
+              "Missing key '{key}' in component '{component}'",
             userNotFoundTemplate: "User '{username}' not found in system",
-            validationErrorTemplate: "Field '{field}' failed validation: {reason}",
+            validationErrorTemplate:
+              "Field '{field}' failed validation: {reason}",
           },
           fr: {
-            missingKeyTemplate: "Clé '{key}' manquante dans le composant '{component}'",
-            userNotFoundTemplate: "Utilisateur '{username}' introuvable dans le système",
-            validationErrorTemplate: "Le champ '{field}' a échoué la validation: {reason}",
+            missingKeyTemplate:
+              "Clé '{key}' manquante dans le composant '{component}'",
+            userNotFoundTemplate:
+              "Utilisateur '{username}' introuvable dans le système",
+            validationErrorTemplate:
+              "Le champ '{field}' a échoué la validation: {reason}",
           },
         },
       });
@@ -218,7 +235,10 @@ describe('t() Function - Comprehensive Tests', () => {
 
     it('should resolve template strings with variables', () => {
       expect(
-        engine.t('{{errors.missingKeyTemplate}}', { key: 'login', component: 'auth' }),
+        engine.t('{{errors.missingKeyTemplate}}', {
+          key: 'login',
+          component: 'auth',
+        }),
       ).toBe("Missing key 'login' in component 'auth'");
     });
 
@@ -269,21 +289,27 @@ describe('t() Function - Comprehensive Tests', () => {
     });
 
     it('should handle multiple components in one template', () => {
-      expect(engine.t('{{app.welcome}} - {{auth.status}}')).toBe('Welcome - Status');
+      expect(engine.t('{{app.welcome}} - {{auth.status}}')).toBe(
+        'Welcome - Status',
+      );
     });
 
     it('should handle components, aliases, and variables', () => {
-      expect(engine.t('{{app.welcome}}, {name}! {{AuthModule.status}}: {status}', {
-        name: 'John',
-        status: 'Active',
-      })).toBe('Welcome, John! Status: Active');
+      expect(
+        engine.t('{{app.welcome}}, {name}! {{AuthModule.status}}: {status}', {
+          name: 'John',
+          status: 'Active',
+        }),
+      ).toBe('Welcome, John! Status: Active');
     });
 
     it('should handle nested patterns', () => {
-      expect(engine.t('{{app.user}}: {username} ({{auth.status}}: {status})', {
-        username: 'john',
-        status: 'active',
-      })).toBe('User: john (Status: active)');
+      expect(
+        engine.t('{{app.user}}: {username} ({{auth.status}}: {status})', {
+          username: 'john',
+          status: 'active',
+        }),
+      ).toBe('User: john (Status: active)');
     });
 
     it('should handle complex patterns in different languages', () => {
@@ -332,7 +358,9 @@ describe('t() Function - Comprehensive Tests', () => {
     });
 
     it('should preserve unmatched patterns', () => {
-      expect(engine.t('{{missing.key}} and {missing}')).toBe('[missing.key] and {missing}');
+      expect(engine.t('{{missing.key}} and {missing}')).toBe(
+        '[missing.key] and {missing}',
+      );
     });
   });
 
@@ -373,7 +401,9 @@ describe('t() Function - Comprehensive Tests', () => {
     });
 
     it('should inject constants in direct templates', () => {
-      expect(engine.t('App: {AppName}, Version: {Version}', {})).toBe('App: MyApp, Version: 1.0.0');
+      expect(engine.t('App: {AppName}, Version: {Version}', {})).toBe(
+        'App: MyApp, Version: 1.0.0',
+      );
     });
 
     it('should allow variables to override constants', () => {
@@ -398,14 +428,25 @@ describe('t() Function - Comprehensive Tests', () => {
     });
 
     it('should handle many patterns in one template', () => {
-      const template = '{{perf.msg1}} {{perf.msg2}} {{perf.msg3}} {{perf.msg4}} {{perf.msg5}}';
-      expect(engine.t(template)).toBe('Message 1 Message 2 Message 3 Message 4 Message 5');
+      const template =
+        '{{perf.msg1}} {{perf.msg2}} {{perf.msg3}} {{perf.msg4}} {{perf.msg5}}';
+      expect(engine.t(template)).toBe(
+        'Message 1 Message 2 Message 3 Message 4 Message 5',
+      );
     });
 
     it('should handle many variables', () => {
       const vars = {
-        v1: 'a', v2: 'b', v3: 'c', v4: 'd', v5: 'e',
-        v6: 'f', v7: 'g', v8: 'h', v9: 'i', v10: 'j',
+        v1: 'a',
+        v2: 'b',
+        v3: 'c',
+        v4: 'd',
+        v5: 'e',
+        v6: 'f',
+        v7: 'g',
+        v8: 'h',
+        v9: 'i',
+        v10: 'j',
       };
       const template = '{v1}{v2}{v3}{v4}{v5}{v6}{v7}{v8}{v9}{v10}';
       expect(engine.t(template, vars)).toBe('abcdefghij');
@@ -424,7 +465,8 @@ describe('t() Function - Comprehensive Tests', () => {
 
     beforeEach(() => {
       // Import context classes
-      GlobalActiveContext = require('../src/global-active-context').GlobalActiveContext;
+      GlobalActiveContext =
+        require('../src/global-active-context').GlobalActiveContext;
       CurrencyCode = require('../src/utils/currency').CurrencyCode;
       Timezone = require('../src/utils/timezone').Timezone;
 
@@ -440,7 +482,8 @@ describe('t() Function - Comprehensive Tests', () => {
             withCurrency: 'Price in {currencyCode}',
             withTimezone: 'Time in {timezone}',
             withLanguage: 'Current language: {language}',
-            withMultiple: 'Language: {language}, Currency: {currency}, Timezone: {userTimezone}',
+            withMultiple:
+              'Language: {language}, Currency: {currency}, Timezone: {userTimezone}',
           },
         },
       });
@@ -461,14 +504,18 @@ describe('t() Function - Comprehensive Tests', () => {
       const globalContext = GlobalActiveContext.getInstance();
       globalContext.setUserTimezone(new Timezone('America/New_York'));
 
-      expect(engine.t('{{context-test.withTimezone}}')).toBe('Time in America/New_York');
+      expect(engine.t('{{context-test.withTimezone}}')).toBe(
+        'Time in America/New_York',
+      );
     });
 
     it('should inject language from context', () => {
       const globalContext = GlobalActiveContext.getInstance();
       globalContext.setUserLanguage('fr');
 
-      expect(engine.t('{{context-test.withLanguage}}')).toBe('Current language: fr');
+      expect(engine.t('{{context-test.withLanguage}}')).toBe(
+        'Current language: fr',
+      );
     });
 
     it('should inject multiple context variables', () => {
@@ -486,9 +533,9 @@ describe('t() Function - Comprehensive Tests', () => {
       const globalContext = GlobalActiveContext.getInstance();
       globalContext.setCurrencyCode(new CurrencyCode('USD'));
 
-      expect(engine.t('{{context-test.withCurrency}}', { currencyCode: 'JPY' })).toBe(
-        'Price in JPY',
-      );
+      expect(
+        engine.t('{{context-test.withCurrency}}', { currencyCode: 'JPY' }),
+      ).toBe('Price in JPY');
     });
 
     it('should inject context variables in direct templates', () => {
@@ -505,9 +552,9 @@ describe('t() Function - Comprehensive Tests', () => {
       GlobalActiveContext.clearAll();
 
       // Should not throw, just skip context variables
-      expect(engine.t('{{context-test.withCurrency}}', { currencyCode: 'USD' })).toBe(
-        'Price in USD',
-      );
+      expect(
+        engine.t('{{context-test.withCurrency}}', { currencyCode: 'USD' }),
+      ).toBe('Price in USD');
     });
   });
 
@@ -515,7 +562,9 @@ describe('t() Function - Comprehensive Tests', () => {
     beforeEach(() => {
       I18nEngine.resetAll();
       engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withConstants({
           AppName: 'MyApp',
           Version: '1.0.0',
@@ -527,7 +576,8 @@ describe('t() Function - Comprehensive Tests', () => {
         id: 'priority-test',
         strings: {
           'en-US': {
-            message: 'App: {AppName}, Version: {Version}, Currency: {DefaultCurrency}',
+            message:
+              'App: {AppName}, Version: {Version}, Currency: {DefaultCurrency}',
           },
         },
       });
@@ -540,9 +590,9 @@ describe('t() Function - Comprehensive Tests', () => {
     });
 
     it('should allow variables to override constants', () => {
-      expect(engine.t('{{priority-test.message}}', { AppName: 'CustomApp' })).toBe(
-        'App: CustomApp, Version: 1.0.0, Currency: USD',
-      );
+      expect(
+        engine.t('{{priority-test.message}}', { AppName: 'CustomApp' }),
+      ).toBe('App: CustomApp, Version: 1.0.0, Currency: USD');
     });
 
     it('should allow variables to override multiple constants', () => {
@@ -560,7 +610,9 @@ describe('t() Function - Comprehensive Tests', () => {
     });
 
     it('should allow variables to override constants in direct templates', () => {
-      expect(engine.t('{AppName} v{Version}', { Version: '3.0.0' })).toBe('MyApp v3.0.0');
+      expect(engine.t('{AppName} v{Version}', { Version: '3.0.0' })).toBe(
+        'MyApp v3.0.0',
+      );
     });
   });
 
@@ -569,7 +621,8 @@ describe('t() Function - Comprehensive Tests', () => {
     let CurrencyCode: any;
 
     beforeEach(() => {
-      GlobalActiveContext = require('../src/global-active-context').GlobalActiveContext;
+      GlobalActiveContext =
+        require('../src/global-active-context').GlobalActiveContext;
       CurrencyCode = require('../src/utils/currency').CurrencyCode;
 
       GlobalActiveContext.clearAll();
@@ -579,7 +632,9 @@ describe('t() Function - Comprehensive Tests', () => {
 
       I18nEngine.resetAll();
       engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withConstants({
           AppName: 'MyApp',
           currency: 'USD', // Note: lowercase to test override
@@ -603,7 +658,9 @@ describe('t() Function - Comprehensive Tests', () => {
     it('should use context over constants', () => {
       // Context has EUR, constant has USD
       // Context should win
-      expect(engine.t('{{combined-test.message}}')).toBe('App: MyApp, Currency: EUR');
+      expect(engine.t('{{combined-test.message}}')).toBe(
+        'App: MyApp, Currency: EUR',
+      );
     });
 
     it('should use provided variables over context and constants', () => {
@@ -615,7 +672,10 @@ describe('t() Function - Comprehensive Tests', () => {
 
     it('should use provided variables over context and constants for all vars', () => {
       expect(
-        engine.t('{{combined-test.message}}', { AppName: 'CustomApp', currency: 'JPY' }),
+        engine.t('{{combined-test.message}}', {
+          AppName: 'CustomApp',
+          currency: 'JPY',
+        }),
       ).toBe('App: CustomApp, Currency: JPY');
     });
   });
@@ -626,10 +686,10 @@ describe('t() Function - Comprehensive Tests', () => {
         id: 'test',
         strings: {
           'en-US': {
-            'simple_key': 'Simple Key',
-            'camelCaseKey': 'Camel Case Key',
+            simple_key: 'Simple Key',
+            camelCaseKey: 'Camel Case Key',
             'kebab-case-key': 'Kebab Case Key',
-            'PascalCaseKey': 'Pascal Case Key',
+            PascalCaseKey: 'Pascal Case Key',
           },
         },
       });
@@ -657,7 +717,8 @@ describe('t() Function - Comprehensive Tests', () => {
     let Timezone: any;
 
     beforeEach(() => {
-      GlobalActiveContext = require('../src/global-active-context').GlobalActiveContext;
+      GlobalActiveContext =
+        require('../src/global-active-context').GlobalActiveContext;
       Timezone = require('../src/utils/timezone').Timezone;
 
       GlobalActiveContext.clearAll();
@@ -671,7 +732,8 @@ describe('t() Function - Comprehensive Tests', () => {
         id: 'admin-test',
         strings: {
           'en-US': {
-            adminInfo: 'Admin Language: {adminLanguage}, Admin Timezone: {adminTimezone}',
+            adminInfo:
+              'Admin Language: {adminLanguage}, Admin Timezone: {adminTimezone}',
             userInfo: 'User Timezone: {userTimezone}',
           },
         },
@@ -683,16 +745,21 @@ describe('t() Function - Comprehensive Tests', () => {
     });
 
     it('should inject admin language from context', () => {
-      expect(engine.t('{{admin-test.adminInfo}}')).toContain('Admin Language: fr');
+      expect(engine.t('{{admin-test.adminInfo}}')).toContain(
+        'Admin Language: fr',
+      );
     });
 
     it('should inject admin timezone from context', () => {
-      expect(engine.t('{{admin-test.adminInfo}}')).toContain('Admin Timezone: UTC');
+      expect(engine.t('{{admin-test.adminInfo}}')).toContain(
+        'Admin Timezone: UTC',
+      );
     });
 
     it('should inject user timezone from context', () => {
-      expect(engine.t('{{admin-test.userInfo}}')).toBe('User Timezone: America/New_York');
+      expect(engine.t('{{admin-test.userInfo}}')).toBe(
+        'User Timezone: America/New_York',
+      );
     });
   });
 });
-

@@ -1,8 +1,8 @@
 export interface FormatterContext {
   locale: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface Formatter {
-  format(value: any, style?: string, context?: FormatterContext): string;
+  format(value: unknown, style?: string, context?: FormatterContext): string;
 }

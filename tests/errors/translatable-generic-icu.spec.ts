@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 /**
  * Tests for TranslatableGenericError with ICU MessageFormat, pluralization, and nested messages (v3.5.0 features)
  */
 
 import { I18nEngine } from '../../src/core/i18n-engine';
-import { createPluralString } from '../../src/utils/plural-helpers';
 import { formatICUMessage } from '../../src/icu/helpers';
-import { TranslatableGenericError } from '../../src/errors/translatable-generic';
+import { createPluralString } from '../../src/utils/plural-helpers';
 
 describe('TranslatableGenericError with ICU MessageFormat', () => {
   let engine: I18nEngine;
@@ -18,7 +19,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
     engine = I18nEngine.createInstance('test-icu-errors', [
       { id: 'en-US', name: 'English (US)', code: 'en-US', isDefault: true },
       { id: 'fr', name: 'Français', code: 'fr' },
-      { id: 'uk', name: 'Українська', code: 'uk' }
+      { id: 'uk', name: 'Українська', code: 'uk' },
     ]);
   });
 
@@ -33,40 +34,40 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         id: 'validation',
         strings: {
           'en-US': {
-            'itemsFound': createPluralString({
+            itemsFound: createPluralString({
               one: 'Found {count} item',
-              other: 'Found {count} items'
+              other: 'Found {count} items',
             }),
-            'errorsDetected': createPluralString({
+            errorsDetected: createPluralString({
               one: 'Detected {count} error in {context}',
-              other: 'Detected {count} errors in {context}'
-            })
-          },
-          'fr': {
-            'itemsFound': createPluralString({
-              one: 'Trouvé {count} élément',
-              other: 'Trouvé {count} éléments'
+              other: 'Detected {count} errors in {context}',
             }),
-            'errorsDetected': createPluralString({
-              one: 'Détecté {count} erreur dans {context}',
-              other: 'Détecté {count} erreurs dans {context}'
-            })
           },
-          'uk': {
-            'itemsFound': createPluralString({
+          fr: {
+            itemsFound: createPluralString({
+              one: 'Trouvé {count} élément',
+              other: 'Trouvé {count} éléments',
+            }),
+            errorsDetected: createPluralString({
+              one: 'Détecté {count} erreur dans {context}',
+              other: 'Détecté {count} erreurs dans {context}',
+            }),
+          },
+          uk: {
+            itemsFound: createPluralString({
               one: 'Знайдено {count} елемент',
               few: 'Знайдено {count} елементи',
               many: 'Знайдено {count} елементів',
-              other: 'Знайдено {count} елемента'
+              other: 'Знайдено {count} елемента',
             }),
-            'errorsDetected': createPluralString({
+            errorsDetected: createPluralString({
               one: 'Виявлено {count} помилку в {context}',
               few: 'Виявлено {count} помилки в {context}',
               many: 'Виявлено {count} помилок в {context}',
-              other: 'Виявлено {count} помилки в {context}'
-            })
-          }
-        }
+              other: 'Виявлено {count} помилки в {context}',
+            }),
+          },
+        },
       });
     });
 
@@ -75,7 +76,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         engine,
         'validation',
         'itemsFound',
-        { count: 1 }
+        { count: 1 },
       );
 
       expect(error.message).toBe('Found 1 item');
@@ -87,7 +88,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         engine,
         'validation',
         'itemsFound',
-        { count: 5 }
+        { count: 5 },
       );
 
       expect(error.message).toBe('Found 5 items');
@@ -99,7 +100,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         'validation',
         'itemsFound',
         { count: 1 },
-        'fr'
+        'fr',
       );
 
       const error2 = TranslatableGenericError.withEngine(
@@ -107,7 +108,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         'validation',
         'itemsFound',
         { count: 5 },
-        'fr'
+        'fr',
       );
 
       expect(error1.message).toBe('Trouvé 1 élément');
@@ -120,7 +121,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         'validation',
         'itemsFound',
         { count: 1 },
-        'uk'
+        'uk',
       );
 
       const error2 = TranslatableGenericError.withEngine(
@@ -128,7 +129,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         'validation',
         'itemsFound',
         { count: 2 },
-        'uk'
+        'uk',
       );
 
       const error5 = TranslatableGenericError.withEngine(
@@ -136,7 +137,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         'validation',
         'itemsFound',
         { count: 5 },
-        'uk'
+        'uk',
       );
 
       const error21 = TranslatableGenericError.withEngine(
@@ -144,7 +145,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         'validation',
         'itemsFound',
         { count: 21 },
-        'uk'
+        'uk',
       );
 
       expect(error1.message).toBe('Знайдено 1 елемент'); // one
@@ -158,7 +159,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         engine,
         'validation',
         'errorsDetected',
-        { count: 3, context: 'configuration' }
+        { count: 3, context: 'configuration' },
       );
 
       expect(error.message).toBe('Detected 3 errors in configuration');
@@ -169,7 +170,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         engine,
         'validation',
         'itemsFound',
-        { count: 5 }
+        { count: 5 },
       );
 
       expect(error.message).toBe('Found 5 items'); // English
@@ -183,12 +184,12 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
       // ICU MessageFormat works standalone
       const message1 = formatICUMessage(
         '{count, plural, one {# item} other {# items}}',
-        { count: 1 }
+        { count: 1 },
       );
 
       const message5 = formatICUMessage(
         '{count, plural, one {# item} other {# items}}',
-        { count: 5 }
+        { count: 5 },
       );
 
       expect(message1).toBe('1 item');
@@ -198,12 +199,12 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
     it('should demonstrate ICU select format', () => {
       const male = formatICUMessage(
         '{gender, select, male {He} female {She} other {They}} found {count} items',
-        { gender: 'male', count: 1 }
+        { gender: 'male', count: 1 },
       );
 
       const female = formatICUMessage(
         '{gender, select, male {He} female {She} other {They}} found {count} items',
-        { gender: 'female', count: 2 }
+        { gender: 'female', count: 2 },
       );
 
       expect(male).toContain('He found 1');
@@ -213,7 +214,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
     it('should demonstrate ICU nested messages', () => {
       const message = formatICUMessage(
         '{gender, select, male {He has} female {She has} other {They have}} {count, plural, one {# item} other {# items}}',
-        { gender: 'female', count: 2 }
+        { gender: 'female', count: 2 },
       );
 
       expect(message).toBe('She has 2 items');
@@ -223,7 +224,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
       const price = formatICUMessage(
         'Price: {amount, number, currency}',
         { amount: 99.99 },
-        'en-US'
+        'en-US',
       );
 
       expect(price).toContain('99.99');
@@ -236,20 +237,22 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         id: 'validation',
         strings: {
           'en-US': {
-            'configValidationFailed': createPluralString({
+            configValidationFailed: createPluralString({
               one: 'Configuration validation failed ({count} invariant):\n\n{failures}',
-              other: 'Configuration validation failed ({count} invariants):\n\n{failures}'
+              other:
+                'Configuration validation failed ({count} invariants):\n\n{failures}',
             }),
-            'unknownInvariant': 'Unknown invariant: {name}'
+            unknownInvariant: 'Unknown invariant: {name}',
           },
-          'fr': {
-            'configValidationFailed': createPluralString({
+          fr: {
+            configValidationFailed: createPluralString({
               one: 'La validation de la configuration a échoué ({count} invariant):\n\n{failures}',
-              other: 'La validation de la configuration a échoué ({count} invariants):\n\n{failures}'
+              other:
+                'La validation de la configuration a échoué ({count} invariants):\n\n{failures}',
             }),
-            'unknownInvariant': 'Invariant inconnu: {name}'
-          }
-        }
+            unknownInvariant: 'Invariant inconnu: {name}',
+          },
+        },
       });
     });
 
@@ -260,8 +263,8 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         'configValidationFailed',
         {
           count: 1,
-          failures: 'MEMBER_ID_LENGTH !== RECIPIENT_ID_SIZE (12 !== 32)'
-        }
+          failures: 'MEMBER_ID_LENGTH !== RECIPIENT_ID_SIZE (12 !== 32)',
+        },
       );
 
       expect(error.message).toContain('(1 invariant)');
@@ -272,14 +275,14 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
       const failures = [
         'MEMBER_ID_LENGTH !== RECIPIENT_ID_SIZE',
         'Invalid PBKDF2 iterations: 999',
-        'Unsupported curve: secp256r1'
+        'Unsupported curve: secp256r1',
       ].join('\n\n');
 
       const error = TranslatableGenericError.withEngine(
         engine,
         'validation',
         'configValidationFailed',
-        { count: 3, failures }
+        { count: 3, failures },
       );
 
       expect(error.message).toContain('(3 invariants)');
@@ -293,7 +296,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         engine,
         'validation',
         'unknownInvariant',
-        { name: 'CustomInvariant' }
+        { name: 'CustomInvariant' },
       );
 
       expect(error.message).toBe('Unknown invariant: CustomInvariant');
@@ -307,7 +310,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         'validation',
         'configValidationFailed',
         { count: 2, failures },
-        'en-US'
+        'en-US',
       );
 
       const errorFr = TranslatableGenericError.withEngine(
@@ -315,7 +318,7 @@ describe('TranslatableGenericError with ICU MessageFormat', () => {
         'validation',
         'configValidationFailed',
         { count: 2, failures },
-        'fr'
+        'fr',
       );
 
       expect(errorEn.message).toContain('(2 invariants)');

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { Runtime } from '../../src/icu/runtime';
 
 describe('ICU Runtime - Security', () => {
@@ -35,7 +37,7 @@ describe('ICU Runtime - Security', () => {
       const msg = 'Hello {name}';
       const en = runtime.format(msg, { name: 'World' }, { locale: 'en-US' });
       const fr = runtime.format(msg, { name: 'Monde' }, { locale: 'fr-FR' });
-      
+
       expect(en).toContain('World');
       expect(fr).toContain('Monde');
     });
@@ -61,7 +63,11 @@ describe('ICU Runtime - Security', () => {
   describe('validation integration', () => {
     it('should validate AST', () => {
       expect(() => {
-        runtime.format('{count, plural, one {item}}', { count: 1 }, { locale: 'en-US' });
+        runtime.format(
+          '{count, plural, one {item}}',
+          { count: 1 },
+          { locale: 'en-US' },
+        );
       }).toThrow(/other.*case/i);
     });
   });

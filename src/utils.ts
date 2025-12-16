@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */
+
 import moment from 'moment-timezone';
 
 /**
@@ -10,7 +12,7 @@ import moment from 'moment-timezone';
 export function replaceVariables(
   str: string,
   vars?: Record<string, string | number>,
-  constants?: any,
+  constants?: Record<string, any>,
 ): string {
   // Ensure input is a string
   if (typeof str !== 'string') {

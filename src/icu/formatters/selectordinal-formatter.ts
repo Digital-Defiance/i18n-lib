@@ -1,7 +1,7 @@
 import { Formatter, FormatterContext } from './base-formatter';
 
 export class SelectOrdinalFormatter implements Formatter {
-  format(value: any, style?: string, context?: FormatterContext): string {
+  format(value: unknown, _style?: string, _context?: FormatterContext): string {
     const num = Number(value);
     if (isNaN(num)) return 'other';
 

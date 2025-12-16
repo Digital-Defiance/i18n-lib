@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 /**
  * I18n Engine v2 tests
  */
 
-import { I18nEngine, I18nBuilder, I18nError, I18nErrorCode } from '../../src';
+import { I18nBuilder, I18nEngine, I18nError, I18nErrorCode } from '../../src';
 
 describe('I18nEngine v2', () => {
   beforeEach(() => {
@@ -34,7 +36,9 @@ describe('I18nEngine v2', () => {
 
     it('should support constants', () => {
       const engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withConstants({ Site: 'TestSite' })
         .build();
 
@@ -66,7 +70,7 @@ describe('I18nEngine v2', () => {
         id: 'auth',
         strings: {
           'en-US': { login: 'Login', logout: 'Logout' },
-          'fr': { login: 'Connexion', logout: 'Déconnexion' },
+          fr: { login: 'Connexion', logout: 'Déconnexion' },
         },
       });
 
@@ -146,7 +150,7 @@ describe('I18nEngine v2', () => {
             welcome: 'Welcome!',
             greeting: 'Hello, {name}!',
           },
-          'fr': {
+          fr: {
             welcome: 'Bienvenue!',
             greeting: 'Bonjour, {name}!',
           },
@@ -159,7 +163,9 @@ describe('I18nEngine v2', () => {
     });
 
     it('should translate with variables', () => {
-      expect(engine.translate('app', 'greeting', { name: 'John' })).toBe('Hello, John!');
+      expect(engine.translate('app', 'greeting', { name: 'John' })).toBe(
+        'Hello, John!',
+      );
     });
 
     it('should translate in different language', () => {
@@ -189,7 +195,9 @@ describe('I18nEngine v2', () => {
 
     beforeEach(() => {
       engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .build();
 
       engine.register({
@@ -216,7 +224,9 @@ describe('I18nEngine v2', () => {
 
     beforeEach(() => {
       engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .build();
 
       engine.register({
@@ -239,7 +249,9 @@ describe('I18nEngine v2', () => {
     });
 
     it('should process mixed patterns', () => {
-      expect(engine.t('{{app.welcome}} {name}!', { name: 'John' })).toBe('Welcome! John!');
+      expect(engine.t('{{app.welcome}} {name}!', { name: 'John' })).toBe(
+        'Welcome! John!',
+      );
     });
 
     it('should handle missing components gracefully', () => {
@@ -252,7 +264,9 @@ describe('I18nEngine v2', () => {
 
     beforeEach(() => {
       engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withConstants({ Site: 'OriginalSite', Version: '1.0' })
         .build();
 
@@ -268,12 +282,16 @@ describe('I18nEngine v2', () => {
     });
 
     it('should use initial constants', () => {
-      expect(engine.translate('app', 'info')).toBe('Welcome to OriginalSite v1.0');
+      expect(engine.translate('app', 'info')).toBe(
+        'Welcome to OriginalSite v1.0',
+      );
     });
 
     it('should merge constants', () => {
       engine.mergeConstants({ Version: '2.0', Author: 'Test' });
-      expect(engine.translate('app', 'info')).toBe('Welcome to OriginalSite v2.0');
+      expect(engine.translate('app', 'info')).toBe(
+        'Welcome to OriginalSite v2.0',
+      );
     });
 
     it('should preserve existing constants when merging', () => {
@@ -362,7 +380,9 @@ describe('I18nEngine v2', () => {
 
     it('should get default instance', () => {
       const engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .build();
 
       expect(I18nEngine.getInstance()).toBe(engine);
@@ -390,7 +410,9 @@ describe('I18nEngine v2', () => {
         throw I18nError.componentNotFound('test');
       } catch (error) {
         expect(error).toBeInstanceOf(I18nError);
-        expect((error as I18nError).code).toBe(I18nErrorCode.COMPONENT_NOT_FOUND);
+        expect((error as I18nError).code).toBe(
+          I18nErrorCode.COMPONENT_NOT_FOUND,
+        );
         expect((error as I18nError).metadata).toEqual({ componentId: 'test' });
       }
     });
@@ -418,7 +440,7 @@ describe('I18nEngine v2', () => {
         Status,
         {
           'en-US': { [Status.Active]: 'Active', [Status.Inactive]: 'Inactive' },
-          'fr': { [Status.Active]: 'Actif', [Status.Inactive]: 'Inactif' },
+          fr: { [Status.Active]: 'Actif', [Status.Inactive]: 'Inactif' },
         },
         'Status',
       );

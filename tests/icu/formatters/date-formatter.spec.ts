@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { DateFormatter } from '../../../src/icu/formatters/date-formatter';
 
 describe('DateFormatter', () => {
@@ -37,7 +39,9 @@ describe('DateFormatter', () => {
   });
 
   it('should handle invalid dates', () => {
-    expect(formatter.format('invalid', 'short', { locale: 'en-US' })).toBe('invalid');
+    expect(formatter.format('invalid', 'short', { locale: 'en-US' })).toBe(
+      'invalid',
+    );
   });
 
   it('should default to medium', () => {

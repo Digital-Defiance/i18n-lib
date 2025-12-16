@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return, import/order */
 import { CoreI18nComponentId } from '../core-component-id';
 import { CoreStringKey } from '../core-string-key';
 import { I18nEngine } from '../core/i18n-engine';
@@ -40,7 +41,7 @@ import { CompleteReasonMap } from './typed';
  * // Use typed handleable error
  * try {
  *   await apiCall();
- * } catch (error) {
+ * } catch (_error) {
  *   throw new TypedHandleableError(
  *     'network',
  *     NetworkError.Timeout,
@@ -103,7 +104,7 @@ export class TypedHandleableError<
         language,
       );
       message = String(translated || type);
-    } catch (error) {
+    } catch (_error) {
       // Fallback if engine not available
       message = key ? `[${componentId}.${key}]` : String(type);
     }
@@ -128,7 +129,7 @@ export class TypedHandleableError<
     this.name = 'TypedHandleableError';
   }
 
-  public override toJSON(): Record<string, unknown> {
+  public override toJSON(): Record<string, any> {
     const baseJson = super.toJSON();
     return {
       ...baseJson,

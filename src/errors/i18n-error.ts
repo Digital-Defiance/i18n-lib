@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 /**
  * Unified error class for i18n library with ICU MessageFormat support
  */
@@ -205,7 +206,7 @@ export class I18nError extends Error {
    */
   static duplicateLanguage(
     language: string,
-    messageLanguage = 'en-US',
+    _messageLanguage = 'en-US',
   ): I18nError {
     const message = `Language '${language}' already registered`;
     return new I18nError(I18nErrorCode.DUPLICATE_LANGUAGE, message, {

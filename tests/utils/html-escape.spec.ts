@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { escapeHtml, safeStringify } from '../../src/utils/html-escape';
 
 describe('html-escape', () => {
@@ -27,13 +29,13 @@ describe('html-escape', () => {
     });
 
     it('should escape script tags', () => {
-      expect(escapeHtml('<script>alert(1)</script>'))
-        .toBe('&lt;script&gt;alert(1)&lt;&#x2F;script&gt;');
+      expect(escapeHtml('<script>alert(1)</script>')).toBe(
+        '&lt;script&gt;alert(1)&lt;&#x2F;script&gt;',
+      );
     });
 
     it('should escape all dangerous chars', () => {
-      expect(escapeHtml('&<>"\'/'))
-        .toBe('&amp;&lt;&gt;&quot;&#x27;&#x2F;');
+      expect(escapeHtml('&<>"\'/')).toBe('&amp;&lt;&gt;&quot;&#x27;&#x2F;');
     });
 
     it('should handle empty string', () => {
@@ -70,13 +72,15 @@ describe('html-escape', () => {
     });
 
     it('should escape HTML when enabled', () => {
-      expect(safeStringify('<script>', { escapeHtml: true }))
-        .toBe('&lt;script&gt;');
+      expect(safeStringify('<script>', { escapeHtml: true })).toBe(
+        '&lt;script&gt;',
+      );
     });
 
     it('should not escape when disabled', () => {
-      expect(safeStringify('<b>test</b>', { escapeHtml: false }))
-        .toBe('<b>test</b>');
+      expect(safeStringify('<b>test</b>', { escapeHtml: false })).toBe(
+        '<b>test</b>',
+      );
     });
 
     it('should reject objects', () => {

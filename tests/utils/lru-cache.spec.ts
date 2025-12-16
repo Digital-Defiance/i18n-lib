@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { LRUCache } from '../../src/utils/lru-cache';
 
 describe('LRUCache', () => {
@@ -18,7 +20,7 @@ describe('LRUCache', () => {
     cache.set('b', 2);
     cache.set('c', 3);
     cache.set('d', 4);
-    
+
     expect(cache.size()).toBe(3);
     expect(cache.get('a')).toBeUndefined();
     expect(cache.get('d')).toBe(4);
@@ -31,7 +33,7 @@ describe('LRUCache', () => {
     cache.set('c', 3);
     cache.get('a');
     cache.set('d', 4);
-    
+
     expect(cache.get('b')).toBeUndefined();
     expect(cache.get('a')).toBe(1);
   });
@@ -40,7 +42,7 @@ describe('LRUCache', () => {
     const cache = new LRUCache<string, number>(3);
     cache.set('a', 1);
     cache.set('a', 2);
-    
+
     expect(cache.get('a')).toBe(2);
     expect(cache.size()).toBe(1);
   });
@@ -50,7 +52,7 @@ describe('LRUCache', () => {
     cache.set('a', 1);
     cache.set('b', 2);
     cache.clear();
-    
+
     expect(cache.size()).toBe(0);
     expect(cache.get('a')).toBeUndefined();
   });

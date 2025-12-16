@@ -1,9 +1,18 @@
-import { createPluralString, createGenderedString, getRequiredPluralForms } from '../../src/utils/plural-helpers';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
+import {
+  createGenderedString,
+  createPluralString,
+  getRequiredPluralForms,
+} from '../../src/utils/plural-helpers';
 
 describe('Plural Helpers', () => {
   describe('createPluralString', () => {
     it('should create plural string with one and other', () => {
-      const result = createPluralString({ one: '1 item', other: '{count} items' });
+      const result = createPluralString({
+        one: '1 item',
+        other: '{count} items',
+      });
       expect(result).toEqual({ one: '1 item', other: '{count} items' });
     });
 
@@ -14,7 +23,7 @@ describe('Plural Helpers', () => {
         two: '2 items',
         few: '{count} items',
         many: '{count} items',
-        other: '{count} items'
+        other: '{count} items',
       });
       expect(result).toHaveProperty('zero');
       expect(result).toHaveProperty('many');
@@ -42,7 +51,7 @@ describe('Plural Helpers', () => {
         male: 'He',
         female: 'She',
         neutral: 'They',
-        other: 'Person'
+        other: 'Person',
       });
       expect(result).toHaveProperty('neutral');
       expect(result).toHaveProperty('other');
@@ -94,7 +103,7 @@ describe('Plural Helpers', () => {
         two: 'two',
         few: 'few',
         many: 'many',
-        other: 'other'
+        other: 'other',
       });
       expect(result).toBeDefined();
     });
@@ -104,7 +113,7 @@ describe('Plural Helpers', () => {
         male: 'male',
         female: 'female',
         neutral: 'neutral',
-        other: 'other'
+        other: 'other',
       });
       expect(result).toBeDefined();
     });

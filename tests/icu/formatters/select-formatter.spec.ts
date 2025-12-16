@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { SelectFormatter } from '../../../src/icu/formatters/select-formatter';
 
 describe('SelectFormatter', () => {
@@ -8,7 +10,9 @@ describe('SelectFormatter', () => {
   });
 
   it('should return string value', () => {
-    expect(formatter.format('male', undefined, { locale: 'en-US' })).toBe('male');
+    expect(formatter.format('male', undefined, { locale: 'en-US' })).toBe(
+      'male',
+    );
   });
 
   it('should convert numbers to strings', () => {
@@ -20,6 +24,8 @@ describe('SelectFormatter', () => {
   });
 
   it('should handle undefined', () => {
-    expect(formatter.format(undefined, undefined, { locale: 'en-US' })).toBe('undefined');
+    expect(formatter.format(undefined, undefined, { locale: 'en-US' })).toBe(
+      'undefined',
+    );
   });
 });

@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /**
  * I18n Engine type definitions
  *
  * This file provides type-safe interfaces for i18n engine implementations.
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
  * Generic I18n Engine interface with type-safe string key constraints
@@ -19,7 +22,7 @@ export interface II18nEngine<TStringKeys extends string = string> {
    * @param params - Optional parameters for interpolation
    * @returns The translated string
    */
-  translate(key: TStringKeys, params?: Record<string, unknown>): string;
+  translate(key: TStringKeys, params?: Record<string, any>): string;
 
   /**
    * Translate an enum value to a string

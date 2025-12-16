@@ -1,8 +1,9 @@
 import { Formatter, FormatterContext } from './base-formatter';
 
 export class DateFormatter implements Formatter {
-  format(value: any, style?: string, context?: FormatterContext): string {
-    const date = value instanceof Date ? value : new Date(value);
+  format(value: unknown, style?: string, context?: FormatterContext): string {
+    const date =
+      value instanceof Date ? value : new Date(value as string | number);
     if (isNaN(date.getTime())) return String(value);
 
     const locale = context?.locale || 'en-US';

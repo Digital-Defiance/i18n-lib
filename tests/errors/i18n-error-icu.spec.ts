@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 /**
  * Tests for I18nError ICU MessageFormat integration
  * Verifies that error classes properly leverage 3.5.0 ICU features
@@ -32,7 +34,7 @@ describe('I18nError ICU MessageFormat Integration', () => {
 
     it('should work with different locales', () => {
       const errors = ['erreur1', 'erreur2'];
-      
+
       // French pluralization
       const frError = I18nError.validationFailed(errors, 'fr');
       expect(frError.message).toContain('erreur1');
@@ -47,7 +49,7 @@ describe('I18nError ICU MessageFormat Integration', () => {
       const errors = ['Error A', 'Error B', 'Error C'];
       const error = I18nError.validationFailed(errors);
 
-      errors.forEach(err => {
+      errors.forEach((err) => {
         expect(error.message).toContain(err);
       });
     });
@@ -56,12 +58,12 @@ describe('I18nError ICU MessageFormat Integration', () => {
       const errors = [
         "Field 'username' is required",
         'Password must be at least 8 characters',
-        "Email format: user@domain.com"
+        'Email format: user@domain.com',
       ];
       const error = I18nError.validationFailed(errors);
 
       expect(error.message).toContain('3 errors');
-      errors.forEach(err => {
+      errors.forEach((err) => {
         expect(error.message).toContain(err);
       });
     });
@@ -69,12 +71,10 @@ describe('I18nError ICU MessageFormat Integration', () => {
 
   describe('pluralFormNotFound - Nested Select and Number Formatting', () => {
     it('should use nested ICU select and number formatting to show available forms', () => {
-      const errorWithKey = I18nError.pluralFormNotFound(
-        'few',
-        'ru',
-        'items',
-        ['one', 'many']
-      );
+      const errorWithKey = I18nError.pluralFormNotFound('few', 'ru', 'items', [
+        'one',
+        'many',
+      ]);
 
       expect(errorWithKey.message).toContain('few');
       expect(errorWithKey.message).toContain('key items');
@@ -85,16 +85,23 @@ describe('I18nError ICU MessageFormat Integration', () => {
 
     it('should list all available forms', () => {
       const forms = ['zero', 'one', 'two', 'few', 'many', 'other'];
-      const error = I18nError.pluralFormNotFound('invalid', 'ar', 'count', forms);
+      const error = I18nError.pluralFormNotFound(
+        'invalid',
+        'ar',
+        'count',
+        forms,
+      );
 
-      forms.forEach(form => {
+      forms.forEach((form) => {
         expect(error.message).toContain(form);
       });
       expect(error.metadata?.availableForms).toEqual(forms);
     });
 
     it('should work with minimal available forms', () => {
-      const error = I18nError.pluralFormNotFound('many', 'en', 'items', ['other']);
+      const error = I18nError.pluralFormNotFound('many', 'en', 'items', [
+        'other',
+      ]);
 
       expect(error.message).toContain('other');
       expect(error.metadata?.availableForms).toEqual(['other']);
@@ -102,21 +109,22 @@ describe('I18nError ICU MessageFormat Integration', () => {
 
     it('should format for different languages', () => {
       // Russian with many forms
-      const ruError = I18nError.pluralFormNotFound(
+      const ruError = I18nError.pluralFormNotFound('few', 'ru', 'товары', [
+        'one',
         'few',
-        'ru',
-        'товары',
-        ['one', 'few', 'many']
-      );
+        'many',
+      ]);
       expect(ruError.message).toContain('ru');
 
       // Arabic with all forms
-      const arError = I18nError.pluralFormNotFound(
-        'invalid',
-        'ar',
-        'عناصر',
-        ['zero', 'one', 'two', 'few', 'many', 'other']
-      );
+      const arError = I18nError.pluralFormNotFound('invalid', 'ar', 'عناصر', [
+        'zero',
+        'one',
+        'two',
+        'few',
+        'many',
+        'other',
+      ]);
       expect(arError.message).toContain('ar');
     });
   });
@@ -143,27 +151,39 @@ describe('I18nError ICU MessageFormat Integration', () => {
       const error = I18nError.invalidPluralCategory('wrong', categories);
 
       expect(error.message).toContain('wrong');
-      categories.forEach(cat => {
+      categories.forEach((cat) => {
         expect(error.message).toContain(cat);
       });
     });
 
     it('should work with different locales', () => {
       const categories = ['one', 'other'];
-      
+
       // English
-      const enError = I18nError.invalidPluralCategory('bad', categories, 'en-US');
+      const enError = I18nError.invalidPluralCategory(
+        'bad',
+        categories,
+        'en-US',
+      );
       expect(enError.metadata?.count).toBe(2);
 
       // French
-      const frError = I18nError.invalidPluralCategory('mauvais', categories, 'fr');
+      const frError = I18nError.invalidPluralCategory(
+        'mauvais',
+        categories,
+        'fr',
+      );
       expect(frError.metadata?.count).toBe(2);
     });
 
     it('should handle complex plural systems', () => {
       // Arabic categories
       const arabicCategories = ['zero', 'one', 'two', 'few', 'many', 'other'];
-      const error = I18nError.invalidPluralCategory('invalid', arabicCategories, 'ar');
+      const error = I18nError.invalidPluralCategory(
+        'invalid',
+        arabicCategories,
+        'ar',
+      );
 
       expect(error.message).toMatch(/Valid categories/i);
       expect(error.metadata?.count).toBe(6);
@@ -174,7 +194,7 @@ describe('I18nError ICU MessageFormat Integration', () => {
     it('should handle nested variable substitution in validation errors', () => {
       const errors = [
         'Field {username} is required',
-        'Value {price} is invalid'
+        'Value {price} is invalid',
       ];
       const error = I18nError.validationFailed(errors);
 
@@ -189,7 +209,7 @@ describe('I18nError ICU MessageFormat Integration', () => {
 
       expect(error.metadata).toMatchObject({
         errors,
-        count: 3
+        count: 3,
       });
       expect(error.code).toBe(I18nErrorCode.VALIDATION_FAILED);
     });
@@ -198,12 +218,12 @@ describe('I18nError ICU MessageFormat Integration', () => {
       const errors = [
         "Field 'user.name' contains invalid characters: @#$",
         'Path "/api/v1" not found',
-        'Regex pattern: ^[a-z]+$ failed'
+        'Regex pattern: ^[a-z]+$ failed',
       ];
       const error = I18nError.validationFailed(errors);
 
       expect(error.message).toContain('3 errors');
-      errors.forEach(err => {
+      errors.forEach((err) => {
         expect(error.message).toContain(err);
       });
     });
@@ -212,18 +232,21 @@ describe('I18nError ICU MessageFormat Integration', () => {
       const errors = [
         '用户名必填',
         'パスワードが無効です',
-        'Адреса електронної пошти недійсна'
+        'Адреса електронної пошти недійсна',
       ];
       const error = I18nError.validationFailed(errors);
 
       expect(error.message).toContain('3 errors');
-      errors.forEach(err => {
+      errors.forEach((err) => {
         expect(error.message).toContain(err);
       });
     });
 
     it('should format large numbers correctly', () => {
-      const manyErrors = Array.from({ length: 100 }, (_, i) => `Error ${i + 1}`);
+      const manyErrors = Array.from(
+        { length: 100 },
+        (_, i) => `Error ${i + 1}`,
+      );
       const error = I18nError.validationFailed(manyErrors);
 
       expect(error.message).toContain('100 errors');
@@ -269,7 +292,7 @@ describe('I18nError ICU MessageFormat Integration', () => {
         'Email is required',
         'Password must be at least 8 characters',
         'Password must contain at least one number',
-        'Password must contain at least one special character'
+        'Password must contain at least one special character',
       ];
       const error = I18nError.validationFailed(errors);
 
@@ -282,23 +305,21 @@ describe('I18nError ICU MessageFormat Integration', () => {
       const errors = [
         'Missing required field: username',
         'Invalid format: email',
-        'Value out of range: age must be between 18 and 120'
+        'Value out of range: age must be between 18 and 120',
       ];
       const error = I18nError.validationFailed(errors);
 
       expect(error.message).toContain('3 errors');
-      errors.forEach(err => {
+      errors.forEach((err) => {
         expect(error.message).toContain(err);
       });
     });
 
     it('should format pluralization errors with context', () => {
-      const error = I18nError.pluralFormNotFound(
-        'few',
-        'ru',
-        'cart.items',
-        ['one', 'many']
-      );
+      const error = I18nError.pluralFormNotFound('few', 'ru', 'cart.items', [
+        'one',
+        'many',
+      ]);
 
       expect(error.message).toContain('few');
       expect(error.message).toContain('cart.items');
@@ -307,7 +328,7 @@ describe('I18nError ICU MessageFormat Integration', () => {
         category: 'few',
         language: 'ru',
         key: 'cart.items',
-        availableForms: ['one', 'many']
+        availableForms: ['one', 'many'],
       });
     });
   });
@@ -329,7 +350,11 @@ describe('I18nError ICU MessageFormat Integration', () => {
     it('should respect locale parameter in invalidPluralCategory', () => {
       const categories = ['one', 'other'];
 
-      const enError = I18nError.invalidPluralCategory('bad', categories, 'en-US');
+      const enError = I18nError.invalidPluralCategory(
+        'bad',
+        categories,
+        'en-US',
+      );
       const frError = I18nError.invalidPluralCategory('bad', categories, 'fr');
       const esError = I18nError.invalidPluralCategory('bad', categories, 'es');
 
@@ -354,7 +379,7 @@ describe('I18nError ICU MessageFormat Integration', () => {
         () => I18nError.missingCountVariable('items', 'fr'),
       ];
 
-      methods.forEach(method => {
+      methods.forEach((method) => {
         const error = method();
         expect(error).toBeInstanceOf(I18nError);
       });
@@ -461,7 +486,7 @@ describe('I18nError ICU MessageFormat Integration', () => {
       const error = I18nError.translationMissing(
         'auth.validation',
         'password.requirements.min_length',
-        'en-US'
+        'en-US',
       );
 
       expect(error.message).toContain('auth.validation');
@@ -531,16 +556,22 @@ describe('I18nError ICU MessageFormat Integration', () => {
         I18nError.missingCountVariable('items'),
       ];
 
-      errors.forEach(error => {
+      errors.forEach((error) => {
         expect(error).toBeInstanceOf(I18nError);
         expect(error.message).toBeTruthy();
       });
     });
 
     it('should maintain same error codes as before', () => {
-      expect(I18nError.componentNotFound('test').code).toBe(I18nErrorCode.COMPONENT_NOT_FOUND);
-      expect(I18nError.validationFailed([]).code).toBe(I18nErrorCode.VALIDATION_FAILED);
-      expect(I18nError.pluralFormNotFound('few', 'ru', 'items', []).code).toBe(I18nErrorCode.PLURAL_FORM_NOT_FOUND);
+      expect(I18nError.componentNotFound('test').code).toBe(
+        I18nErrorCode.COMPONENT_NOT_FOUND,
+      );
+      expect(I18nError.validationFailed([]).code).toBe(
+        I18nErrorCode.VALIDATION_FAILED,
+      );
+      expect(I18nError.pluralFormNotFound('few', 'ru', 'items', []).code).toBe(
+        I18nErrorCode.PLURAL_FORM_NOT_FOUND,
+      );
     });
 
     it('should maintain same metadata structure', () => {

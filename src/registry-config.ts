@@ -5,6 +5,7 @@ import { ValidationConfig } from './validation-config';
 /**
  * Registry configuration
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface RegistryConfig<TLanguages extends string> {
   readonly defaultLanguage: TLanguages;
   readonly fallbackLanguage: TLanguages;

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import {
   ComponentDefinition,
   ComponentRegistration,
@@ -147,7 +149,10 @@ describe('PluginI18nEngine', () => {
         stringKeys: Object.values(TestStrings),
       };
 
-      const registration: ComponentRegistration<TestStrings, 'en' | 'fr' | 'es'> = {
+      const registration: ComponentRegistration<
+        TestStrings,
+        'en' | 'fr' | 'es'
+      > = {
         component: newComponent,
         strings: {
           en: {
@@ -171,7 +176,9 @@ describe('PluginI18nEngine', () => {
       const result = engine.registerComponentIfNotExists(registration);
       expect(result.isValid).toBe(true);
       expect(engine.hasComponent('new-component')).toBe(true);
-      expect(engine.translate('new-component', TestStrings.Welcome)).toBe('Hello');
+      expect(engine.translate('new-component', TestStrings.Welcome)).toBe(
+        'Hello',
+      );
     });
 
     it('should translate simple strings', () => {
@@ -283,10 +290,9 @@ describe('PluginI18nEngine', () => {
     it('should replace constants in templates', () => {
       PluginI18nEngine.resetAll();
       const constants = { Site: 'TestSite.com', Version: '1.0' };
-      const engineWithConstants = new PluginI18nEngine(
-        [englishLang],
-        { constants }
-      );
+      const engineWithConstants = new PluginI18nEngine([englishLang], {
+        constants,
+      });
 
       const component: ComponentDefinition<'siteTemplate'> = {
         id: 'test',
@@ -309,10 +315,9 @@ describe('PluginI18nEngine', () => {
     it('should prioritize variables over constants', () => {
       PluginI18nEngine.resetAll();
       const constants = { name: 'ConstantName' };
-      const engineWithConstants = new PluginI18nEngine(
-        [englishLang],
-        { constants }
-      );
+      const engineWithConstants = new PluginI18nEngine([englishLang], {
+        constants,
+      });
 
       const component: ComponentDefinition<'greetingTemplate'> = {
         id: 'test',
@@ -328,7 +333,9 @@ describe('PluginI18nEngine', () => {
       };
 
       engineWithConstants.registerComponent(registration);
-      const result = engineWithConstants.translate('test', 'greetingTemplate', { name: 'VariableName' });
+      const result = engineWithConstants.translate('test', 'greetingTemplate', {
+        name: 'VariableName',
+      });
       expect(result).toBe('Hello VariableName');
     });
   });
@@ -878,7 +885,11 @@ describe('PluginI18nEngine', () => {
           key: 'my-key',
           expected: '[my-component.my-key]',
         },
-        { component: CoreI18nComponentId, key: 'error', expected: '[core.error]' },
+        {
+          component: CoreI18nComponentId,
+          key: 'error',
+          expected: '[core.error]',
+        },
       ];
 
       testCases.forEach(({ component, key, expected }) => {

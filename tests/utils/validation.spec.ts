@@ -1,9 +1,11 @@
-import { 
-  validateTemplateLength, 
-  validateKeyLength, 
-  validateComponentId, 
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
+import {
+  LIMITS,
+  validateComponentId,
+  validateKeyLength,
   validateLanguageCode,
-  LIMITS 
+  validateTemplateLength,
 } from '../../src/utils/validation';
 
 describe('validation', () => {
@@ -67,19 +69,27 @@ describe('validation', () => {
     });
 
     it('should reject dots', () => {
-      expect(() => validateComponentId('test.component')).toThrow(/invalid characters/i);
+      expect(() => validateComponentId('test.component')).toThrow(
+        /invalid characters/i,
+      );
     });
 
     it('should reject slashes', () => {
-      expect(() => validateComponentId('test/component')).toThrow(/invalid characters/i);
+      expect(() => validateComponentId('test/component')).toThrow(
+        /invalid characters/i,
+      );
     });
 
     it('should reject path traversal', () => {
-      expect(() => validateComponentId('../../../etc/passwd')).toThrow(/invalid characters/i);
+      expect(() => validateComponentId('../../../etc/passwd')).toThrow(
+        /invalid characters/i,
+      );
     });
 
     it('should reject special chars', () => {
-      expect(() => validateComponentId('test<script>')).toThrow(/invalid characters/i);
+      expect(() => validateComponentId('test<script>')).toThrow(
+        /invalid characters/i,
+      );
     });
 
     it('should reject over max length', () => {
@@ -110,7 +120,9 @@ describe('validation', () => {
     });
 
     it('should reject too long', () => {
-      expect(() => validateLanguageCode('en-US-extra')).toThrow(/maximum length/i);
+      expect(() => validateLanguageCode('en-US-extra')).toThrow(
+        /maximum length/i,
+      );
     });
   });
 });

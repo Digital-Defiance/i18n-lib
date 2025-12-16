@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { replaceVariables } from '../../src/utils/string-utils';
 
 describe('string-utils - Security', () => {
@@ -13,7 +15,11 @@ describe('string-utils - Security', () => {
     });
 
     it('should prefer variables over constants', () => {
-      const result = replaceVariables('Hello {name}', { name: 'Var' }, { name: 'Const' });
+      const result = replaceVariables(
+        'Hello {name}',
+        { name: 'Var' },
+        { name: 'Const' },
+      );
       expect(result).toBe('Hello Var');
     });
 
@@ -22,7 +28,7 @@ describe('string-utils - Security', () => {
         'Hello {name}',
         { name: '<script>alert(1)</script>' },
         undefined,
-        { escapeHtml: true }
+        { escapeHtml: true },
       );
       expect(result).not.toContain('<script>');
       expect(result).toContain('&lt;script&gt;');
@@ -33,7 +39,7 @@ describe('string-utils - Security', () => {
         'Hello {name}',
         { name: '<b>World</b>' },
         undefined,
-        { escapeHtml: false }
+        { escapeHtml: false },
       );
       expect(result).toBe('Hello <b>World</b>');
     });
@@ -44,10 +50,10 @@ describe('string-utils - Security', () => {
     });
 
     it('should handle multiple variables', () => {
-      const result = replaceVariables(
-        '{greeting} {name}!',
-        { greeting: 'Hello', name: 'World' }
-      );
+      const result = replaceVariables('{greeting} {name}!', {
+        greeting: 'Hello',
+        name: 'World',
+      });
       expect(result).toBe('Hello World!');
     });
 

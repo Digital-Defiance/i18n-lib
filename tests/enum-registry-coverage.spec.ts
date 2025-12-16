@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { EnumRegistry } from '../src/core/enum-registry';
 
 enum TestEnum {
@@ -22,12 +24,19 @@ describe('EnumRegistry coverage', () => {
       registry.register(
         NumericEnum,
         {
-          'en-US': { [NumericEnum.First]: 'First', [NumericEnum.Second]: 'Second' },
+          'en-US': {
+            [NumericEnum.First]: 'First',
+            [NumericEnum.Second]: 'Second',
+          },
         },
         'NumericEnum',
       );
 
-      const result = registry.translate(NumericEnum, NumericEnum.First, 'en-US');
+      const result = registry.translate(
+        NumericEnum,
+        NumericEnum.First,
+        'en-US',
+      );
       expect(result).toBe('First');
     });
 

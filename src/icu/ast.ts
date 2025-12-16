@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 /**
  * ICU MessageFormat Abstract Syntax Tree (AST) types
  */
@@ -17,7 +18,9 @@ export interface BaseNode {
 
 export interface MessageNode extends BaseNode {
   type: NodeType.MESSAGE;
-  elements: Array<LiteralNode | ArgumentNode | PluralNode | SelectNode | SelectOrdinalNode>;
+  elements: Array<
+    LiteralNode | ArgumentNode | PluralNode | SelectNode | SelectOrdinalNode
+  >;
 }
 
 export interface LiteralNode extends BaseNode {
@@ -52,5 +55,10 @@ export interface SelectOrdinalNode extends BaseNode {
   cases: Record<string, MessageNode>;
 }
 
-export type ASTNode = LiteralNode | ArgumentNode | PluralNode | SelectNode | SelectOrdinalNode;
+export type ASTNode =
+  | LiteralNode
+  | ArgumentNode
+  | PluralNode
+  | SelectNode
+  | SelectOrdinalNode;
 export type ASTNodeOrMessage = MessageNode | ASTNode;

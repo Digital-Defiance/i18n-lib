@@ -1,6 +1,7 @@
 /**
  * Fluent builder for I18n Engine
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { I18nEngine } from '../core/i18n-engine';
 import { EngineConfig, LanguageDefinition } from '../interfaces';
@@ -33,6 +34,7 @@ export class I18nBuilder {
     return this;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   withConstants(constants: Record<string, any>): this {
     this.config.constants = constants;
     return this;

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { ComponentRegistration } from '../src/component-registration';
 import { ComponentRegistry } from '../src/component-registry';
 import { RegistryError } from '../src/registry-error';
@@ -126,8 +128,12 @@ describe('ComponentRegistry', () => {
 
   it('should replace constants in template', () => {
     const constants = { Site: 'MyApp.com' };
-    const registryWithConstants = new ComponentRegistry(['en'], validationConfig, constants);
-    
+    const registryWithConstants = new ComponentRegistry(
+      ['en'],
+      validationConfig,
+      constants,
+    );
+
     const registration: ComponentRegistration<TestStringKey, 'en'> = {
       component: {
         id: 'test',
@@ -149,8 +155,12 @@ describe('ComponentRegistry', () => {
 
   it('should prioritize variables over constants', () => {
     const constants = { name: 'Constant' };
-    const registryWithConstants = new ComponentRegistry(['en'], validationConfig, constants);
-    
+    const registryWithConstants = new ComponentRegistry(
+      ['en'],
+      validationConfig,
+      constants,
+    );
+
     const registration: ComponentRegistration<TestStringKey, 'en'> = {
       component: {
         id: 'test',

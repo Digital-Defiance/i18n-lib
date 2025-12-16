@@ -15,14 +15,22 @@ export class GlobalActiveContext<
   TActiveContext extends IActiveContext<TLanguage>,
 > implements IGlobalActiveContext<TLanguage, TActiveContext>
 {
-  protected static _contextMap: Map<string, IActiveContext<any>> = new Map();
+  protected static _contextMap: Map<string, IActiveContext<string>> = new Map();
   public static readonly defaultContextKey = 'default';
   public static readonly defaultLanguage: string = 'en-US';
 
-  private static _instance: GlobalActiveContext<any, any> | undefined;
-  public static get instance(): GlobalActiveContext<any, any> {
+  private static _instance:
+    | GlobalActiveContext<string, IActiveContext<string>>
+    | undefined;
+  public static get instance(): GlobalActiveContext<
+    string,
+    IActiveContext<string>
+  > {
     if (!this._instance) {
-      this._instance = new GlobalActiveContext<any, any>();
+      this._instance = new GlobalActiveContext<
+        string,
+        IActiveContext<string>
+      >();
       this._instance.createContext(this.defaultLanguage);
     }
     return this._instance;
@@ -45,7 +53,7 @@ export class GlobalActiveContext<
     return this._instance as GlobalActiveContext<TLanguage, TActiveContext>;
   }
   public static overrideInstance(
-    instance: GlobalActiveContext<any, any>,
+    instance: GlobalActiveContext<string, IActiveContext<string>>,
   ): void {
     this._instance = instance;
   }

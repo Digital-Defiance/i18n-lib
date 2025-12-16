@@ -47,7 +47,7 @@ export class LRUCache<K, V> {
     if (this.cache.has(key)) {
       this.cache.delete(key);
     }
-    
+
     // Remove oldest if at capacity
     if (this.cache.size >= this.maxSize) {
       const firstKey = this.cache.keys().next().value;
@@ -55,7 +55,7 @@ export class LRUCache<K, V> {
         this.cache.delete(firstKey);
       }
     }
-    
+
     this.cache.set(key, value);
   }
 

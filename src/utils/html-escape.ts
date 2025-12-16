@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /**
  * HTML escaping utilities for XSS prevention
  */
@@ -25,7 +27,7 @@ const HTML_ESCAPE_REGEX = /[&<>"'/]/g;
  * @returns The escaped string
  */
 export function escapeHtml(str: string): string {
-  return str.replace(HTML_ESCAPE_REGEX, char => HTML_ESCAPES[char]);
+  return str.replace(HTML_ESCAPE_REGEX, (char) => HTML_ESCAPES[char]);
 }
 
 /**
@@ -37,19 +39,22 @@ export function escapeHtml(str: string): string {
  * @returns The stringified value
  * @throws {Error} If the value is an object (to prevent exploits)
  */
-export function safeStringify(value: any, options?: { escapeHtml?: boolean }): string {
+export function safeStringify(
+  value: any,
+  options?: { escapeHtml?: boolean },
+): string {
   if (value === null || value === undefined) {
     return '';
   }
-  
+
   if (typeof value === 'string') {
     return options?.escapeHtml ? escapeHtml(value) : value;
   }
-  
+
   if (typeof value === 'number' || typeof value === 'boolean') {
     return String(value);
   }
-  
+
   // Reject objects to prevent toString exploits
   throw new Error('Invalid value type for stringification');
 }

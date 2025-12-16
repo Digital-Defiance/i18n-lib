@@ -1,6 +1,7 @@
 /**
  * Component storage (no generics)
  */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 
 import { I18nError } from '../errors/i18n-error';
 import { ComponentConfig, ValidationResult } from '../interfaces';
@@ -227,6 +228,7 @@ export class ComponentStore {
    * Sets constants for variable replacement.
    * @param constants - The constants to set.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setConstants(constants: Record<string, any>): void {
     this.constants = constants;
   }

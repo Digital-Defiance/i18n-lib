@@ -1,6 +1,7 @@
 /**
  * Template processing utilities for i18n
  */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
 export type EnumKeys<T> = keyof T;
 
 /**
@@ -49,7 +50,7 @@ export function createTemplateProcessor<
       const needsVars = (enumValue as string)
         .toLowerCase()
         .endsWith('template');
-      const vars = needsVars ? (otherVars[varIndex++] ?? {}) : {};
+      const vars = needsVars ? otherVars[varIndex++] ?? {} : {};
       return translateFn(enumValue, vars, language);
     });
 

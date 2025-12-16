@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 /**
  * Comprehensive tests for string-utils
  * Tests variable replacement with CurrencyCode, Timezone, and other objects
  */
 
-import { replaceVariables, isTemplate } from '../src/utils/string-utils';
 import { CurrencyCode } from '../src/utils/currency';
+import { isTemplate, replaceVariables } from '../src/utils/string-utils';
 import { Timezone } from '../src/utils/timezone';
 
 describe('String Utils', () => {
@@ -15,11 +17,14 @@ describe('String Utils', () => {
     });
 
     it('should replace multiple variables', () => {
-      const result = replaceVariables('{greeting} {name}, you have {count} messages', {
-        greeting: 'Hello',
-        name: 'Alice',
-        count: 5,
-      });
+      const result = replaceVariables(
+        '{greeting} {name}, you have {count} messages',
+        {
+          greeting: 'Hello',
+          name: 'Alice',
+          count: 5,
+        },
+      );
       expect(result).toBe('Hello Alice, you have 5 messages');
     });
 
@@ -80,17 +85,21 @@ describe('String Utils', () => {
     it('should handle mixed CurrencyCode, Timezone, and primitives', () => {
       const currency = new CurrencyCode('GBP');
       const timezone = new Timezone('Europe/London');
-      const result = replaceVariables(
-        '{name} uses {currency} in {timezone}',
-        { name: 'Bob', currency, timezone },
-      );
+      const result = replaceVariables('{name} uses {currency} in {timezone}', {
+        name: 'Bob',
+        currency,
+        timezone,
+      });
       expect(result).toBe('Bob uses GBP in Europe/London');
     });
 
     it('should leave unmatched variables as-is', () => {
-      const result = replaceVariables('Hello {name}, you have {count} messages', {
-        name: 'John',
-      });
+      const result = replaceVariables(
+        'Hello {name}, you have {count} messages',
+        {
+          name: 'John',
+        },
+      );
       expect(result).toBe('Hello John, you have {count} messages');
     });
 
@@ -105,7 +114,11 @@ describe('String Utils', () => {
     });
 
     it('should handle undefined constants', () => {
-      const result = replaceVariables('Hello {name}!', { name: 'John' }, undefined);
+      const result = replaceVariables(
+        'Hello {name}!',
+        { name: 'John' },
+        undefined,
+      );
       expect(result).toBe('Hello John!');
     });
 
@@ -142,26 +155,36 @@ describe('String Utils', () => {
 
     it('should reject objects without value property', () => {
       const obj = { data: 'test' };
-      expect(() => replaceVariables('Object: {obj}', { obj })).toThrow(/invalid value type/i);
+      expect(() => replaceVariables('Object: {obj}', { obj })).toThrow(
+        /invalid value type/i,
+      );
     });
 
     it('should reject arrays', () => {
       const arr = [1, 2, 3];
-      expect(() => replaceVariables('Array: {arr}', { arr })).toThrow(/invalid value type/i);
+      expect(() => replaceVariables('Array: {arr}', { arr })).toThrow(
+        /invalid value type/i,
+      );
     });
 
     it('should handle special characters in values', () => {
-      const result = replaceVariables('Path: {path}', { path: '/usr/local/bin' });
+      const result = replaceVariables('Path: {path}', {
+        path: '/usr/local/bin',
+      });
       expect(result).toBe('Path: /usr/local/bin');
     });
 
     it('should handle quotes in values', () => {
-      const result = replaceVariables('Message: {msg}', { msg: "It's working" });
+      const result = replaceVariables('Message: {msg}', {
+        msg: "It's working",
+      });
       expect(result).toBe("Message: It's working");
     });
 
     it('should handle multiple occurrences of same variable', () => {
-      const result = replaceVariables('{name} said: "Hello {name}!"', { name: 'Alice' });
+      const result = replaceVariables('{name} said: "Hello {name}!"', {
+        name: 'Alice',
+      });
       expect(result).toBe('Alice said: "Hello Alice!"');
     });
 
@@ -176,12 +199,17 @@ describe('String Utils', () => {
     });
 
     it('should handle variables with underscores', () => {
-      const result = replaceVariables('Value: {user_name}', { user_name: 'john_doe' });
+      const result = replaceVariables('Value: {user_name}', {
+        user_name: 'john_doe',
+      });
       expect(result).toBe('Value: john_doe');
     });
 
     it('should handle variables with numbers', () => {
-      const result = replaceVariables('Value: {var1} and {var2}', { var1: 'a', var2: 'b' });
+      const result = replaceVariables('Value: {var1} and {var2}', {
+        var1: 'a',
+        var2: 'b',
+      });
       expect(result).toBe('Value: a and b');
     });
 

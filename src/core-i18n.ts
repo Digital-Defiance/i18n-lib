@@ -6,6 +6,7 @@ import { ComponentDefinition } from './component-definition';
 import { ComponentRegistration } from './component-registration';
 import { CoreI18nComponentId } from './core-component-id';
 import { CoreStringKey } from './core-string-key';
+// eslint-disable-next-line import/order
 import { I18nEngine } from './core/i18n-engine';
 import { ComponentConfig, EngineConfig } from './interfaces';
 import { LanguageCodes } from './language-codes';

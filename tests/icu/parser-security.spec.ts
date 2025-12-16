@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { parse, ParseError } from '../../src/icu/parser';
 
 describe('ICU Parser - Security', () => {
@@ -24,7 +26,8 @@ describe('ICU Parser - Security', () => {
     });
 
     it('should allow reasonable depth', () => {
-      const depth5 = '{a, select, x {{b, select, y {{c, select, z {{d, select, w {{e, select, v {text}}}}}}}}}}';
+      const depth5 =
+        '{a, select, x {{b, select, y {{c, select, z {{d, select, w {{e, select, v {text}}}}}}}}}}';
       expect(() => parse(depth5)).not.toThrow();
     });
 
@@ -37,7 +40,7 @@ describe('ICU Parser - Security', () => {
       const msg = '{a, select, x {text}}';
       const ast = parse(msg);
       expect(ast).toBeDefined();
-      
+
       // Should be able to parse again (depth reset)
       expect(() => parse(msg)).not.toThrow();
     });

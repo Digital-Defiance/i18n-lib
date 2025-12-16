@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 /**
  * Comprehensive tests for context variable integration
  * Tests currency, timezone, language injection into translations
  */
 
-import { I18nEngine } from '../src/core/i18n-engine';
 import { I18nBuilder } from '../src/builders/i18n-builder';
+import { I18nEngine } from '../src/core/i18n-engine';
 import { CurrencyCode } from '../src/utils/currency';
 import { Timezone } from '../src/utils/timezone';
 
@@ -50,35 +52,41 @@ describe('Context Integration - Currency and Timezone', () => {
   describe('CurrencyCode Object Handling', () => {
     it('should extract value from CurrencyCode object in variables', () => {
       const currency = new CurrencyCode('EUR');
-      expect(engine.translate('test', 'withCurrency', { currency })).toBe('Price in EUR');
+      expect(engine.translate('test', 'withCurrency', { currency })).toBe(
+        'Price in EUR',
+      );
     });
 
     it('should extract value from CurrencyCode using currencyCode key', () => {
       const currencyCode = new CurrencyCode('GBP');
-      expect(engine.translate('test', 'withCurrencyCode', { currencyCode })).toBe(
-        'Currency code: GBP',
-      );
+      expect(
+        engine.translate('test', 'withCurrencyCode', { currencyCode }),
+      ).toBe('Currency code: GBP');
     });
 
     it('should work with CurrencyCode in t() function', () => {
       const currency = new CurrencyCode('JPY');
-      expect(engine.t('{{test.withCurrency}}', { currency })).toBe('Price in JPY');
+      expect(engine.t('{{test.withCurrency}}', { currency })).toBe(
+        'Price in JPY',
+      );
     });
 
     it('should work with CurrencyCode in different languages', () => {
       const currency = new CurrencyCode('CAD');
-      expect(engine.translate('test', 'withCurrency', { currency }, 'fr')).toBe('Prix en CAD');
+      expect(engine.translate('test', 'withCurrency', { currency }, 'fr')).toBe(
+        'Prix en CAD',
+      );
     });
 
     it('should handle multiple CurrencyCode objects', () => {
       const currency = new CurrencyCode('USD');
       const currencyCode = new CurrencyCode('EUR');
-      
+
       const result = engine.t('Currency: {currency}, Code: {currencyCode}', {
         currency,
         currencyCode,
       });
-      
+
       expect(result).toBe('Currency: USD, Code: EUR');
     });
   });
@@ -93,21 +101,23 @@ describe('Context Integration - Currency and Timezone', () => {
 
     it('should extract value from Timezone using userTimezone key', () => {
       const userTimezone = new Timezone('Europe/London');
-      expect(engine.translate('test', 'withUserTimezone', { userTimezone })).toBe(
-        'User timezone: Europe/London',
-      );
+      expect(
+        engine.translate('test', 'withUserTimezone', { userTimezone }),
+      ).toBe('User timezone: Europe/London');
     });
 
     it('should extract value from Timezone using adminTimezone key', () => {
       const adminTimezone = new Timezone('UTC');
-      expect(engine.translate('test', 'withAdminTimezone', { adminTimezone })).toBe(
-        'Admin timezone: UTC',
-      );
+      expect(
+        engine.translate('test', 'withAdminTimezone', { adminTimezone }),
+      ).toBe('Admin timezone: UTC');
     });
 
     it('should work with Timezone in t() function', () => {
       const timezone = new Timezone('Asia/Tokyo');
-      expect(engine.t('{{test.withTimezone}}', { timezone })).toBe('Timezone: Asia/Tokyo');
+      expect(engine.t('{{test.withTimezone}}', { timezone })).toBe(
+        'Timezone: Asia/Tokyo',
+      );
     });
 
     it('should work with Timezone in different languages', () => {
@@ -120,12 +130,12 @@ describe('Context Integration - Currency and Timezone', () => {
     it('should handle multiple Timezone objects', () => {
       const userTimezone = new Timezone('America/Los_Angeles');
       const adminTimezone = new Timezone('UTC');
-      
+
       const result = engine.t('User: {userTimezone}, Admin: {adminTimezone}', {
         userTimezone,
         adminTimezone,
       });
-      
+
       expect(result).toBe('User: America/Los_Angeles, Admin: UTC');
     });
   });
@@ -134,7 +144,7 @@ describe('Context Integration - Currency and Timezone', () => {
     it('should handle both CurrencyCode and Timezone objects', () => {
       const currency = new CurrencyCode('EUR');
       const timezone = new Timezone('Europe/Berlin');
-      
+
       expect(engine.translate('test', 'combined', { currency, timezone })).toBe(
         'Currency: EUR, Timezone: Europe/Berlin',
       );
@@ -143,7 +153,7 @@ describe('Context Integration - Currency and Timezone', () => {
     it('should handle both in t() function', () => {
       const currency = new CurrencyCode('AUD');
       const timezone = new Timezone('Australia/Sydney');
-      
+
       expect(engine.t('{{test.combined}}', { currency, timezone })).toBe(
         'Currency: AUD, Timezone: Australia/Sydney',
       );
@@ -152,10 +162,10 @@ describe('Context Integration - Currency and Timezone', () => {
     it('should handle both in different languages', () => {
       const currency = new CurrencyCode('CHF');
       const timezone = new Timezone('Europe/Zurich');
-      
-      expect(engine.translate('test', 'combined', { currency, timezone }, 'fr')).toBe(
-        'Devise: CHF, Fuseau horaire: Europe/Zurich',
-      );
+
+      expect(
+        engine.translate('test', 'combined', { currency, timezone }, 'fr'),
+      ).toBe('Devise: CHF, Fuseau horaire: Europe/Zurich');
     });
   });
 
@@ -163,16 +173,22 @@ describe('Context Integration - Currency and Timezone', () => {
     it('should handle mix of CurrencyCode objects and strings', () => {
       const currency = new CurrencyCode('USD');
       const name = 'John';
-      
-      const result = engine.t('User {name} uses {currency}', { currency, name });
+
+      const result = engine.t('User {name} uses {currency}', {
+        currency,
+        name,
+      });
       expect(result).toBe('User John uses USD');
     });
 
     it('should handle mix of Timezone objects and numbers', () => {
       const timezone = new Timezone('America/Chicago');
       const count = 42;
-      
-      const result = engine.t('Count: {count}, Timezone: {timezone}', { timezone, count });
+
+      const result = engine.t('Count: {count}, Timezone: {timezone}', {
+        timezone,
+        count,
+      });
       expect(result).toBe('Count: 42, Timezone: America/Chicago');
     });
 
@@ -181,12 +197,14 @@ describe('Context Integration - Currency and Timezone', () => {
       const timezone = new Timezone('Europe/London');
       const name = 'Alice';
       const amount = 100;
-      
-      const result = engine.t(
-        '{name} has {amount} {currency} in {timezone}',
-        { currency, timezone, name, amount },
-      );
-      
+
+      const result = engine.t('{name} has {amount} {currency} in {timezone}', {
+        currency,
+        timezone,
+        name,
+        amount,
+      });
+
       expect(result).toBe('Alice has 100 GBP in Europe/London');
     });
   });
@@ -195,7 +213,9 @@ describe('Context Integration - Currency and Timezone', () => {
     beforeEach(() => {
       I18nEngine.resetAll();
       engine = I18nBuilder.create()
-        .withLanguages([{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }])
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
         .withConstants({
           DefaultCurrency: new CurrencyCode('USD'),
           DefaultTimezone: new Timezone('UTC'),
@@ -207,7 +227,8 @@ describe('Context Integration - Currency and Timezone', () => {
         id: 'constants-test',
         strings: {
           'en-US': {
-            message: 'App: {AppName}, Currency: {DefaultCurrency}, Timezone: {DefaultTimezone}',
+            message:
+              'App: {AppName}, Currency: {DefaultCurrency}, Timezone: {DefaultTimezone}',
           },
         },
       });
@@ -221,9 +242,9 @@ describe('Context Integration - Currency and Timezone', () => {
 
     it('should allow variables to override constant objects', () => {
       const DefaultCurrency = new CurrencyCode('EUR');
-      expect(engine.translate('constants-test', 'message', { DefaultCurrency })).toBe(
-        'App: MyApp, Currency: EUR, Timezone: UTC',
-      );
+      expect(
+        engine.translate('constants-test', 'message', { DefaultCurrency }),
+      ).toBe('App: MyApp, Currency: EUR, Timezone: UTC');
     });
 
     it('should work in t() function', () => {
@@ -235,21 +256,27 @@ describe('Context Integration - Currency and Timezone', () => {
 
   describe('Edge Cases', () => {
     it('should handle null currency gracefully', () => {
-      expect(engine.translate('test', 'withCurrency', { currency: null })).toBe('Price in null');
-    });
-
-    it('should handle undefined timezone gracefully', () => {
-      expect(engine.translate('test', 'withTimezone', { timezone: undefined })).toBe(
-        'Timezone: undefined',
+      expect(engine.translate('test', 'withCurrency', { currency: null })).toBe(
+        'Price in null',
       );
     });
 
+    it('should handle undefined timezone gracefully', () => {
+      expect(
+        engine.translate('test', 'withTimezone', { timezone: undefined }),
+      ).toBe('Timezone: undefined');
+    });
+
     it('should handle plain string when CurrencyCode expected', () => {
-      expect(engine.translate('test', 'withCurrency', { currency: 'USD' })).toBe('Price in USD');
+      expect(
+        engine.translate('test', 'withCurrency', { currency: 'USD' }),
+      ).toBe('Price in USD');
     });
 
     it('should handle plain string when Timezone expected', () => {
-      expect(engine.translate('test', 'withTimezone', { timezone: 'UTC' })).toBe('Timezone: UTC');
+      expect(
+        engine.translate('test', 'withTimezone', { timezone: 'UTC' }),
+      ).toBe('Timezone: UTC');
     });
 
     it('should handle objects with value property that are not Currency/Timezone', () => {
@@ -268,7 +295,9 @@ describe('Context Integration - Currency and Timezone', () => {
   describe('safeTranslate with Objects', () => {
     it('should extract CurrencyCode value in safeTranslate', () => {
       const currency = new CurrencyCode('EUR');
-      expect(engine.safeTranslate('test', 'withCurrency', { currency })).toBe('Price in EUR');
+      expect(engine.safeTranslate('test', 'withCurrency', { currency })).toBe(
+        'Price in EUR',
+      );
     });
 
     it('should extract Timezone value in safeTranslate', () => {
@@ -280,7 +309,9 @@ describe('Context Integration - Currency and Timezone', () => {
 
     it('should handle missing keys with objects gracefully', () => {
       const currency = new CurrencyCode('JPY');
-      expect(engine.safeTranslate('test', 'missing', { currency })).toBe('[test.missing]');
+      expect(engine.safeTranslate('test', 'missing', { currency })).toBe(
+        '[test.missing]',
+      );
     });
   });
 });

@@ -1,4 +1,9 @@
-import { defineLanguageStrings, CompleteLanguageStrings } from '../src/strict-types';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
+import {
+  CompleteLanguageStrings,
+  defineLanguageStrings,
+} from '../src/strict-types';
 
 enum TestKey {
   Key1 = 'key1',

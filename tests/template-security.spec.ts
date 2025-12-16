@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { createTemplateProcessor } from '../src/template';
 
 enum TestEnum {
@@ -38,32 +40,29 @@ describe('template - Security', () => {
   describe('prototype pollution prevention', () => {
     it('should filter __proto__ from variables', () => {
       translateFn.mockReturnValue('result');
-      const result = processor(
-        '{{TestEnum.Simple}}',
-        undefined,
-        { name: 'safe', '__proto__': { bad: true } }
-      );
+      const result = processor('{{TestEnum.Simple}}', undefined, {
+        name: 'safe',
+        __proto__: { bad: true },
+      });
       expect(result).toBe('result');
-      expect((({} as any).bad)).toBeUndefined();
+      expect(({} as any).bad).toBeUndefined();
     });
 
     it('should filter constructor from variables', () => {
       translateFn.mockReturnValue('result');
-      const result = processor(
-        '{{TestEnum.Simple}}',
-        undefined,
-        { name: 'safe', 'constructor': { bad: true } }
-      );
+      const result = processor('{{TestEnum.Simple}}', undefined, {
+        name: 'safe',
+        constructor: { bad: true },
+      });
       expect(result).toBe('result');
     });
 
     it('should filter prototype from variables', () => {
       translateFn.mockReturnValue('result');
-      const result = processor(
-        '{{TestEnum.Simple}}',
-        undefined,
-        { name: 'safe', 'prototype': { bad: true } }
-      );
+      const result = processor('{{TestEnum.Simple}}', undefined, {
+        name: 'safe',
+        prototype: { bad: true },
+      });
       expect(result).toBe('result');
     });
   });
@@ -75,12 +74,7 @@ describe('template - Security', () => {
     });
 
     it('should handle multiple variable objects', () => {
-      const result = processor(
-        '{a} {b}',
-        undefined,
-        { a: '1' },
-        { b: '2' }
-      );
+      const result = processor('{a} {b}', undefined, { a: '1' }, { b: '2' });
       expect(result).toBe('1 2');
     });
 
@@ -88,11 +82,11 @@ describe('template - Security', () => {
       const result = processor(
         '{x}',
         undefined,
-        { x: 'first', '__proto__': { bad: true } },
-        { y: 'second' }
+        { x: 'first', __proto__: { bad: true } },
+        { y: 'second' },
       );
       expect(result).toBe('first');
-      expect((({} as any).bad)).toBeUndefined();
+      expect(({} as any).bad).toBeUndefined();
     });
   });
 });

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import {
   CoreI18nComponentId,
   CoreStringKey,
@@ -7,8 +9,6 @@ import {
 import { I18nEngine } from '../src/core/i18n-engine';
 
 describe('TranslatableGenericError', () => {
-
-
   enum TestStringKey {
     UserNotFound = 'userNotFound',
     InvalidCredentials = 'invalidCredentials',
@@ -19,10 +19,14 @@ describe('TranslatableGenericError', () => {
 
   beforeEach(() => {
     I18nEngine.resetAll();
-    engine = new I18nEngine([
-      { id: 'en', name: 'English', code: 'en', isDefault: true },
-      { id: 'fr', name: 'French', code: 'fr' },
-    ], {}, { instanceKey: 'test-errors' });
+    engine = new I18nEngine(
+      [
+        { id: 'en', name: 'English', code: 'en', isDefault: true },
+        { id: 'fr', name: 'French', code: 'fr' },
+      ],
+      {},
+      { instanceKey: 'test-errors' },
+    );
 
     engine.register({
       id: 'test-errors',
@@ -319,11 +323,20 @@ describe('TranslatableGenericError', () => {
     let coreEngine: I18nEngine;
 
     beforeEach(() => {
-      coreEngine = new I18nEngine([
-        { id: LanguageCodes.EN_US, name: 'English (US)', code: 'en-US', isDefault: true },
-        { id: LanguageCodes.FR, name: 'Français', code: 'fr' },
-      ], {}, { instanceKey: 'core-errors' });
-      
+      coreEngine = new I18nEngine(
+        [
+          {
+            id: LanguageCodes.EN_US,
+            name: 'English (US)',
+            code: 'en-US',
+            isDefault: true,
+          },
+          { id: LanguageCodes.FR, name: 'Français', code: 'fr' },
+        ],
+        {},
+        { instanceKey: 'core-errors' },
+      );
+
       coreEngine.register({
         id: CoreI18nComponentId,
         name: 'Core',
@@ -332,12 +345,14 @@ describe('TranslatableGenericError', () => {
           [LanguageCodes.EN_US]: {
             [CoreStringKey.Common_Yes]: 'Yes',
             [CoreStringKey.Error_AccessDenied]: 'Access denied',
-            [CoreStringKey.Error_ComponentNotFoundTemplate]: 'Component "{componentId}" not found',
+            [CoreStringKey.Error_ComponentNotFoundTemplate]:
+              'Component "{componentId}" not found',
           },
           [LanguageCodes.FR]: {
             [CoreStringKey.Common_Yes]: 'Oui',
             [CoreStringKey.Error_AccessDenied]: 'Accès refusé',
-            [CoreStringKey.Error_ComponentNotFoundTemplate]: 'Composant "{componentId}" non trouvé',
+            [CoreStringKey.Error_ComponentNotFoundTemplate]:
+              'Composant "{componentId}" non trouvé',
           },
         },
       });

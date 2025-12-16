@@ -1,4 +1,12 @@
-import { MessageNode, NodeType, ArgumentNode, PluralNode, SelectNode, SelectOrdinalNode } from './ast';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
+import {
+  ArgumentNode,
+  MessageNode,
+  NodeType,
+  PluralNode,
+  SelectNode,
+  SelectOrdinalNode,
+} from './ast';
 
 export class ValidationError extends Error {
   constructor(message: string) {
@@ -19,7 +27,10 @@ const DEFAULT_OPTIONS: ValidationOptions = {
   maxDepth: 10,
 };
 
-export function validate(ast: MessageNode, options: ValidationOptions = {}): void {
+export function validate(
+  ast: MessageNode,
+  options: ValidationOptions = {},
+): void {
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const context = new ValidationContext(opts);
   validateMessage(ast, context);
@@ -42,7 +53,9 @@ class ValidationContext {
   enterDepth(): void {
     this.currentDepth++;
     if (this.currentDepth > this.options.maxDepth!) {
-      throw new ValidationError(`Maximum nesting depth of ${this.options.maxDepth} exceeded`);
+      throw new ValidationError(
+        `Maximum nesting depth of ${this.options.maxDepth} exceeded`,
+      );
     }
   }
 
@@ -78,7 +91,10 @@ function validateNode(node: any, context: ValidationContext): void {
   }
 }
 
-function validateArgument(node: ArgumentNode, context: ValidationContext): void {
+function validateArgument(
+  node: ArgumentNode,
+  context: ValidationContext,
+): void {
   if (!node.name || node.name.trim() === '') {
     throw new ValidationError('Argument name cannot be empty');
   }
@@ -92,17 +108,23 @@ function validatePlural(node: PluralNode, context: ValidationContext): void {
   context.addArgument(node.name);
 
   if (!node.cases || Object.keys(node.cases).length === 0) {
-    throw new ValidationError(`Plural '${node.name}' must have at least one case`);
+    throw new ValidationError(
+      `Plural '${node.name}' must have at least one case`,
+    );
   }
 
   if (context.options.requireOtherCase && !node.cases.other) {
-    throw new ValidationError(`Plural '${node.name}' must have an 'other' case`);
+    throw new ValidationError(
+      `Plural '${node.name}' must have an 'other' case`,
+    );
   }
 
   const validCases = ['zero', 'one', 'two', 'few', 'many', 'other'];
   for (const caseName of Object.keys(node.cases)) {
     if (!validCases.includes(caseName)) {
-      throw new ValidationError(`Invalid plural case '${caseName}' in '${node.name}'`);
+      throw new ValidationError(
+        `Invalid plural case '${caseName}' in '${node.name}'`,
+      );
     }
   }
 
@@ -120,11 +142,15 @@ function validateSelect(node: SelectNode, context: ValidationContext): void {
   context.addArgument(node.name);
 
   if (!node.cases || Object.keys(node.cases).length === 0) {
-    throw new ValidationError(`Select '${node.name}' must have at least one case`);
+    throw new ValidationError(
+      `Select '${node.name}' must have at least one case`,
+    );
   }
 
   if (context.options.requireOtherCase && !node.cases.other) {
-    throw new ValidationError(`Select '${node.name}' must have an 'other' case`);
+    throw new ValidationError(
+      `Select '${node.name}' must have an 'other' case`,
+    );
   }
 
   context.enterDepth();
@@ -134,24 +160,33 @@ function validateSelect(node: SelectNode, context: ValidationContext): void {
   context.exitDepth();
 }
 
-function validateSelectOrdinal(node: SelectOrdinalNode, context: ValidationContext): void {
+function validateSelectOrdinal(
+  node: SelectOrdinalNode,
+  context: ValidationContext,
+): void {
   if (!node.name || node.name.trim() === '') {
     throw new ValidationError('SelectOrdinal variable name cannot be empty');
   }
   context.addArgument(node.name);
 
   if (!node.cases || Object.keys(node.cases).length === 0) {
-    throw new ValidationError(`SelectOrdinal '${node.name}' must have at least one case`);
+    throw new ValidationError(
+      `SelectOrdinal '${node.name}' must have at least one case`,
+    );
   }
 
   if (context.options.requireOtherCase && !node.cases.other) {
-    throw new ValidationError(`SelectOrdinal '${node.name}' must have an 'other' case`);
+    throw new ValidationError(
+      `SelectOrdinal '${node.name}' must have an 'other' case`,
+    );
   }
 
   const validCases = ['zero', 'one', 'two', 'few', 'many', 'other'];
   for (const caseName of Object.keys(node.cases)) {
     if (!validCases.includes(caseName)) {
-      throw new ValidationError(`Invalid selectordinal case '${caseName}' in '${node.name}'`);
+      throw new ValidationError(
+        `Invalid selectordinal case '${caseName}' in '${node.name}'`,
+      );
     }
   }
 

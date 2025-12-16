@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { NumberFormatter } from '../../../src/icu/formatters/number-formatter';
 
 describe('NumberFormatter', () => {
@@ -9,11 +11,15 @@ describe('NumberFormatter', () => {
 
   describe('Basic formatting', () => {
     it('should format integer', () => {
-      expect(formatter.format(1234, undefined, { locale: 'en-US' })).toBe('1,234');
+      expect(formatter.format(1234, undefined, { locale: 'en-US' })).toBe(
+        '1,234',
+      );
     });
 
     it('should format decimal', () => {
-      expect(formatter.format(1234.56, undefined, { locale: 'en-US' })).toBe('1,234.56');
+      expect(formatter.format(1234.56, undefined, { locale: 'en-US' })).toBe(
+        '1,234.56',
+      );
     });
 
     it('should format zero', () => {
@@ -21,28 +27,40 @@ describe('NumberFormatter', () => {
     });
 
     it('should format negative', () => {
-      expect(formatter.format(-1234, undefined, { locale: 'en-US' })).toBe('-1,234');
+      expect(formatter.format(-1234, undefined, { locale: 'en-US' })).toBe(
+        '-1,234',
+      );
     });
   });
 
   describe('Integer style', () => {
     it('should format as integer', () => {
-      expect(formatter.format(1234.56, 'integer', { locale: 'en-US' })).toBe('1,235');
+      expect(formatter.format(1234.56, 'integer', { locale: 'en-US' })).toBe(
+        '1,235',
+      );
     });
 
     it('should round decimals', () => {
-      expect(formatter.format(1234.4, 'integer', { locale: 'en-US' })).toBe('1,234');
+      expect(formatter.format(1234.4, 'integer', { locale: 'en-US' })).toBe(
+        '1,234',
+      );
     });
   });
 
   describe('Currency style', () => {
     it('should format USD', () => {
-      const result = formatter.format(1234.56, 'currency', { locale: 'en-US', currency: 'USD' });
+      const result = formatter.format(1234.56, 'currency', {
+        locale: 'en-US',
+        currency: 'USD',
+      });
       expect(result).toContain('1,234.56');
     });
 
     it('should format EUR', () => {
-      const result = formatter.format(1234.56, 'currency', { locale: 'de-DE', currency: 'EUR' });
+      const result = formatter.format(1234.56, 'currency', {
+        locale: 'de-DE',
+        currency: 'EUR',
+      });
       expect(result).toContain('1');
       expect(result).toContain('234');
     });
@@ -59,7 +77,9 @@ describe('NumberFormatter', () => {
     });
 
     it('should format decimal as percent', () => {
-      expect(formatter.format(0.123, 'percent', { locale: 'en-US' })).toBe('12.3%');
+      expect(formatter.format(0.123, 'percent', { locale: 'en-US' })).toBe(
+        '12.3%',
+      );
     });
 
     it('should format whole number as percent', () => {
@@ -87,15 +107,21 @@ describe('NumberFormatter', () => {
 
   describe('Edge cases', () => {
     it('should handle NaN', () => {
-      expect(formatter.format('invalid', undefined, { locale: 'en-US' })).toBe('invalid');
+      expect(formatter.format('invalid', undefined, { locale: 'en-US' })).toBe(
+        'invalid',
+      );
     });
 
     it('should handle string numbers', () => {
-      expect(formatter.format('1234', undefined, { locale: 'en-US' })).toBe('1,234');
+      expect(formatter.format('1234', undefined, { locale: 'en-US' })).toBe(
+        '1,234',
+      );
     });
 
     it('should handle very large numbers', () => {
-      const result = formatter.format(1234567890, undefined, { locale: 'en-US' });
+      const result = formatter.format(1234567890, undefined, {
+        locale: 'en-US',
+      });
       expect(result).toContain('1');
       expect(result).toContain('234');
     });

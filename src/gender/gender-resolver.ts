@@ -2,7 +2,11 @@
  * Gender form resolution
  */
 
-import { GenderCategory, GenderedString, isGenderedString } from './gender-categories';
+import {
+  GenderCategory,
+  GenderedString,
+  isGenderedString,
+} from './gender-categories';
 
 /**
  * Resolve a gender-specific form with fallback logic.
@@ -14,7 +18,7 @@ import { GenderCategory, GenderedString, isGenderedString } from './gender-categ
  */
 export function resolveGenderForm(
   value: GenderedString,
-  gender: GenderCategory | string | undefined
+  gender: GenderCategory | string | undefined,
 ): string {
   if (typeof value === 'string') {
     return value;

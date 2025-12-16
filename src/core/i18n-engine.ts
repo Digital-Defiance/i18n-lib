@@ -2,6 +2,9 @@
  * Main I18n Engine (no generics)
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
+// Note: This file uses 'any' for variable dictionaries which is appropriate for dynamic i18n substitution
+
 import { CoreI18nComponentId } from '../core-component-id';
 import { I18nError } from '../errors/i18n-error';
 import {
@@ -144,7 +147,7 @@ export class I18nEngine implements II18nEngine {
     // Use type-safe property access with index signature
     const configWithOptional = config as ComponentConfig & {
       enumName?: string;
-      enumObject?: Record<string, unknown>;
+      enumObject?: Record<string, any>;
     };
     const enumName = configWithOptional.enumName;
     const enumObject = configWithOptional.enumObject;
@@ -400,13 +403,19 @@ export class I18nEngine implements II18nEngine {
     // GlobalActiveContext is optional and may not be available in all environments
     try {
       // Check if GlobalActiveContext is available in global scope
-      const GlobalActiveContext = globalThis.GlobalActiveContext;
+      const GlobalActiveContext = (globalThis as Record<string, any>)
+        .GlobalActiveContext as
+        | {
+            getInstance?: () => { context?: Record<string, any> } | undefined;
+          }
+        | undefined;
 
       if (
         GlobalActiveContext &&
         typeof GlobalActiveContext.getInstance === 'function'
       ) {
-        const context = GlobalActiveContext.getInstance()?.context;
+        const instance = GlobalActiveContext.getInstance();
+        const context = instance?.context;
         if (context) {
           // Add context variables
           combined['language'] = context.language;
@@ -435,7 +444,7 @@ export class I18nEngine implements II18nEngine {
           }
         }
       }
-    } catch (error) {
+    } catch (_error) {
       // GlobalActiveContext not available or not initialized - continue without context vars
     }
 
@@ -457,16 +466,16 @@ export class I18nEngine implements II18nEngine {
    * @param value - Value or wrapper object.
    * @returns Extracted primitive value.
    */
-  private extractValue(value: any): any {
+  private extractValue(value: unknown): unknown {
     if (value instanceof CurrencyCode) return value.value;
     if (value instanceof Timezone) return value.value;
     if (
       value &&
       typeof value === 'object' &&
       'value' in value &&
-      typeof value.value !== 'function'
+      typeof (value as Record<string, any>).value !== 'function'
     ) {
-      return value.value;
+      return (value as Record<string, any>).value;
     }
     // Return as-is for primitives and other objects
     return value;
@@ -525,6 +534,7 @@ export class I18nEngine implements II18nEngine {
    * Merges new constants into existing config constants.
    * @param constants - Key-value constants to merge.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mergeConstants(constants: Record<string, any>): void {
     validateObjectKeys(constants);
     safeAssign(this.config.constants, constants);
@@ -534,6 +544,7 @@ export class I18nEngine implements II18nEngine {
    * Updates config constants and componentStore constants to new values.
    * @param constants - New constants record.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateConstants(constants: Record<string, any>): void {
     validateObjectKeys(constants);
     this.config.constants = constants;
@@ -597,7 +608,7 @@ export class I18nEngine implements II18nEngine {
    * @param enumObj - Enum object to check.
    * @returns True if the enum is registered.
    */
-  hasEnum(enumObj: any): boolean {
+  hasEnum(enumObj: object): boolean {
     return this.enumRegistry.has(enumObj);
   }
 

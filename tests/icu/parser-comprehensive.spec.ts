@@ -1,18 +1,32 @@
-import { parse, ParseError } from '../../src/icu/parser';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { NodeType } from '../../src/icu/ast';
+import { parse, ParseError } from '../../src/icu/parser';
 
 describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
   describe('Real-world messages', () => {
     it('should parse email notification with multiple variables', () => {
-      const ast = parse('{sender} sent you {count, plural, one {a message} other {# messages}} at {time, time, short}');
+      const ast = parse(
+        '{sender} sent you {count, plural, one {a message} other {# messages}} at {time, time, short}',
+      );
       expect(ast.elements).toHaveLength(5);
-      expect(ast.elements[0]).toEqual({ type: NodeType.ARGUMENT, name: 'sender' });
+      expect(ast.elements[0]).toEqual({
+        type: NodeType.ARGUMENT,
+        name: 'sender',
+      });
       expect(ast.elements[2].type).toBe(NodeType.PLURAL);
-      expect(ast.elements[4]).toEqual({ type: NodeType.ARGUMENT, name: 'time', format: 'time', style: 'short' });
+      expect(ast.elements[4]).toEqual({
+        type: NodeType.ARGUMENT,
+        name: 'time',
+        format: 'time',
+        style: 'short',
+      });
     });
 
     it('should parse shopping cart message', () => {
-      const ast = parse('Your cart has {itemCount, plural, zero {no items} one {# item} other {# items}} totaling {total, number, currency}');
+      const ast = parse(
+        'Your cart has {itemCount, plural, zero {no items} one {# item} other {# items}} totaling {total, number, currency}',
+      );
       expect(ast.elements).toHaveLength(4);
       const plural = ast.elements[1] as any;
       expect(plural.cases.zero).toBeDefined();
@@ -21,7 +35,9 @@ describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
     });
 
     it('should parse deeply nested gender and plural', () => {
-      const ast = parse('{gender, select, male {{count, plural, one {He has # item} other {He has # items}}} female {{count, plural, one {She has # item} other {She has # items}}} other {{count, plural, one {They have # item} other {They have # items}}}}');
+      const ast = parse(
+        '{gender, select, male {{count, plural, one {He has # item} other {He has # items}}} female {{count, plural, one {She has # item} other {She has # items}}} other {{count, plural, one {They have # item} other {They have # items}}}}',
+      );
       const select = ast.elements[0] as any;
       expect(select.type).toBe(NodeType.SELECT);
       expect(select.cases.male.elements[0].type).toBe(NodeType.PLURAL);
@@ -30,7 +46,9 @@ describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
     });
 
     it('should parse triple nesting: select > plural > select', () => {
-      const ast = parse('{userGender, select, male {{itemCount, plural, one {{itemGender, select, male {his item} female {her item}}} other {{itemGender, select, male {his items} female {her items}}}}} female {{itemCount, plural, one {{itemGender, select, male {his item} female {her item}}} other {{itemGender, select, male {his items} female {her items}}}}}}');
+      const ast = parse(
+        '{userGender, select, male {{itemCount, plural, one {{itemGender, select, male {his item} female {her item}}} other {{itemGender, select, male {his items} female {her items}}}}} female {{itemCount, plural, one {{itemGender, select, male {his item} female {her item}}} other {{itemGender, select, male {his items} female {her items}}}}}}',
+      );
       const outerSelect = ast.elements[0] as any;
       expect(outerSelect.type).toBe(NodeType.SELECT);
       const plural = outerSelect.cases.male.elements[0] as any;
@@ -42,7 +60,9 @@ describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
 
   describe('Edge cases with numbers', () => {
     it('should parse plural with zero category', () => {
-      const ast = parse('{count, plural, zero {no items} one {one item} other {# items}}');
+      const ast = parse(
+        '{count, plural, zero {no items} one {one item} other {# items}}',
+      );
       const plural = ast.elements[0] as any;
       expect(plural.cases.zero).toBeDefined();
       expect(plural.cases.one).toBeDefined();
@@ -50,7 +70,9 @@ describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
     });
 
     it('should parse selectordinal with two category', () => {
-      const ast = parse('{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}');
+      const ast = parse(
+        '{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}',
+      );
       const ordinal = ast.elements[0] as any;
       expect(ordinal.type).toBe(NodeType.SELECTORDINAL);
       expect(ordinal.cases.one).toBeDefined();
@@ -58,7 +80,9 @@ describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
     });
 
     it('should parse plural with many categories', () => {
-      const ast = parse('{count, plural, zero {none} one {# item} two {# items} few {# items} many {# items} other {# items}}');
+      const ast = parse(
+        '{count, plural, zero {none} one {# item} two {# items} few {# items} many {# items} other {# items}}',
+      );
       const plural = ast.elements[0] as any;
       expect(plural.cases.zero).toBeDefined();
       expect(plural.cases.one).toBeDefined();
@@ -71,19 +95,51 @@ describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
 
   describe('Complex formatting', () => {
     it('should parse multiple date/time formats', () => {
-      const ast = parse('Event on {date, date, long} at {time, time, short} in {timezone}');
+      const ast = parse(
+        'Event on {date, date, long} at {time, time, short} in {timezone}',
+      );
       expect(ast.elements).toHaveLength(6);
-      expect(ast.elements[1]).toEqual({ type: NodeType.ARGUMENT, name: 'date', format: 'date', style: 'long' });
-      expect(ast.elements[3]).toEqual({ type: NodeType.ARGUMENT, name: 'time', format: 'time', style: 'short' });
-      expect(ast.elements[5]).toEqual({ type: NodeType.ARGUMENT, name: 'timezone' });
+      expect(ast.elements[1]).toEqual({
+        type: NodeType.ARGUMENT,
+        name: 'date',
+        format: 'date',
+        style: 'long',
+      });
+      expect(ast.elements[3]).toEqual({
+        type: NodeType.ARGUMENT,
+        name: 'time',
+        format: 'time',
+        style: 'short',
+      });
+      expect(ast.elements[5]).toEqual({
+        type: NodeType.ARGUMENT,
+        name: 'timezone',
+      });
     });
 
     it('should parse number with various styles', () => {
-      const ast = parse('Price: {price, number, currency}, Discount: {discount, number, percent}, Items: {count, number, integer}');
+      const ast = parse(
+        'Price: {price, number, currency}, Discount: {discount, number, percent}, Items: {count, number, integer}',
+      );
       expect(ast.elements).toHaveLength(6);
-      expect(ast.elements[1]).toEqual({ type: NodeType.ARGUMENT, name: 'price', format: 'number', style: 'currency' });
-      expect(ast.elements[3]).toEqual({ type: NodeType.ARGUMENT, name: 'discount', format: 'number', style: 'percent' });
-      expect(ast.elements[5]).toEqual({ type: NodeType.ARGUMENT, name: 'count', format: 'number', style: 'integer' });
+      expect(ast.elements[1]).toEqual({
+        type: NodeType.ARGUMENT,
+        name: 'price',
+        format: 'number',
+        style: 'currency',
+      });
+      expect(ast.elements[3]).toEqual({
+        type: NodeType.ARGUMENT,
+        name: 'discount',
+        format: 'number',
+        style: 'percent',
+      });
+      expect(ast.elements[5]).toEqual({
+        type: NodeType.ARGUMENT,
+        name: 'count',
+        format: 'number',
+        style: 'integer',
+      });
     });
   });
 
@@ -91,36 +147,62 @@ describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
     it('should parse message with punctuation', () => {
       const ast = parse('Hello, {name}! How are you? I have {count} items.');
       expect(ast.elements).toHaveLength(5);
-      expect(ast.elements[0]).toEqual({ type: NodeType.LITERAL, value: 'Hello, ' });
-      expect(ast.elements[2]).toEqual({ type: NodeType.LITERAL, value: '! How are you? I have ' });
-      expect(ast.elements[4]).toEqual({ type: NodeType.LITERAL, value: ' items.' });
+      expect(ast.elements[0]).toEqual({
+        type: NodeType.LITERAL,
+        value: 'Hello, ',
+      });
+      expect(ast.elements[2]).toEqual({
+        type: NodeType.LITERAL,
+        value: '! How are you? I have ',
+      });
+      expect(ast.elements[4]).toEqual({
+        type: NodeType.LITERAL,
+        value: ' items.',
+      });
     });
 
     it('should parse message with quotes and apostrophes', () => {
       const ast = parse("It's {name}'s birthday!");
       expect(ast.elements).toHaveLength(3);
-      expect(ast.elements[0]).toEqual({ type: NodeType.LITERAL, value: "It's " });
-      expect(ast.elements[2]).toEqual({ type: NodeType.LITERAL, value: "'s birthday!" });
+      expect(ast.elements[0]).toEqual({
+        type: NodeType.LITERAL,
+        value: "It's ",
+      });
+      expect(ast.elements[2]).toEqual({
+        type: NodeType.LITERAL,
+        value: "'s birthday!",
+      });
     });
 
     it('should parse message with numbers in text', () => {
       const ast = parse('You have 123 items and {count} more');
       expect(ast.elements).toHaveLength(3);
-      expect(ast.elements[0]).toEqual({ type: NodeType.LITERAL, value: 'You have 123 items and ' });
+      expect(ast.elements[0]).toEqual({
+        type: NodeType.LITERAL,
+        value: 'You have 123 items and ',
+      });
     });
 
     it('should parse message with escaped open brace', () => {
       const ast = parse("Use '{' for opening");
       expect(ast.elements).toHaveLength(3);
-      expect(ast.elements[0]).toEqual({ type: NodeType.LITERAL, value: 'Use ' });
+      expect(ast.elements[0]).toEqual({
+        type: NodeType.LITERAL,
+        value: 'Use ',
+      });
       expect(ast.elements[1]).toEqual({ type: NodeType.LITERAL, value: '{' });
-      expect(ast.elements[2]).toEqual({ type: NodeType.LITERAL, value: "' for opening" });
+      expect(ast.elements[2]).toEqual({
+        type: NodeType.LITERAL,
+        value: "' for opening",
+      });
     });
   });
 
   describe('Select with various cases', () => {
     it('should parse select with many cases', () => {
-      const ast = parse('{status, select, pending {Pending} approved {Approved} rejected {Rejected} cancelled {Cancelled} completed {Completed} other {Unknown}}');
+      const ast = parse(
+        '{status, select, pending {Pending} approved {Approved} rejected {Rejected} cancelled {Cancelled} completed {Completed} other {Unknown}}',
+      );
       const select = ast.elements[0] as any;
       expect(select.type).toBe(NodeType.SELECT);
       expect(Object.keys(select.cases)).toHaveLength(6);
@@ -133,7 +215,9 @@ describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
     });
 
     it('should parse select with underscores and numbers', () => {
-      const ast = parse('{user_type_123, select, admin_1 {Admin} user_2 {User} guest_3 {Guest} other {Unknown}}');
+      const ast = parse(
+        '{user_type_123, select, admin_1 {Admin} user_2 {User} guest_3 {Guest} other {Unknown}}',
+      );
       const select = ast.elements[0] as any;
       expect(select.name).toBe('user_type_123');
       expect(select.cases.admin_1).toBeDefined();
@@ -144,7 +228,9 @@ describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
 
   describe('Plural with all CLDR categories', () => {
     it('should parse plural with all six categories', () => {
-      const ast = parse('{count, plural, zero {no items} one {# item} two {# items} few {# items} many {# items} other {# items}}');
+      const ast = parse(
+        '{count, plural, zero {no items} one {# item} two {# items} few {# items} many {# items} other {# items}}',
+      );
       const plural = ast.elements[0] as any;
       expect(plural.type).toBe(NodeType.PLURAL);
       expect(plural.cases.zero).toBeDefined();
@@ -156,7 +242,9 @@ describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
     });
 
     it('should parse selectordinal with all categories', () => {
-      const ast = parse('{rank, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}');
+      const ast = parse(
+        '{rank, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}',
+      );
       const ordinal = ast.elements[0] as any;
       expect(ordinal.type).toBe(NodeType.SELECTORDINAL);
       expect(ordinal.cases.one).toBeDefined();
@@ -168,7 +256,9 @@ describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
 
   describe('Whitespace handling', () => {
     it('should handle extra whitespace in format', () => {
-      const ast = parse('{  count  ,  plural  ,  one  {  item  }  other  {  items  }  }');
+      const ast = parse(
+        '{  count  ,  plural  ,  one  {  item  }  other  {  items  }  }',
+      );
       const plural = ast.elements[0] as any;
       expect(plural.type).toBe(NodeType.PLURAL);
       expect(plural.name).toBe('count');
@@ -186,8 +276,14 @@ describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
     it('should handle newlines in message', () => {
       const ast = parse('Line 1\nLine 2\n{name}\nLine 3');
       expect(ast.elements).toHaveLength(3);
-      expect(ast.elements[0]).toEqual({ type: NodeType.LITERAL, value: 'Line 1\nLine 2\n' });
-      expect(ast.elements[2]).toEqual({ type: NodeType.LITERAL, value: '\nLine 3' });
+      expect(ast.elements[0]).toEqual({
+        type: NodeType.LITERAL,
+        value: 'Line 1\nLine 2\n',
+      });
+      expect(ast.elements[2]).toEqual({
+        type: NodeType.LITERAL,
+        value: '\nLine 3',
+      });
     });
   });
 
@@ -195,49 +291,108 @@ describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
     it('should parse multiple consecutive arguments', () => {
       const ast = parse('{first}{second}{third}');
       expect(ast.elements).toHaveLength(3);
-      expect(ast.elements[0]).toEqual({ type: NodeType.ARGUMENT, name: 'first' });
-      expect(ast.elements[1]).toEqual({ type: NodeType.ARGUMENT, name: 'second' });
-      expect(ast.elements[2]).toEqual({ type: NodeType.ARGUMENT, name: 'third' });
+      expect(ast.elements[0]).toEqual({
+        type: NodeType.ARGUMENT,
+        name: 'first',
+      });
+      expect(ast.elements[1]).toEqual({
+        type: NodeType.ARGUMENT,
+        name: 'second',
+      });
+      expect(ast.elements[2]).toEqual({
+        type: NodeType.ARGUMENT,
+        name: 'third',
+      });
     });
 
     it('should parse mixed arguments and plurals', () => {
-      const ast = parse('{user} has {count, plural, one {# item} other {# items}} and {points} points');
+      const ast = parse(
+        '{user} has {count, plural, one {# item} other {# items}} and {points} points',
+      );
       expect(ast.elements).toHaveLength(6);
-      expect(ast.elements[0]).toEqual({ type: NodeType.ARGUMENT, name: 'user' });
-      expect(ast.elements[1]).toEqual({ type: NodeType.LITERAL, value: ' has ' });
+      expect(ast.elements[0]).toEqual({
+        type: NodeType.ARGUMENT,
+        name: 'user',
+      });
+      expect(ast.elements[1]).toEqual({
+        type: NodeType.LITERAL,
+        value: ' has ',
+      });
       expect(ast.elements[2].type).toBe(NodeType.PLURAL);
-      expect(ast.elements[3]).toEqual({ type: NodeType.LITERAL, value: ' and ' });
-      expect(ast.elements[4]).toEqual({ type: NodeType.ARGUMENT, name: 'points' });
-      expect(ast.elements[5]).toEqual({ type: NodeType.LITERAL, value: ' points' });
+      expect(ast.elements[3]).toEqual({
+        type: NodeType.LITERAL,
+        value: ' and ',
+      });
+      expect(ast.elements[4]).toEqual({
+        type: NodeType.ARGUMENT,
+        name: 'points',
+      });
+      expect(ast.elements[5]).toEqual({
+        type: NodeType.LITERAL,
+        value: ' points',
+      });
     });
 
     it('should parse multiple plurals in one message', () => {
-      const ast = parse('{apples, plural, one {# apple} other {# apples}} and {oranges, plural, one {# orange} other {# oranges}}');
+      const ast = parse(
+        '{apples, plural, one {# apple} other {# apples}} and {oranges, plural, one {# orange} other {# oranges}}',
+      );
       expect(ast.elements).toHaveLength(3);
       expect(ast.elements[0].type).toBe(NodeType.PLURAL);
-      expect(ast.elements[1]).toEqual({ type: NodeType.LITERAL, value: ' and ' });
+      expect(ast.elements[1]).toEqual({
+        type: NodeType.LITERAL,
+        value: ' and ',
+      });
       expect(ast.elements[2].type).toBe(NodeType.PLURAL);
     });
   });
 
   describe('Hash placeholder variations', () => {
     it('should parse # at different positions', () => {
-      const ast = parse('{count, plural, one {# item total} other {Total: # items}}');
+      const ast = parse(
+        '{count, plural, one {# item total} other {Total: # items}}',
+      );
       const plural = ast.elements[0] as any;
-      expect(plural.cases.one.elements[0]).toEqual({ type: NodeType.LITERAL, value: '#' });
-      expect(plural.cases.one.elements[1]).toEqual({ type: NodeType.LITERAL, value: ' item total' });
-      expect(plural.cases.other.elements[0]).toEqual({ type: NodeType.LITERAL, value: 'Total: ' });
-      expect(plural.cases.other.elements[1]).toEqual({ type: NodeType.LITERAL, value: '#' });
+      expect(plural.cases.one.elements[0]).toEqual({
+        type: NodeType.LITERAL,
+        value: '#',
+      });
+      expect(plural.cases.one.elements[1]).toEqual({
+        type: NodeType.LITERAL,
+        value: ' item total',
+      });
+      expect(plural.cases.other.elements[0]).toEqual({
+        type: NodeType.LITERAL,
+        value: 'Total: ',
+      });
+      expect(plural.cases.other.elements[1]).toEqual({
+        type: NodeType.LITERAL,
+        value: '#',
+      });
     });
 
     it('should parse multiple # in one case', () => {
-      const ast = parse('{count, plural, one {# of # items} other {# of # items}}');
+      const ast = parse(
+        '{count, plural, one {# of # items} other {# of # items}}',
+      );
       const plural = ast.elements[0] as any;
       expect(plural.cases.one.elements).toHaveLength(4);
-      expect(plural.cases.one.elements[0]).toEqual({ type: NodeType.LITERAL, value: '#' });
-      expect(plural.cases.one.elements[1]).toEqual({ type: NodeType.LITERAL, value: ' of ' });
-      expect(plural.cases.one.elements[2]).toEqual({ type: NodeType.LITERAL, value: '#' });
-      expect(plural.cases.one.elements[3]).toEqual({ type: NodeType.LITERAL, value: ' items' });
+      expect(plural.cases.one.elements[0]).toEqual({
+        type: NodeType.LITERAL,
+        value: '#',
+      });
+      expect(plural.cases.one.elements[1]).toEqual({
+        type: NodeType.LITERAL,
+        value: ' of ',
+      });
+      expect(plural.cases.one.elements[2]).toEqual({
+        type: NodeType.LITERAL,
+        value: '#',
+      });
+      expect(plural.cases.one.elements[3]).toEqual({
+        type: NodeType.LITERAL,
+        value: ' items',
+      });
     });
   });
 
@@ -250,7 +405,10 @@ describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
     it('should handle closing brace in text', () => {
       // Closing brace outside of format is treated as text
       const ast = parse('Hello}');
-      expect(ast.elements[0]).toEqual({ type: NodeType.LITERAL, value: 'Hello}' });
+      expect(ast.elements[0]).toEqual({
+        type: NodeType.LITERAL,
+        value: 'Hello}',
+      });
     });
 
     it('should throw on empty argument', () => {
@@ -276,8 +434,12 @@ describe('ICU MessageFormat Parser - Comprehensive Tests', () => {
     });
 
     it('should throw on nested unmatched braces', () => {
-      expect(() => parse('{gender, select, male {{count, plural, one {item}}')).toThrow(ParseError);
-      expect(() => parse('{gender, select, male {{count, plural, one {item}}}')).toThrow(ParseError);
+      expect(() =>
+        parse('{gender, select, male {{count, plural, one {item}}'),
+      ).toThrow(ParseError);
+      expect(() =>
+        parse('{gender, select, male {{count, plural, one {item}}}'),
+      ).toThrow(ParseError);
     });
   });
 });

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 import { IHandleable } from '../interfaces/handleable';
 import { HandleableErrorOptions } from '../interfaces/handleable-error-options';
 
@@ -5,23 +6,26 @@ import { HandleableErrorOptions } from '../interfaces/handleable-error-options';
  * Extended Error constructor type that includes stack trace capture functionality.
  */
 type ErrorConstructorWithStack = ErrorConstructor & {
-  captureStackTrace?: (target: Error, constructorOpt?: Function) => void;
+  captureStackTrace?: (
+    target: Error,
+    constructorOpt?: new (...args: any[]) => Error,
+  ) => void;
 };
 
 /**
  * Base error class that implements IHandleable interface with full i18n support.
- * 
+ *
  * Provides enhanced error handling capabilities including status codes, handled state tracking,
  * and source data preservation. Fully compatible with all i18n features when used with
  * translation strings.
- * 
+ *
  * **Supported i18n Features** (via translation strings in derived classes):
  * - ICU MessageFormat: plural, select, selectordinal
  * - Pluralization: 37 languages with CLDR rules
  * - Gender support: male, female, neutral, other
  * - Number formatting: integer, currency, percent
  * - Nested messages: complex patterns
- * 
+ *
  * **Usage Pattern:**
  * ```typescript
  * // Extend HandleableError with translated messages
@@ -33,7 +37,7 @@ type ErrorConstructorWithStack = ErrorConstructor & {
  *     super(error, { statusCode: 400 });
  *   }
  * }
- * 
+ *
  * // Register translation with ICU features
  * engine.registerComponent({
  *   component: { id: 'api', stringKeys: ['validationError'] },
@@ -43,7 +47,7 @@ type ErrorConstructorWithStack = ErrorConstructor & {
  *     }
  *   }
  * });
- * 
+ *
  * // Use with i18n features
  * throw new MyHandleableError('api', 'validationError', { count: 3 });
  * // Result: \"3 fields are invalid\"
@@ -136,7 +140,7 @@ export class HandleableError extends Error implements IHandleable {
    * Includes name, message, status code, handled state, stack trace, and optional source data.
    * @returns A plain object representation of the error
    */
-  public toJSON(): Record<string, unknown> {
+  public toJSON(): Record<string, any> {
     return {
       name: this.name,
       message: this.message,

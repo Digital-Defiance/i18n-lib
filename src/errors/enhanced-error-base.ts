@@ -1,11 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 /**
  * Enhanced error base with i18n 3.0/3.5 feature support
  * Provides helper methods for ICU MessageFormat, pluralization, gender, and advanced features
  */
 
-import { formatICUMessage } from '../icu/helpers';
-import { PluralCategory } from '../pluralization/plural-categories';
 import { GenderCategory } from '../gender/gender-categories';
+import { formatICUMessage } from '../icu/helpers';
 
 /**
  * Options for enhanced error message formatting
@@ -39,7 +39,7 @@ export class EnhancedErrorHelper {
     options: EnhancedErrorOptions = {},
   ): string {
     const { variables = {}, language = 'en-US', count, gender } = options;
-    
+
     // Add count and gender to variables if provided
     const allVars = {
       ...variables,
@@ -81,7 +81,11 @@ export class EnhancedErrorHelper {
     options: Omit<EnhancedErrorOptions, 'gender'> = {},
   ): string {
     const { male, female, neutral, other } = patterns;
-    const selectPattern = `{gender, select, ${male ? `male {${male}}` : ''} ${female ? `female {${female}}` : ''} ${neutral ? `neutral {${neutral}}` : ''} other {${other || patterns.male || patterns.female || patterns.neutral || 'Error'}}}`;
+    const selectPattern = `{gender, select, ${male ? `male {${male}}` : ''} ${
+      female ? `female {${female}}` : ''
+    } ${neutral ? `neutral {${neutral}}` : ''} other {${
+      other || patterns.male || patterns.female || patterns.neutral || 'Error'
+    }}}`;
     return this.formatMessage(selectPattern, { ...options, gender });
   }
 
@@ -99,7 +103,7 @@ export class EnhancedErrorHelper {
   ): string {
     const ordinalPattern = pattern.replace(
       '{number}',
-      `{number, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}`
+      `{number, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}`,
     );
     return this.formatMessage(ordinalPattern, {
       ...options,
@@ -123,7 +127,7 @@ export class EnhancedErrorHelper {
   ): string {
     const numberPattern = pattern.replace(
       '{value}',
-      `{value, number, ${format}}`
+      `{value, number, ${format}}`,
     );
     return this.formatMessage(numberPattern, {
       ...options,
@@ -195,10 +199,10 @@ export class EnhancedErrorHelper {
     }
 
     const required = variableMatches
-      .map(match => match.substring(1))
+      .map((match) => match.substring(1))
       .filter((name, index, self) => self.indexOf(name) === index);
 
-    const missing = required.filter(name => !(name in variables));
+    const missing = required.filter((name) => !(name in variables));
 
     return {
       valid: missing.length === 0,
@@ -213,7 +217,7 @@ export class EnhancedErrorHelper {
  * @returns Enhanced error class
  */
 export function withEnhancedI18n<T extends new (...args: any[]) => Error>(
-  Base: T
+  Base: T,
 ) {
   return class extends Base {
     public formatMessage(
@@ -229,7 +233,12 @@ export function withEnhancedI18n<T extends new (...args: any[]) => Error>(
       count: number,
       options: Omit<EnhancedErrorOptions, 'count'> = {},
     ): string {
-      return EnhancedErrorHelper.formatPlural(singularPattern, pluralPattern, count, options);
+      return EnhancedErrorHelper.formatPlural(
+        singularPattern,
+        pluralPattern,
+        count,
+        options,
+      );
     }
 
     public formatGender(

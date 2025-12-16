@@ -1,4 +1,6 @@
-import { buildReasonMap, I18nEngine, isTemplate, LanguageCodes } from '../src';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
+import { buildReasonMap, I18nEngine, isTemplate } from '../src';
 
 describe('Template Processing with buildReasonMap', () => {
   enum TestErrorType {
@@ -20,9 +22,11 @@ describe('Template Processing with buildReasonMap', () => {
     );
 
     // Initialize engine with template translations
-    const langs = [{ id: 'en-US', name: 'English', code: 'en-US', isDefault: true }];
+    const langs = [
+      { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+    ];
     const engine = new I18nEngine(langs);
-    
+
     engine.register({
       id: 'test',
       name: 'Test',
@@ -37,7 +41,10 @@ describe('Template Processing with buildReasonMap', () => {
     });
 
     // Test simple error (no template processing)
-    const simpleResult = engine.translate('test', reasonMap[TestErrorType.SimpleError]);
+    const simpleResult = engine.translate(
+      'test',
+      reasonMap[TestErrorType.SimpleError],
+    );
     expect(simpleResult).toBe('Simple error occurred');
 
     // Test template error (with variable processing)

@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { formatICUMessage } from '../../src/icu/helpers';
 
 describe('ICU Edge Cases', () => {
   describe('Extreme nesting', () => {
     it('should handle 4-level nesting', () => {
-      const msg = '{a, select, x {{b, select, y {{c, plural, one {{d, select, m {deep} other {text}}} other {text}}} other {text}}} other {text}}';
+      const msg =
+        '{a, select, x {{b, select, y {{c, plural, one {{d, select, m {deep} other {text}}} other {text}}} other {text}}} other {text}}';
       const result = formatICUMessage(msg, { a: 'x', b: 'y', c: 1, d: 'm' });
       expect(result).toBe('deep');
     });
@@ -23,7 +26,7 @@ describe('ICU Edge Cases', () => {
 
   describe('Special characters', () => {
     it('should handle quotes', () => {
-      const msg = "He said {name}";
+      const msg = 'He said {name}';
       expect(formatICUMessage(msg, { name: 'hello' })).toContain('hello');
     });
 

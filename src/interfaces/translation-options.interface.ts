@@ -7,6 +7,7 @@
  */
 export interface TranslationOptions {
   /** Variables to replace in template strings */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   readonly variables?: Record<string, any>;
   /** Language code to use for the translation */
   readonly language?: string;

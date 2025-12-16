@@ -1,4 +1,11 @@
-import { createSafeObject, isDangerousKey, safeAssign, validateObjectKeys } from '../../src/utils/safe-object';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
+import {
+  createSafeObject,
+  isDangerousKey,
+  safeAssign,
+  validateObjectKeys,
+} from '../../src/utils/safe-object';
 
 describe('safe-object', () => {
   describe('isDangerousKey', () => {
@@ -42,14 +49,14 @@ describe('safe-object', () => {
 
     it('should filter __proto__', () => {
       const target = {};
-      safeAssign(target, { name: 'test', '__proto__': { polluted: true } });
+      safeAssign(target, { name: 'test', __proto__: { polluted: true } });
       expect(target).toEqual({ name: 'test' });
-      expect((({} as any).polluted)).toBeUndefined();
+      expect(({} as any).polluted).toBeUndefined();
     });
 
     it('should filter constructor', () => {
       const target = {};
-      safeAssign(target, { name: 'test', 'constructor': { polluted: true } });
+      safeAssign(target, { name: 'test', constructor: { polluted: true } });
       expect(target).toEqual({ name: 'test' });
     });
 

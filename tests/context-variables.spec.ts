@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import {
   ComponentDefinition,
   ComponentRegistration,
-  PluginI18nEngine,
   LanguageDefinition,
+  PluginI18nEngine,
 } from '../src';
 import { CurrencyCode } from '../src/utils/currency';
 import { Timezone } from '../src/utils/timezone';
@@ -123,7 +125,9 @@ describe('Context Variables in Templates', () => {
         component,
         strings: {
           en: { message: 'User: {userTimezone}, Admin: {adminTimezone}' },
-          fr: { message: 'Utilisateur: {userTimezone}, Admin: {adminTimezone}' },
+          fr: {
+            message: 'Utilisateur: {userTimezone}, Admin: {adminTimezone}',
+          },
         },
       };
 
@@ -303,7 +307,9 @@ describe('Context Variables in Templates', () => {
         component,
         strings: {
           en: { message: 'User: {userLanguage}, Admin: {adminLanguage}' },
-          fr: { message: 'Utilisateur: {userLanguage}, Admin: {adminLanguage}' },
+          fr: {
+            message: 'Utilisateur: {userLanguage}, Admin: {adminLanguage}',
+          },
         },
       };
 
@@ -345,7 +351,9 @@ describe('Context Variables in Templates', () => {
       engine.registerComponent(registration);
 
       const result = engine.t('{{test.message}}');
-      expect(result).toBe('Language: en, Currency: EUR, Timezone: Europe/Paris');
+      expect(result).toBe(
+        'Language: en, Currency: EUR, Timezone: Europe/Paris',
+      );
     });
 
     it('should allow user variables to override context variables', () => {
@@ -370,7 +378,9 @@ describe('Context Variables in Templates', () => {
       engine.registerComponent(registration);
 
       // User-provided variable should override context
-      const result = engine.t('{{test.message}}', 'en', { currencyCode: 'GBP' });
+      const result = engine.t('{{test.message}}', 'en', {
+        currencyCode: 'GBP',
+      });
       expect(result).toBe('Currency: GBP');
     });
 

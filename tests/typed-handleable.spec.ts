@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
+import { I18nEngine } from '../src/core/i18n-engine';
 import { HandleableError } from '../src/errors/handleable';
-import { HandleableErrorOptions } from '../src/interfaces/handleable-error-options';
-import { LanguageCodes } from '../src/language-codes';
 import { CompleteReasonMap } from '../src/errors/typed';
 import { TypedHandleableError } from '../src/errors/typed-handleable';
-import { I18nEngine } from '../src/core/i18n-engine';
-import { CoreI18nComponentId, CoreStringKey } from '../src';
+import { HandleableErrorOptions } from '../src/interfaces/handleable-error-options';
+import { LanguageCodes } from '../src/language-codes';
 
 type TestLanguageCode =
   | typeof LanguageCodes.EN_US
@@ -41,7 +42,15 @@ class TestTypedError extends TypedHandleableError<
     otherVars?: Record<string, string | number>,
     options?: HandleableErrorOptions,
   ) {
-    super('test-component', type, testReasonMap, new Error(), options, language, otherVars);
+    super(
+      'test-component',
+      type,
+      testReasonMap,
+      new Error(),
+      options,
+      language,
+      otherVars,
+    );
     this.name = 'TestTypedError';
   }
 }
@@ -50,32 +59,41 @@ describe('TypedError', () => {
   beforeEach(() => {
     I18nEngine.resetAll();
     const engine = new I18nEngine([
-      { id: LanguageCodes.EN_US, name: 'English (US)', code: 'en-US', isDefault: true },
+      {
+        id: LanguageCodes.EN_US,
+        name: 'English (US)',
+        code: 'en-US',
+        isDefault: true,
+      },
       { id: LanguageCodes.FR, name: 'French', code: 'fr' },
     ]);
-    
+
     engine.register({
       id: CoreI18nComponentId,
       strings: {
         [LanguageCodes.EN_US]: {
-          [CoreStringKey.Error_MissingTranslationKeyTemplate]: "Missing translation key: {stringKey}",
+          [CoreStringKey.Error_MissingTranslationKeyTemplate]:
+            'Missing translation key: {stringKey}',
         },
         [LanguageCodes.FR]: {
-          [CoreStringKey.Error_MissingTranslationKeyTemplate]: "Clé de traduction manquante: {stringKey}",
+          [CoreStringKey.Error_MissingTranslationKeyTemplate]:
+            'Clé de traduction manquante: {stringKey}',
         },
       },
     });
-    
+
     engine.register({
       id: 'test-component',
       strings: {
         [LanguageCodes.EN_US]: {
           [TestStringKeys.Common_Test]: 'This is a test error message.',
-          [TestStringKeys.Error_MissingTranslationTemplate]: 'Missing template variable: {key} in language {language}.',
+          [TestStringKeys.Error_MissingTranslationTemplate]:
+            'Missing template variable: {key} in language {language}.',
         },
         [LanguageCodes.FR]: {
           [TestStringKeys.Common_Test]: "Ceci est un message d'erreur de test.",
-          [TestStringKeys.Error_MissingTranslationTemplate]: 'Variable de modèle manquante : {key} dans la langue {language}.',
+          [TestStringKeys.Error_MissingTranslationTemplate]:
+            'Variable de modèle manquante : {key} dans la langue {language}.',
         },
       },
     });
@@ -226,4 +244,3 @@ describe('TypedError', () => {
     expect(json.sourceData).toBeUndefined();
   });
 });
-

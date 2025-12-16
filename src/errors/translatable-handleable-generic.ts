@@ -1,21 +1,21 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
+import { GenderCategory } from '../gender/gender-categories';
 import { IHandleable } from '../interfaces/handleable';
 import { TranslatableGenericError } from './translatable-generic';
-import { PluralCategory } from '../pluralization/plural-categories';
-import { GenderCategory } from '../gender/gender-categories';
 
 /**
  * Generic translatable handleable error with full i18n feature support.
- * 
+ *
  * Combines translation capabilities with handleable error patterns and provides
  * static factory methods for all i18n features.
- * 
+ *
  * **Supported i18n Features:**
  * - ICU MessageFormat: plural, select, selectordinal
  * - Pluralization: 37 languages with CLDR rules
  * - Gender support: male, female, neutral, other
  * - Number formatting: integer, currency, percent
  * - Nested messages: complex multi-level patterns
- * 
+ *
  * **Usage Examples:**
  * ```typescript
  * // Pluralization with handleable options
@@ -24,21 +24,21 @@ import { GenderCategory } from '../gender/gender-categories';
  *   {}, 'en-US', 'default',
  *   { statusCode: 400 }
  * );
- * 
+ *
  * // Gender-aware messages
  * throw TranslatableHandleableGenericError.withGender(
  *   'user', 'accountError', 'female',
  *   {}, 'en-US', 'default',
  *   { statusCode: 403 }
  * );
- * 
+ *
  * // Number formatting with error handling
  * throw TranslatableHandleableGenericError.withNumberFormat(
  *   'payment', 'amountExceeded', 1599.99,
  *   { limit: 1000 }, 'en-US', 'default',
  *   { statusCode: 402 }
  * );
- * 
+ *
  * // Ordinal formatting (1st, 2nd, 3rd)
  * throw TranslatableHandleableGenericError.withOrdinal(
  *   'workflow', 'stepFailed', 3,
@@ -92,7 +92,7 @@ export class TranslatableHandleableGenericError<
   public set handled(value: boolean) {
     this._handled = value;
   }
-  toJSON(): Record<string, unknown> {
+  toJSON(): Record<string, any> {
     return {
       statusCode: this.statusCode,
       message: this.message,
@@ -112,7 +112,11 @@ export class TranslatableHandleableGenericError<
     otherVars?: Record<string, string | number>,
     language?: string,
     instanceKey?: string,
-    handleableOptions?: { statusCode?: number; cause?: Error; sourceData?: unknown },
+    handleableOptions?: {
+      statusCode?: number;
+      cause?: Error;
+      sourceData?: unknown;
+    },
   ): TranslatableHandleableGenericError<TStringKey> {
     return new TranslatableHandleableGenericError(
       componentId,
@@ -136,7 +140,11 @@ export class TranslatableHandleableGenericError<
     otherVars?: Record<string, string | number>,
     language?: string,
     instanceKey?: string,
-    handleableOptions?: { statusCode?: number; cause?: Error; sourceData?: unknown },
+    handleableOptions?: {
+      statusCode?: number;
+      cause?: Error;
+      sourceData?: unknown;
+    },
   ): TranslatableHandleableGenericError<TStringKey> {
     return new TranslatableHandleableGenericError(
       componentId,
@@ -160,7 +168,11 @@ export class TranslatableHandleableGenericError<
     otherVars?: Record<string, string | number>,
     language?: string,
     instanceKey?: string,
-    handleableOptions?: { statusCode?: number; cause?: Error; sourceData?: unknown },
+    handleableOptions?: {
+      statusCode?: number;
+      cause?: Error;
+      sourceData?: unknown;
+    },
   ): TranslatableHandleableGenericError<TStringKey> {
     return new TranslatableHandleableGenericError(
       componentId,
@@ -184,7 +196,11 @@ export class TranslatableHandleableGenericError<
     otherVars?: Record<string, string | number>,
     language?: string,
     instanceKey?: string,
-    handleableOptions?: { statusCode?: number; cause?: Error; sourceData?: unknown },
+    handleableOptions?: {
+      statusCode?: number;
+      cause?: Error;
+      sourceData?: unknown;
+    },
   ): TranslatableHandleableGenericError<TStringKey> {
     return new TranslatableHandleableGenericError(
       componentId,
@@ -207,7 +223,11 @@ export class TranslatableHandleableGenericError<
     features: Record<string, string | number>,
     language?: string,
     instanceKey?: string,
-    handleableOptions?: { statusCode?: number; cause?: Error; sourceData?: unknown },
+    handleableOptions?: {
+      statusCode?: number;
+      cause?: Error;
+      sourceData?: unknown;
+    },
   ): TranslatableHandleableGenericError<TStringKey> {
     return new TranslatableHandleableGenericError(
       componentId,

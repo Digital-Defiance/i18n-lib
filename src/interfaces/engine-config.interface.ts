@@ -11,6 +11,7 @@ export interface EngineConfig {
   /** Fallback language to use when a translation is missing */
   fallbackLanguage?: string;
   /** Constants available for variable replacement in templates */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constants?: Record<string, any>;
   /** Validation configuration */
   validation?: {

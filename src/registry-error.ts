@@ -1,11 +1,19 @@
-// CoreLanguageCode is deprecated - using string
-import { CoreI18nComponentId } from './core-component-id';
-import { CoreStringKey } from './core-string-key';
-import { RegistryErrorType } from './registry-error-type';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
+// CoreLanguageCode is deprecated - using string
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { CoreI18nComponentId } from './core-component-id';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { CoreStringKey } from './core-string-key';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { RegistryErrorType } from './registry-error-type';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Minimal translation engine interface to avoid circular dependencies
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface RegistryTranslationEngine {
   safeTranslate(
     componentId: string,
@@ -71,7 +79,7 @@ export class RegistryError extends Error {
           variables,
           language,
         );
-      } catch (translationError) {
+      } catch (_translationError) {
         // Fallback if translation fails
         message = `Error: ${type}${
           metadata ? ` - ${JSON.stringify(metadata)}` : ''

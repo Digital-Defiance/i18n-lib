@@ -1,8 +1,9 @@
 /**
  * String utility functions
  */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 
-import { escapeHtml, safeStringify } from './html-escape';
+import { safeStringify } from './html-escape';
 
 /**
  * Extract the actual value from an object that might be a wrapper (CurrencyCode, Timezone, etc.).
@@ -11,7 +12,12 @@ import { escapeHtml, safeStringify } from './html-escape';
  */
 function extractValue(value: any): any {
   // Handle objects with a 'value' property (CurrencyCode, Timezone, etc.)
-  if (value && typeof value === 'object' && 'value' in value && typeof value.value !== 'function') {
+  if (
+    value &&
+    typeof value === 'object' &&
+    'value' in value &&
+    typeof value.value !== 'function'
+  ) {
     return value.value;
   }
   return value;

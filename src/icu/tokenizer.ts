@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 /**
  * ICU MessageFormat Tokenizer
  */
@@ -72,14 +73,22 @@ export class Tokenizer {
       // 3. After CLOSE_BRACE at depth 0 - consecutive formats
       // 4. After OPEN_BRACE - nested format (unless after case name)
       // NOT after IDENTIFIER at format depth - that's a case name, next brace is message content
-      if (this.lastTokenType === null || 
-          (this.lastTokenType === TokenType.TEXT && !this.lastIdentifierWasAtFormatDepth) ||
-          (this.lastTokenType === TokenType.CLOSE_BRACE && prevDepth === 0) ||
-          (this.lastTokenType === TokenType.OPEN_BRACE && !this.lastIdentifierWasAtFormatDepth)) {
+      if (
+        this.lastTokenType === null ||
+        (this.lastTokenType === TokenType.TEXT &&
+          !this.lastIdentifierWasAtFormatDepth) ||
+        (this.lastTokenType === TokenType.CLOSE_BRACE && prevDepth === 0) ||
+        (this.lastTokenType === TokenType.OPEN_BRACE &&
+          !this.lastIdentifierWasAtFormatDepth)
+      ) {
         this.formatDepths.add(this.braceDepth);
       }
       this.lastIdentifierWasAtFormatDepth = false;
-      const token = { type: TokenType.OPEN_BRACE, value: char, position: this.position++ };
+      const token = {
+        type: TokenType.OPEN_BRACE,
+        value: char,
+        position: this.position++,
+      };
       this.lastTokenType = TokenType.OPEN_BRACE;
       return token;
     }
@@ -87,14 +96,22 @@ export class Tokenizer {
       this.formatDepths.delete(this.braceDepth);
       this.braceDepth--;
       this.lastIdentifierWasAtFormatDepth = false; // Reset after closing
-      const token = { type: TokenType.CLOSE_BRACE, value: char, position: this.position++ };
+      const token = {
+        type: TokenType.CLOSE_BRACE,
+        value: char,
+        position: this.position++,
+      };
       this.lastTokenType = TokenType.CLOSE_BRACE;
       return token;
     }
     if (char === ',') {
       // Comma at depth 1+ is format separator, at depth 0 is text
       if (this.braceDepth >= 1) {
-        const token = { type: TokenType.COMMA, value: char, position: this.position++ };
+        const token = {
+          type: TokenType.COMMA,
+          value: char,
+          position: this.position++,
+        };
         this.lastTokenType = TokenType.COMMA;
         return token;
       }
@@ -106,7 +123,11 @@ export class Tokenizer {
     }
 
     // Whitespace - skip at format level OR after identifier at depth 1
-    if (this.isWhitespace(char) && (this.isAtFormatLevel() || (this.braceDepth === 1 && this.lastTokenType === TokenType.IDENTIFIER))) {
+    if (
+      this.isWhitespace(char) &&
+      (this.isAtFormatLevel() ||
+        (this.braceDepth === 1 && this.lastTokenType === TokenType.IDENTIFIER))
+    ) {
       this.position++;
       return this.nextToken();
     }
@@ -124,7 +145,10 @@ export class Tokenizer {
 
   private readIdentifier(): Token {
     const start = this.position;
-    while (this.position < this.length && this.isIdentifierChar(this.input[this.position])) {
+    while (
+      this.position < this.length &&
+      this.isIdentifierChar(this.input[this.position])
+    ) {
       this.position++;
     }
     const token = {
@@ -133,41 +157,43 @@ export class Tokenizer {
       position: start,
     };
     this.lastTokenType = TokenType.IDENTIFIER;
-    this.lastIdentifierWasAtFormatDepth = this.formatDepths.has(this.braceDepth);
+    this.lastIdentifierWasAtFormatDepth = this.formatDepths.has(
+      this.braceDepth,
+    );
     return token;
   }
 
   private readText(): Token {
     const start = this.position;
     let text = '';
-    
+
     while (this.position < this.length) {
       const char = this.input[this.position];
-      
+
       // Handle escaped quotes - stop before them
       if (char === "'" && (this.peek() === '{' || this.peek() === '}')) {
         break;
       }
-      
+
       // Stop at special characters (but not if they're escaped)
       if (char === '{' || char === '#') {
         break;
       }
-      
+
       // For }, only stop if we're inside braces
       if (char === '}' && this.braceDepth > 0) {
         break;
       }
-      
+
       // Stop at comma if we're at format level (depth >= 1)
       if (char === ',' && this.braceDepth >= 1) {
         break;
       }
-      
+
       text += char;
       this.position++;
     }
-    
+
     const token = {
       type: TokenType.TEXT,
       value: text,
@@ -205,8 +231,10 @@ export class Tokenizer {
     if (!this.formatDepths.has(this.braceDepth)) {
       return false;
     }
-    return this.lastTokenType === TokenType.OPEN_BRACE || 
-           this.lastTokenType === TokenType.COMMA ||
-           this.lastTokenType === TokenType.CLOSE_BRACE;
+    return (
+      this.lastTokenType === TokenType.OPEN_BRACE ||
+      this.lastTokenType === TokenType.COMMA ||
+      this.lastTokenType === TokenType.CLOSE_BRACE
+    );
   }
 }

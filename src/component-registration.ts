@@ -24,6 +24,6 @@ type ExtractStringKeys<T> = T extends ComponentDefinition<infer K> ? K : never;
  * Type utility to create a strongly typed component registration
  */
 export type CreateComponentRegistration<
-  TComponent extends ComponentDefinition<any>,
+  TComponent extends ComponentDefinition<string>,
   TLanguages extends string,
 > = ComponentRegistration<ExtractStringKeys<TComponent>, TLanguages>;

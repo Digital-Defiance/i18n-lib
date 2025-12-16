@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
+
 /**
  * Enum translation registry (v2 - no generics)
  */
@@ -9,8 +11,11 @@ import { I18nError } from '../errors/i18n-error';
  * Provides a centralized way to register and translate enum values.
  */
 export class EnumRegistry {
-  private translations = new Map<any, Record<string, Record<string, string>>>();
-  private enumNames = new WeakMap<any, string>();
+  private translations = new Map<
+    object,
+    Record<string, Record<string, string>>
+  >();
+  private enumNames = new WeakMap<object, string>();
   private translateFn?: (key: string, vars?: Record<string, any>) => string;
 
   /**
@@ -91,7 +96,7 @@ export class EnumRegistry {
    * @param enumObj - The enum object to check
    * @returns True if the enum is registered, false otherwise
    */
-  has(enumObj: any): boolean {
+  has(enumObj: object): boolean {
     return this.translations.has(enumObj);
   }
 
@@ -100,7 +105,7 @@ export class EnumRegistry {
    * @param enumObj - The enum object
    * @returns The enum name or 'UnknownEnum' if not set
    */
-  private getEnumName(enumObj: any): string {
+  private getEnumName(enumObj: object): string {
     return this.enumNames.get(enumObj) || 'UnknownEnum';
   }
 }

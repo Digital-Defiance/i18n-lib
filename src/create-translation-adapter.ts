@@ -4,7 +4,7 @@ import { TranslationEngine } from './translation-engine';
 /**
  * Creates a TranslationEngine adapter from a PluginI18nEngine for a specific component.
  * This allows PluginI18nEngine to be used where TranslationEngine interface is expected.
- * 
+ *
  * The adapter supports both calling conventions:
  * - Full TranslationEngine interface: `translate(componentId, key, vars, lang)`
  * - Simplified interface: `translate(key, vars, lang)` (componentId is bound)
@@ -34,10 +34,18 @@ export function createTranslationAdapter<
   pluginEngine: PluginI18nEngine<TLanguage>,
   componentId: string,
 ): TranslationEngine<TStringKey> & {
-  translate(key: TStringKey, vars?: Record<string, string | number>, lang?: TLanguage): string;
-  safeTranslate(key: TStringKey, vars?: Record<string, string | number>, lang?: TLanguage): string;
+  translate(
+    key: TStringKey,
+    vars?: Record<string, string | number>,
+    lang?: TLanguage,
+  ): string;
+  safeTranslate(
+    key: TStringKey,
+    vars?: Record<string, string | number>,
+    lang?: TLanguage,
+  ): string;
 } {
-  const adapter: any = {
+  const adapter = {
     translate: (
       keyOrComponentId: string | TStringKey,
       varsOrKey?: TStringKey | Record<string, string | number>,
@@ -48,7 +56,7 @@ export function createTranslationAdapter<
       let actualVars: Record<string, string | number> | undefined;
       let actualLang: TLanguage | undefined;
 
-      if (arguments.length >= 4 || (typeof varsOrKey === 'string')) {
+      if (arguments.length >= 4 || typeof varsOrKey === 'string') {
         actualKey = varsOrKey as TStringKey;
         actualVars = langOrVars as Record<string, string | number> | undefined;
         actualLang = maybeLang;
@@ -59,8 +67,13 @@ export function createTranslationAdapter<
       }
 
       try {
-        return pluginEngine.translate(componentId, actualKey, actualVars, actualLang);
-      } catch (error) {
+        return pluginEngine.translate(
+          componentId,
+          actualKey,
+          actualVars,
+          actualLang,
+        );
+      } catch (_error) {
         return String(actualKey);
       }
     },
@@ -75,7 +88,7 @@ export function createTranslationAdapter<
       let actualVars: Record<string, string | number> | undefined;
       let actualLang: TLanguage | undefined;
 
-      if (arguments.length >= 4 || (typeof varsOrKey === 'string')) {
+      if (arguments.length >= 4 || typeof varsOrKey === 'string') {
         actualKey = varsOrKey as TStringKey;
         actualVars = langOrVars as Record<string, string | number> | undefined;
         actualLang = maybeLang;
@@ -85,7 +98,12 @@ export function createTranslationAdapter<
         actualLang = langOrVars as TLanguage | undefined;
       }
 
-      return pluginEngine.safeTranslate(componentId, actualKey, actualVars, actualLang);
+      return pluginEngine.safeTranslate(
+        componentId,
+        actualKey,
+        actualVars,
+        actualLang,
+      );
     },
   };
 

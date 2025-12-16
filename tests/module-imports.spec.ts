@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 /**
  * Module Import Tests
  *
@@ -7,12 +9,12 @@
  * Requirements: 1.3, 1.5, 4.3
  */
 
-import { CoreI18nComponentId } from '../src/core-i18n';
-import { createCorePluginI18nEngine } from '../src/core-plugin-factory';
 import { ComponentStore } from '../src/core/component-store';
 import { EnumRegistry } from '../src/core/enum-registry';
 import { I18nEngine } from '../src/core/i18n-engine';
 import { LanguageRegistry } from '../src/core/language-registry';
+import { CoreI18nComponentId } from '../src/core-i18n';
+import { createCorePluginI18nEngine } from '../src/core-plugin-factory';
 import { I18nError } from '../src/errors/i18n-error';
 import { TranslatableError } from '../src/errors/translatable';
 import { TranslatableGenericError } from '../src/errors/translatable-generic';

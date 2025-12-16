@@ -1,19 +1,25 @@
 import { EnumLanguageTranslation } from './types';
-
 /**
  * Registry for managing translations of enum values across multiple languages.
  *
  * @template TStringKey Type of translation key used in error messages.
  * @template TLanguage Type of supported language codes.
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export class EnumTranslationRegistry<
   TStringKey extends string,
   TLanguage extends string,
 > {
-  protected translations = new Map<any, EnumLanguageTranslation<any, TLanguage>>();
+  protected translations = new Map<
+    any,
+    EnumLanguageTranslation<any, TLanguage>
+  >();
   protected enumNames = new WeakMap<any, string>();
   protected availableLanguages: Set<TLanguage>;
-  protected translateFn?: (key: TStringKey, vars?: Record<string, any>) => string;
+  protected translateFn?: (
+    key: TStringKey,
+    vars?: Record<string, any>,
+  ) => string;
 
   /**
    * Creates a new EnumTranslationRegistry.
@@ -111,7 +117,7 @@ export class EnumTranslationRegistry<
    * @param enumObj The enum object to check.
    * @returns True if registered, false otherwise.
    */
-  public has(enumObj: any): boolean {
+  public has(enumObj: object): boolean {
     return this.translations.has(enumObj);
   }
 
@@ -121,7 +127,7 @@ export class EnumTranslationRegistry<
    * @param enumObj The enum object.
    * @returns Registered enum name or 'UnknownEnum' if not set.
    */
-  private getEnumName(enumObj: any): string {
+  private getEnumName(enumObj: object): string {
     return this.enumNames.get(enumObj) || 'UnknownEnum';
   }
 

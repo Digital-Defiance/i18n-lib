@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { I18nError, I18nErrorCode } from '../src/errors/i18n-error';
 
 describe('I18nError coverage', () => {
@@ -45,7 +47,7 @@ describe('I18nError coverage', () => {
       expect(error.metadata).toMatchObject({
         componentId: 'app',
         stringKey: 'title',
-        language: 'fr'
+        language: 'fr',
       });
     });
 
@@ -131,7 +133,10 @@ describe('I18nError coverage', () => {
     });
 
     it('should create pluralFormNotFound error with ICU select formatting', () => {
-      const error = I18nError.pluralFormNotFound('few', 'ru', 'items', ['one', 'many']);
+      const error = I18nError.pluralFormNotFound('few', 'ru', 'items', [
+        'one',
+        'many',
+      ]);
 
       expect(error.code).toBe(I18nErrorCode.PLURAL_FORM_NOT_FOUND);
       expect(error.message).toContain('few');

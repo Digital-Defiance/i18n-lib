@@ -1,12 +1,14 @@
-import { I18nEngine } from '../../src/core/i18n-engine';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { ComponentStore } from '../../src/core/component-store';
+import { I18nEngine } from '../../src/core/i18n-engine';
 import { LanguageDefinition } from '../../src/interfaces';
 
 describe('Backward Compatibility', () => {
   let engine: I18nEngine;
   const languages: LanguageDefinition[] = [
     { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
-    { id: 'ru', name: 'Russian', code: 'ru' }
+    { id: 'ru', name: 'Russian', code: 'ru' },
   ];
 
   beforeEach(() => {
@@ -25,13 +27,15 @@ describe('Backward Compatibility', () => {
         strings: {
           'en-US': {
             title: 'My Application',
-            greeting: 'Hello, {name}!'
-          }
-        }
+            greeting: 'Hello, {name}!',
+          },
+        },
       });
 
       expect(engine.translate('app', 'title')).toBe('My Application');
-      expect(engine.translate('app', 'greeting', { name: 'World' })).toBe('Hello, World!');
+      expect(engine.translate('app', 'greeting', { name: 'World' })).toBe(
+        'Hello, World!',
+      );
     });
 
     it('should work with t() function', () => {
@@ -39,9 +43,9 @@ describe('Backward Compatibility', () => {
         id: 'app',
         strings: {
           'en-US': {
-            welcome: 'Welcome'
-          }
-        }
+            welcome: 'Welcome',
+          },
+        },
       });
 
       expect(engine.t('{{app.welcome}}')).toBe('Welcome');
@@ -57,17 +61,19 @@ describe('Backward Compatibility', () => {
             title: 'Shopping Cart',
             items: {
               one: '1 item',
-              other: '{count} items'
+              other: '{count} items',
             },
-            total: 'Total: ${amount}'
-          }
-        }
+            total: 'Total: ${amount}',
+          },
+        },
       });
 
       expect(engine.translate('shop', 'title')).toBe('Shopping Cart');
       expect(engine.translate('shop', 'items', { count: 1 })).toBe('1 item');
       expect(engine.translate('shop', 'items', { count: 5 })).toBe('5 items');
-      expect(engine.translate('shop', 'total', { amount: '99.99' })).toBe('Total: $99.99');
+      expect(engine.translate('shop', 'total', { amount: '99.99' })).toBe(
+        'Total: $99.99',
+      );
     });
 
     it('should work in templates', () => {
@@ -78,13 +84,15 @@ describe('Backward Compatibility', () => {
             title: 'Cart',
             items: {
               one: '1 item',
-              other: '{count} items'
-            }
-          }
-        }
+              other: '{count} items',
+            },
+          },
+        },
       });
 
-      expect(engine.t('{{cart.title}}: {{cart.items}}', { count: 5 })).toBe('Cart: 5 items');
+      expect(engine.t('{{cart.title}}: {{cart.items}}', { count: 5 })).toBe(
+        'Cart: 5 items',
+      );
     });
   });
 
@@ -95,9 +103,9 @@ describe('Backward Compatibility', () => {
         id: 'app',
         strings: {
           'en-US': {
-            title: 'App'
-          }
-        }
+            title: 'App',
+          },
+        },
       });
 
       expect(engine.translate('app', 'title')).toBe('App');
@@ -109,10 +117,10 @@ describe('Backward Compatibility', () => {
           'en-US': {
             items: {
               one: '1 item',
-              other: '{count} items'
-            }
-          }
-        }
+              other: '{count} items',
+            },
+          },
+        },
       });
 
       expect(engine.translate('cart', 'items', { count: 5 })).toBe('5 items');
@@ -125,11 +133,11 @@ describe('Backward Compatibility', () => {
         strings: {
           'en-US': {
             items: {
-              one: '1 item'
+              one: '1 item',
               // Missing 'other' - should fallback
-            }
-          }
-        }
+            },
+          },
+        },
       });
 
       expect(engine.translate('test', 'items', { count: 1 })).toBe('1 item');
@@ -143,9 +151,9 @@ describe('Backward Compatibility', () => {
         id: 'legacy',
         strings: {
           'en-US': {
-            message: 'Hello'
-          }
-        }
+            message: 'Hello',
+          },
+        },
       });
 
       // All existing call patterns should work
@@ -159,9 +167,9 @@ describe('Backward Compatibility', () => {
         id: 'app',
         strings: {
           'en-US': {
-            greeting: 'Hi {name}'
-          }
-        }
+            greeting: 'Hi {name}',
+          },
+        },
       });
 
       expect(engine.t('{{app.greeting}}', { name: 'Alice' })).toBe('Hi Alice');
@@ -172,9 +180,9 @@ describe('Backward Compatibility', () => {
         id: 'app',
         strings: {
           'en-US': {
-            exists: 'Value'
-          }
-        }
+            exists: 'Value',
+          },
+        },
       });
 
       expect(engine.safeTranslate('app', 'exists')).toBe('Value');
@@ -188,8 +196,8 @@ describe('Backward Compatibility', () => {
         id: 'app',
         strings: {
           'en-US': { hello: 'Hello' },
-          'ru': { hello: 'Привет' }
-        }
+          ru: { hello: 'Привет' },
+        },
       });
 
       expect(engine.translate('app', 'hello')).toBe('Hello');
@@ -202,12 +210,16 @@ describe('Backward Compatibility', () => {
         id: 'cart',
         strings: {
           'en-US': {
-            items: { one: '1 item', other: '{count} items' }
+            items: { one: '1 item', other: '{count} items' },
           },
-          'ru': {
-            items: { one: '{count} товар', few: '{count} товара', many: '{count} товаров' }
-          }
-        }
+          ru: {
+            items: {
+              one: '{count} товар',
+              few: '{count} товара',
+              many: '{count} товаров',
+            },
+          },
+        },
       });
 
       expect(engine.translate('cart', 'items', { count: 2 })).toBe('2 items');
@@ -223,12 +235,14 @@ describe('Backward Compatibility', () => {
         id: 'test',
         strings: {
           'en-US': {
-            simple: 'Simple string'
-          }
-        }
+            simple: 'Simple string',
+          },
+        },
       });
 
-      expect(store.translate('test', 'simple', {}, 'en-US')).toBe('Simple string');
+      expect(store.translate('test', 'simple', {}, 'en-US')).toBe(
+        'Simple string',
+      );
     });
 
     it('should work with mixed strings', () => {
@@ -238,13 +252,15 @@ describe('Backward Compatibility', () => {
         strings: {
           'en-US': {
             simple: 'Simple',
-            plural: { one: '1', other: '{count}' }
-          }
-        }
+            plural: { one: '1', other: '{count}' },
+          },
+        },
       });
 
       expect(store.translate('test', 'simple', {}, 'en-US')).toBe('Simple');
-      expect(store.translate('test', 'plural', { count: 5 }, 'en-US')).toBe('5');
+      expect(store.translate('test', 'plural', { count: 5 }, 'en-US')).toBe(
+        '5',
+      );
     });
   });
 });

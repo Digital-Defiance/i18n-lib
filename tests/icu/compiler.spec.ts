@@ -1,5 +1,7 @@
-import { parse } from '../../src/icu/parser';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { Compiler } from '../../src/icu/compiler';
+import { parse } from '../../src/icu/parser';
 
 describe('Compiler', () => {
   let compiler: Compiler;
@@ -38,7 +40,9 @@ describe('Compiler', () => {
     it('should handle multiple arguments', () => {
       const ast = parse('{greeting} {name}');
       const fn = compiler.compile(ast);
-      expect(fn({ greeting: 'Hi', name: 'Bob' }, { locale: 'en-US' })).toBe('Hi Bob');
+      expect(fn({ greeting: 'Hi', name: 'Bob' }, { locale: 'en-US' })).toBe(
+        'Hi Bob',
+      );
     });
   });
 
@@ -91,19 +95,25 @@ describe('Compiler', () => {
 
   describe('Select', () => {
     it('should select male case', () => {
-      const ast = parse('{gender, select, male {He} female {She} other {They}}');
+      const ast = parse(
+        '{gender, select, male {He} female {She} other {They}}',
+      );
       const fn = compiler.compile(ast);
       expect(fn({ gender: 'male' }, { locale: 'en-US' })).toBe('He');
     });
 
     it('should select female case', () => {
-      const ast = parse('{gender, select, male {He} female {She} other {They}}');
+      const ast = parse(
+        '{gender, select, male {He} female {She} other {They}}',
+      );
       const fn = compiler.compile(ast);
       expect(fn({ gender: 'female' }, { locale: 'en-US' })).toBe('She');
     });
 
     it('should select other case', () => {
-      const ast = parse('{gender, select, male {He} female {She} other {They}}');
+      const ast = parse(
+        '{gender, select, male {He} female {She} other {They}}',
+      );
       const fn = compiler.compile(ast);
       expect(fn({ gender: 'unknown' }, { locale: 'en-US' })).toBe('They');
     });
@@ -111,25 +121,33 @@ describe('Compiler', () => {
 
   describe('SelectOrdinal', () => {
     it('should format 1st', () => {
-      const ast = parse('{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}');
+      const ast = parse(
+        '{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}',
+      );
       const fn = compiler.compile(ast);
       expect(fn({ place: 1 }, { locale: 'en-US' })).toBe('1st');
     });
 
     it('should format 2nd', () => {
-      const ast = parse('{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}');
+      const ast = parse(
+        '{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}',
+      );
       const fn = compiler.compile(ast);
       expect(fn({ place: 2 }, { locale: 'en-US' })).toBe('2nd');
     });
 
     it('should format 3rd', () => {
-      const ast = parse('{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}');
+      const ast = parse(
+        '{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}',
+      );
       const fn = compiler.compile(ast);
       expect(fn({ place: 3 }, { locale: 'en-US' })).toBe('3rd');
     });
 
     it('should format 4th', () => {
-      const ast = parse('{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}');
+      const ast = parse(
+        '{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}',
+      );
       const fn = compiler.compile(ast);
       expect(fn({ place: 4 }, { locale: 'en-US' })).toBe('4th');
     });
@@ -137,19 +155,32 @@ describe('Compiler', () => {
 
   describe('Nested', () => {
     it('should compile nested select and plural', () => {
-      const ast = parse('{gender, select, male {He has {count, plural, one {# item} other {# items}}} female {She has {count, plural, one {# item} other {# items}}} other {items}}');
+      const ast = parse(
+        '{gender, select, male {He has {count, plural, one {# item} other {# items}}} female {She has {count, plural, one {# item} other {# items}}} other {items}}',
+      );
       const fn = compiler.compile(ast);
-      expect(fn({ gender: 'male', count: 1 }, { locale: 'en-US' })).toBe('He has 1 item');
-      expect(fn({ gender: 'male', count: 2 }, { locale: 'en-US' })).toBe('He has 2 items');
-      expect(fn({ gender: 'female', count: 1 }, { locale: 'en-US' })).toBe('She has 1 item');
+      expect(fn({ gender: 'male', count: 1 }, { locale: 'en-US' })).toBe(
+        'He has 1 item',
+      );
+      expect(fn({ gender: 'male', count: 2 }, { locale: 'en-US' })).toBe(
+        'He has 2 items',
+      );
+      expect(fn({ gender: 'female', count: 1 }, { locale: 'en-US' })).toBe(
+        'She has 1 item',
+      );
     });
   });
 
   describe('Complex messages', () => {
     it('should compile e-commerce message', () => {
-      const ast = parse('{name} ordered {count, plural, one {# item} other {# items}} for {price, number, currency}');
+      const ast = parse(
+        '{name} ordered {count, plural, one {# item} other {# items}} for {price, number, currency}',
+      );
       const fn = compiler.compile(ast);
-      const result = fn({ name: 'Alice', count: 3, price: 99.99 }, { locale: 'en-US', currency: 'USD' });
+      const result = fn(
+        { name: 'Alice', count: 3, price: 99.99 },
+        { locale: 'en-US', currency: 'USD' },
+      );
       expect(result).toContain('Alice');
       expect(result).toContain('3 items');
       expect(result).toContain('99.99');

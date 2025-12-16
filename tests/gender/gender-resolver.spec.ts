@@ -1,25 +1,41 @@
-import { resolveGenderForm } from '../../src/gender/gender-resolver';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { GenderedString } from '../../src/gender/gender-categories';
+import { resolveGenderForm } from '../../src/gender/gender-resolver';
 
 describe('Gender Resolver', () => {
   describe('Simple gender resolution', () => {
     it('should resolve male form', () => {
-      const value: GenderedString = { male: 'He is here', female: 'She is here' };
+      const value: GenderedString = {
+        male: 'He is here',
+        female: 'She is here',
+      };
       expect(resolveGenderForm(value, 'male')).toBe('He is here');
     });
 
     it('should resolve female form', () => {
-      const value: GenderedString = { male: 'He is here', female: 'She is here' };
+      const value: GenderedString = {
+        male: 'He is here',
+        female: 'She is here',
+      };
       expect(resolveGenderForm(value, 'female')).toBe('She is here');
     });
 
     it('should resolve neutral form', () => {
-      const value: GenderedString = { male: 'He', female: 'She', neutral: 'They' };
+      const value: GenderedString = {
+        male: 'He',
+        female: 'She',
+        neutral: 'They',
+      };
       expect(resolveGenderForm(value, 'neutral')).toBe('They');
     });
 
     it('should resolve other form', () => {
-      const value: GenderedString = { male: 'He', female: 'She', other: 'Person' };
+      const value: GenderedString = {
+        male: 'He',
+        female: 'She',
+        other: 'Person',
+      };
       expect(resolveGenderForm(value, 'other')).toBe('Person');
     });
   });
@@ -41,12 +57,20 @@ describe('Gender Resolver', () => {
     });
 
     it('should use neutral when no gender provided', () => {
-      const value: GenderedString = { male: 'He', female: 'She', neutral: 'They' };
+      const value: GenderedString = {
+        male: 'He',
+        female: 'She',
+        neutral: 'They',
+      };
       expect(resolveGenderForm(value, undefined)).toBe('They');
     });
 
     it('should use other when no gender and no neutral', () => {
-      const value: GenderedString = { male: 'He', female: 'She', other: 'Person' };
+      const value: GenderedString = {
+        male: 'He',
+        female: 'She',
+        other: 'Person',
+      };
       expect(resolveGenderForm(value, undefined)).toBe('Person');
     });
 
@@ -82,7 +106,7 @@ describe('Gender Resolver', () => {
         male: 'He',
         female: 'She',
         neutral: 'They',
-        other: 'Person'
+        other: 'Person',
       };
       expect(resolveGenderForm(value, 'male')).toBe('He');
       expect(resolveGenderForm(value, 'female')).toBe('She');
@@ -97,7 +121,11 @@ describe('Gender Resolver', () => {
     });
 
     it('should prioritize neutral over other in fallback', () => {
-      const value: GenderedString = { male: 'He', neutral: 'They', other: 'Person' };
+      const value: GenderedString = {
+        male: 'He',
+        neutral: 'They',
+        other: 'Person',
+      };
       expect(resolveGenderForm(value, 'female')).toBe('They');
     });
 
@@ -113,12 +141,20 @@ describe('Gender Resolver', () => {
     });
 
     it('should handle undefined gender parameter', () => {
-      const value: GenderedString = { male: 'He', female: 'She', neutral: 'They' };
+      const value: GenderedString = {
+        male: 'He',
+        female: 'She',
+        neutral: 'They',
+      };
       expect(resolveGenderForm(value, undefined)).toBe('They');
     });
 
     it('should handle empty string gender parameter', () => {
-      const value: GenderedString = { male: 'He', female: 'She', neutral: 'They' };
+      const value: GenderedString = {
+        male: 'He',
+        female: 'She',
+        neutral: 'They',
+      };
       expect(resolveGenderForm(value, '')).toBe('They');
     });
   });

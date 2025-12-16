@@ -1,4 +1,12 @@
-import { isICUMessage, parseICUMessage, compileICUMessage, formatICUMessage, validateICUMessage } from '../../src/icu/helpers';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
+import {
+  compileICUMessage,
+  formatICUMessage,
+  isICUMessage,
+  parseICUMessage,
+  validateICUMessage,
+} from '../../src/icu/helpers';
 import { ValidationError } from '../../src/icu/validator';
 
 describe('ICU Helpers', () => {
@@ -36,15 +44,25 @@ describe('ICU Helpers', () => {
 
   describe('formatICUMessage', () => {
     it('should format simple message', () => {
-      expect(formatICUMessage('Hello {name}', { name: 'Alice' })).toBe('Hello Alice');
+      expect(formatICUMessage('Hello {name}', { name: 'Alice' })).toBe(
+        'Hello Alice',
+      );
     });
 
     it('should format plural', () => {
-      expect(formatICUMessage('{count, plural, one {# item} other {# items}}', { count: 1 })).toBe('1 item');
+      expect(
+        formatICUMessage('{count, plural, one {# item} other {# items}}', {
+          count: 1,
+        }),
+      ).toBe('1 item');
     });
 
     it('should use custom locale', () => {
-      const result = formatICUMessage('{count, number}', { count: 1234 }, 'en-US');
+      const result = formatICUMessage(
+        '{count, number}',
+        { count: 1234 },
+        'en-US',
+      );
       expect(result).toBe('1,234');
     });
   });
@@ -55,11 +73,17 @@ describe('ICU Helpers', () => {
     });
 
     it('should throw on invalid message', () => {
-      expect(() => validateICUMessage('{count, plural, one {#}}')).toThrow(ValidationError);
+      expect(() => validateICUMessage('{count, plural, one {#}}')).toThrow(
+        ValidationError,
+      );
     });
 
     it('should accept validation options', () => {
-      expect(() => validateICUMessage('{count, plural, one {#}}', { requireOtherCase: false })).not.toThrow();
+      expect(() =>
+        validateICUMessage('{count, plural, one {#}}', {
+          requireOtherCase: false,
+        }),
+      ).not.toThrow();
     });
   });
 });

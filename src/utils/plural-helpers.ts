@@ -2,17 +2,19 @@
  * Helper functions for creating plural and gender strings
  */
 
-import { PluralCategory } from '../pluralization/plural-categories';
-import { PluralString } from '../types/plural-types';
 import { GenderCategory, GenderedString } from '../gender/gender-categories';
 import { getRequiredPluralForms as getRequiredFormsFromMap } from '../pluralization/language-plural-map';
+import { PluralCategory } from '../pluralization/plural-categories';
+import { PluralString } from '../types/plural-types';
 
 /**
  * Creates a PluralString from a partial record of plural forms.
  * @param forms - Object mapping plural categories to their string forms
  * @returns A PluralString that can be used in translations
  */
-export function createPluralString(forms: Partial<Record<PluralCategory, string>>): PluralString {
+export function createPluralString(
+  forms: Partial<Record<PluralCategory, string>>,
+): PluralString {
   return forms;
 }
 
@@ -21,7 +23,9 @@ export function createPluralString(forms: Partial<Record<PluralCategory, string>
  * @param forms - Object mapping gender categories to their string forms
  * @returns A GenderedString that can be used in translations
  */
-export function createGenderedString(forms: Partial<Record<GenderCategory, string>>): GenderedString {
+export function createGenderedString(
+  forms: Partial<Record<GenderCategory, string>>,
+): GenderedString {
   return forms;
 }
 

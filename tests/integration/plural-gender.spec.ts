@@ -1,34 +1,40 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { resolveGenderForm } from '../../src/gender/gender-resolver';
-import { resolvePluralString } from '../../src/types/plural-types';
 import { getPluralCategory } from '../../src/pluralization/language-plural-map';
-import { PluralString } from '../../src/types/plural-types';
-import { GenderedString } from '../../src/gender/gender-categories';
+import { resolvePluralString } from '../../src/types/plural-types';
 
 describe('Plural + Gender Integration', () => {
   describe('Plural then Gender', () => {
     it('should resolve plural then gender', () => {
       const value = {
         one: { male: 'He has {count} item', female: 'She has {count} item' },
-        other: { male: 'He has {count} items', female: 'She has {count} items' },
+        other: {
+          male: 'He has {count} items',
+          female: 'She has {count} items',
+        },
       };
-      
+
       const category = getPluralCategory('en', 1);
       const pluralResolved = value[category as 'one' | 'other'];
       const result = resolveGenderForm(pluralResolved, 'male');
-      
+
       expect(result).toBe('He has {count} item');
     });
 
     it('should handle count=5 with female', () => {
       const value = {
         one: { male: 'He has {count} item', female: 'She has {count} item' },
-        other: { male: 'He has {count} items', female: 'She has {count} items' },
+        other: {
+          male: 'He has {count} items',
+          female: 'She has {count} items',
+        },
       };
-      
+
       const category = getPluralCategory('en', 5);
       const pluralResolved = value[category as 'one' | 'other'];
       const result = resolveGenderForm(pluralResolved, 'female');
-      
+
       expect(result).toBe('She has {count} items');
     });
   });
@@ -39,11 +45,11 @@ describe('Plural + Gender Integration', () => {
         male: { one: 'He has {count} item', other: 'He has {count} items' },
         female: { one: 'She has {count} item', other: 'She has {count} items' },
       };
-      
+
       const genderResolved = value.male;
       const category = getPluralCategory('en', 1);
       const result = resolvePluralString(genderResolved, category);
-      
+
       expect(result).toBe('He has {count} item');
     });
 
@@ -52,11 +58,11 @@ describe('Plural + Gender Integration', () => {
         male: { one: 'He has {count} item', other: 'He has {count} items' },
         female: { one: 'She has {count} item', other: 'She has {count} items' },
       };
-      
+
       const genderResolved = value.female;
       const category = getPluralCategory('en', 5);
       const result = resolvePluralString(genderResolved, category);
-      
+
       expect(result).toBe('She has {count} items');
     });
   });
@@ -65,13 +71,16 @@ describe('Plural + Gender Integration', () => {
     it('should fallback when gender missing in plural form', () => {
       const value = {
         one: { male: 'He has {count} item', neutral: 'They have {count} item' },
-        other: { male: 'He has {count} items', neutral: 'They have {count} items' },
+        other: {
+          male: 'He has {count} items',
+          neutral: 'They have {count} items',
+        },
       };
-      
+
       const category = getPluralCategory('en', 1);
       const pluralResolved = value[category as 'one' | 'other'];
       const result = resolveGenderForm(pluralResolved, 'female');
-      
+
       expect(result).toBe('They have {count} item');
     });
 
@@ -80,11 +89,11 @@ describe('Plural + Gender Integration', () => {
         male: { one: 'He has {count} item' },
         female: { one: 'She has {count} item', other: 'She has {count} items' },
       };
-      
+
       const genderResolved = value.male;
       const category = getPluralCategory('en', 5);
       const result = resolvePluralString(genderResolved, category);
-      
+
       expect(result).toBe('He has {count} item');
     });
   });
@@ -94,13 +103,16 @@ describe('Plural + Gender Integration', () => {
       const value = {
         one: { male: 'У него {count} товар', female: 'У неё {count} товар' },
         few: { male: 'У него {count} товара', female: 'У неё {count} товара' },
-        many: { male: 'У него {count} товаров', female: 'У неё {count} товаров' },
+        many: {
+          male: 'У него {count} товаров',
+          female: 'У неё {count} товаров',
+        },
       };
-      
+
       const category = getPluralCategory('ru', 2);
       const pluralResolved = value[category as 'one' | 'few' | 'many'];
       const result = resolveGenderForm(pluralResolved, 'female');
-      
+
       expect(result).toBe('У неё {count} товара');
     });
 
@@ -113,11 +125,11 @@ describe('Plural + Gender Integration', () => {
         many: { male: 'لديه {count} عنصرًا', female: 'لديها {count} عنصرًا' },
         other: { male: 'لديه {count} عنصر', female: 'لديها {count} عنصر' },
       };
-      
+
       const category = getPluralCategory('ar', 3);
       const pluralResolved = value[category as keyof typeof value];
       const result = resolveGenderForm(pluralResolved, 'male');
-      
+
       expect(result).toBe('لديه {count} عناصر');
     });
 
@@ -127,7 +139,7 @@ describe('Plural + Gender Integration', () => {
         few: { male: 'Он', female: 'Она' },
         many: { male: 'Он', female: 'Она' },
       };
-      
+
       expect(resolveGenderForm(value.one, 'male')).toBe('Он');
       expect(resolveGenderForm(value.one, 'female')).toBe('Она');
       expect(resolveGenderForm(value.few, 'male')).toBe('Он');
@@ -141,13 +153,16 @@ describe('Plural + Gender Integration', () => {
     it('should handle missing gender in some plural forms', () => {
       const value = {
         one: { male: 'He has {count} item' },
-        other: { male: 'He has {count} items', female: 'She has {count} items' },
+        other: {
+          male: 'He has {count} items',
+          female: 'She has {count} items',
+        },
       };
-      
+
       const category = getPluralCategory('en', 1);
       const pluralResolved = value[category as 'one' | 'other'];
       const result = resolveGenderForm(pluralResolved, 'female');
-      
+
       // Should fallback to first available (male)
       expect(result).toBe('He has {count} item');
     });
@@ -157,11 +172,11 @@ describe('Plural + Gender Integration', () => {
         male: { one: 'He has {count} item', other: 'He has {count} items' },
         female: { one: 'She has {count} item' },
       };
-      
+
       const genderResolved = value.female;
       const category = getPluralCategory('en', 5);
       const result = resolvePluralString(genderResolved, category);
-      
+
       // Should fallback to first available (one)
       expect(result).toBe('She has {count} item');
     });
@@ -171,24 +186,27 @@ describe('Plural + Gender Integration', () => {
         one: { male: 'He', female: 'She', neutral: 'They' },
         other: { male: 'He', female: 'She', neutral: 'They' },
       };
-      
+
       const category = getPluralCategory('en', 1);
       const pluralResolved = value[category as 'one' | 'other'];
       const result = resolveGenderForm(pluralResolved, 'neutral');
-      
+
       expect(result).toBe('They');
     });
 
     it('should handle count=0 with gender', () => {
       const value = {
         one: { male: 'He has {count} item', female: 'She has {count} item' },
-        other: { male: 'He has {count} items', female: 'She has {count} items' },
+        other: {
+          male: 'He has {count} items',
+          female: 'She has {count} items',
+        },
       };
-      
+
       const category = getPluralCategory('en', 0);
       const pluralResolved = value[category as 'one' | 'other'];
       const result = resolveGenderForm(pluralResolved, 'female');
-      
+
       expect(result).toBe('She has {count} items');
     });
   });

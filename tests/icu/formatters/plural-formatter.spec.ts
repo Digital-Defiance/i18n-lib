@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { PluralFormatter } from '../../../src/icu/formatters/plural-formatter';
 
 describe('PluralFormatter', () => {
@@ -32,7 +34,9 @@ describe('PluralFormatter', () => {
   });
 
   it('should handle NaN', () => {
-    expect(formatter.format('invalid', undefined, { locale: 'en-US' })).toBe('other');
+    expect(formatter.format('invalid', undefined, { locale: 'en-US' })).toBe(
+      'other',
+    );
   });
 
   it('should default to en-US', () => {

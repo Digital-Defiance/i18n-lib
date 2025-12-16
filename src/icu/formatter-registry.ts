@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 import { Formatter } from './formatters/base-formatter';
-import { NumberFormatter } from './formatters/number-formatter';
 import { DateFormatter } from './formatters/date-formatter';
-import { TimeFormatter } from './formatters/time-formatter';
+import { NumberFormatter } from './formatters/number-formatter';
 import { PluralFormatter } from './formatters/plural-formatter';
 import { SelectFormatter } from './formatters/select-formatter';
 import { SelectOrdinalFormatter } from './formatters/selectordinal-formatter';
+import { TimeFormatter } from './formatters/time-formatter';
 
 export class FormatterRegistry {
   private formatters = new Map<string, Formatter>();

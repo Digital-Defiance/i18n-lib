@@ -1,19 +1,21 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import {
-  getCorePluginI18nEngine,
-  resetCorePluginI18nEngine,
-  corePluginI18nEngine,
-  getCorePluginTranslation,
-  safeCorePluginTranslation,
-  getCoreI18nEngine,
-  resetCoreI18nEngine,
+  CoreI18nComponentId,
   coreI18nEngine,
-  getCoreTranslation,
-  safeCoreTranslation,
+  corePluginI18nEngine,
   CoreStringKey,
+  getCoreI18nEngine,
+  getCorePluginI18nEngine,
+  getCorePluginTranslation,
+  getCoreTranslation,
+  I18nEngine,
   LanguageCodes,
   PluginI18nEngine,
-  I18nEngine,
-  CoreI18nComponentId,
+  resetCoreI18nEngine,
+  resetCorePluginI18nEngine,
+  safeCorePluginTranslation,
+  safeCoreTranslation,
 } from '../src';
 
 describe('core-i18n coverage', () => {

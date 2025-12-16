@@ -1,18 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 /**
  * ICU MessageFormat Parser
  */
 
-import { Tokenizer, Token, TokenType } from './tokenizer';
 import {
-  MessageNode,
-  LiteralNode,
   ArgumentNode,
+  ASTNode,
+  LiteralNode,
+  MessageNode,
+  NodeType,
   PluralNode,
   SelectNode,
   SelectOrdinalNode,
-  NodeType,
-  ASTNode,
 } from './ast';
+import { Token, Tokenizer, TokenType } from './tokenizer';
 
 export class ParseError extends Error {
   constructor(message: string, public position: number) {
@@ -40,9 +41,12 @@ export class Parser {
 
   private parseMessage(): MessageNode {
     if (++this.depth > this.MAX_DEPTH) {
-      throw new ParseError(`Maximum nesting depth of ${this.MAX_DEPTH} exceeded`, this.position);
+      throw new ParseError(
+        `Maximum nesting depth of ${this.MAX_DEPTH} exceeded`,
+        this.position,
+      );
     }
-    
+
     const elements: ASTNode[] = [];
 
     while (!this.isAtEnd() && !this.check(TokenType.CLOSE_BRACE)) {
@@ -68,10 +72,17 @@ export class Parser {
     return { type: NodeType.LITERAL, value: token.value };
   }
 
-  private parseArgument(): ArgumentNode | PluralNode | SelectNode | SelectOrdinalNode {
+  private parseArgument():
+    | ArgumentNode
+    | PluralNode
+    | SelectNode
+    | SelectOrdinalNode {
     this.consume(TokenType.OPEN_BRACE, 'Expected {');
 
-    const name = this.consume(TokenType.IDENTIFIER, 'Expected argument name').value;
+    const name = this.consume(
+      TokenType.IDENTIFIER,
+      'Expected argument name',
+    ).value;
 
     // Simple argument: {name}
     if (this.check(TokenType.CLOSE_BRACE)) {
@@ -82,7 +93,10 @@ export class Parser {
     // Formatted argument: {name, type} or {name, type, style}
     this.consume(TokenType.COMMA, 'Expected ,');
 
-    const format = this.consume(TokenType.IDENTIFIER, 'Expected format type').value;
+    const format = this.consume(
+      TokenType.IDENTIFIER,
+      'Expected format type',
+    ).value;
 
     // Check for plural/select/selectordinal
     if (format === 'plural') {
@@ -127,8 +141,11 @@ export class Parser {
     while (!this.check(TokenType.CLOSE_BRACE) && !this.isAtEnd()) {
       this.skipWhitespace();
       if (this.check(TokenType.CLOSE_BRACE)) break;
-      
-      const caseKey = this.consume(TokenType.IDENTIFIER, 'Expected case key').value;
+
+      const caseKey = this.consume(
+        TokenType.IDENTIFIER,
+        'Expected case key',
+      ).value;
       this.skipWhitespace();
       this.consume(TokenType.OPEN_BRACE, 'Expected {');
       const caseMessage = this.parseMessage();
@@ -137,7 +154,10 @@ export class Parser {
     }
 
     if (Object.keys(cases).length === 0) {
-      throw new ParseError('Plural must have at least one case', this.peek().position);
+      throw new ParseError(
+        'Plural must have at least one case',
+        this.peek().position,
+      );
     }
 
     this.consume(TokenType.CLOSE_BRACE, 'Expected }');
@@ -155,8 +175,11 @@ export class Parser {
     while (!this.check(TokenType.CLOSE_BRACE) && !this.isAtEnd()) {
       this.skipWhitespace();
       if (this.check(TokenType.CLOSE_BRACE)) break;
-      
-      const caseKey = this.consume(TokenType.IDENTIFIER, 'Expected case key').value;
+
+      const caseKey = this.consume(
+        TokenType.IDENTIFIER,
+        'Expected case key',
+      ).value;
       this.skipWhitespace();
       this.consume(TokenType.OPEN_BRACE, 'Expected {');
       const caseMessage = this.parseMessage();
@@ -189,8 +212,11 @@ export class Parser {
     while (!this.check(TokenType.CLOSE_BRACE) && !this.isAtEnd()) {
       this.skipWhitespace();
       if (this.check(TokenType.CLOSE_BRACE)) break;
-      
-      const caseKey = this.consume(TokenType.IDENTIFIER, 'Expected case key').value;
+
+      const caseKey = this.consume(
+        TokenType.IDENTIFIER,
+        'Expected case key',
+      ).value;
       this.skipWhitespace();
       this.consume(TokenType.OPEN_BRACE, 'Expected {');
       const caseMessage = this.parseMessage();

@@ -1,6 +1,7 @@
 /**
  * Safe object utilities to prevent prototype pollution
  */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-assignment */
 
 /**
  * List of dangerous keys that should never be set on objects to prevent prototype pollution.

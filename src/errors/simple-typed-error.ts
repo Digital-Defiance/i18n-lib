@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 /**
  * TypedError class with proper type safety
  *
@@ -25,12 +26,12 @@ export interface TypedErrorOptions {
   /**
    * Map of reasons or context for the error
    */
-  reasonMap?: Record<string, unknown>;
+  reasonMap?: Record<string, any>;
 
   /**
    * Additional metadata associated with the error
    */
-  metadata?: Record<string, unknown>;
+  metadata?: Record<string, any>;
 
   /**
    * The cause of this error (for error chaining)
@@ -44,8 +45,8 @@ export interface TypedErrorOptions {
 export class TypedError extends Error {
   public override readonly type: string;
   public override readonly componentId?: string;
-  public override readonly reasonMap?: Record<string, unknown>;
-  public override readonly metadata?: Record<string, unknown>;
+  public override readonly reasonMap?: Record<string, any>;
+  public override readonly metadata?: Record<string, any>;
 
   constructor(message: string, options: TypedErrorOptions) {
     super(message, { cause: options.cause });

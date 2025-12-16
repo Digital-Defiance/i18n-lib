@@ -1,10 +1,18 @@
-import { validatePluralForms, validateCountVariable } from '../../src/validation/plural-validator';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-empty-object-type, import/order, prettier/prettier */
+
 import { PluralString } from '../../src/types/plural-types';
+import {
+  validateCountVariable,
+  validatePluralForms,
+} from '../../src/validation/plural-validator';
 
 describe('Plural Validation', () => {
   describe('validatePluralForms - English', () => {
     it('should pass with required forms', () => {
-      const value: PluralString = { one: '{count} item', other: '{count} items' };
+      const value: PluralString = {
+        one: '{count} item',
+        other: '{count} items',
+      };
       const result = validatePluralForms(value, 'en', 'items');
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
@@ -14,14 +22,20 @@ describe('Plural Validation', () => {
       const value: PluralString = { one: '{count} item' };
       const result = validatePluralForms(value, 'en', 'items');
       expect(result.isValid).toBe(true);
-      expect(result.warnings).toContain("Missing required plural form 'other' for language 'en' in key 'items'");
+      expect(result.warnings).toContain(
+        "Missing required plural form 'other' for language 'en' in key 'items'",
+      );
     });
 
     it('should error in strict mode for missing forms', () => {
       const value: PluralString = { one: '{count} item' };
-      const result = validatePluralForms(value, 'en', 'items', { strict: true });
+      const result = validatePluralForms(value, 'en', 'items', {
+        strict: true,
+      });
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("Missing required plural form 'other' for language 'en' in key 'items'");
+      expect(result.errors).toContain(
+        "Missing required plural form 'other' for language 'en' in key 'items'",
+      );
     });
 
     it('should pass for simple strings', () => {
@@ -43,15 +57,25 @@ describe('Plural Validation', () => {
     });
 
     it('should warn about missing "few" form', () => {
-      const value: PluralString = { one: '{count} товар', many: '{count} товаров' };
+      const value: PluralString = {
+        one: '{count} товар',
+        many: '{count} товаров',
+      };
       const result = validatePluralForms(value, 'ru', 'items');
-      expect(result.warnings).toContain("Missing required plural form 'few' for language 'ru' in key 'items'");
+      expect(result.warnings).toContain(
+        "Missing required plural form 'few' for language 'ru' in key 'items'",
+      );
     });
 
     it('should warn about missing "many" form', () => {
-      const value: PluralString = { one: '{count} товар', few: '{count} товара' };
+      const value: PluralString = {
+        one: '{count} товар',
+        few: '{count} товара',
+      };
       const result = validatePluralForms(value, 'ru', 'items');
-      expect(result.warnings).toContain("Missing required plural form 'many' for language 'ru' in key 'items'");
+      expect(result.warnings).toContain(
+        "Missing required plural form 'many' for language 'ru' in key 'items'",
+      );
     });
   });
 
@@ -73,8 +97,8 @@ describe('Plural Validation', () => {
       const value: PluralString = { one: 'عنصر واحد', other: '{count} عنصر' };
       const result = validatePluralForms(value, 'ar', 'items');
       expect(result.warnings.length).toBeGreaterThan(0);
-      expect(result.warnings.some(w => w.includes('zero'))).toBe(true);
-      expect(result.warnings.some(w => w.includes('two'))).toBe(true);
+      expect(result.warnings.some((w) => w.includes('zero'))).toBe(true);
+      expect(result.warnings.some((w) => w.includes('two'))).toBe(true);
     });
   });
 
@@ -85,8 +109,12 @@ describe('Plural Validation', () => {
         other: '{count} items',
         two: '{count} items',
       };
-      const result = validatePluralForms(value, 'en', 'items', { checkUnused: true });
-      expect(result.warnings).toContain("Unused plural form 'two' for language 'en' in key 'items'");
+      const result = validatePluralForms(value, 'en', 'items', {
+        checkUnused: true,
+      });
+      expect(result.warnings).toContain(
+        "Unused plural form 'two' for language 'en' in key 'items'",
+      );
     });
 
     it('should not warn when checkUnused is false', () => {
@@ -95,8 +123,10 @@ describe('Plural Validation', () => {
         other: '{count} items',
         two: '{count} items',
       };
-      const result = validatePluralForms(value, 'en', 'items', { checkUnused: false });
-      expect(result.warnings.some(w => w.includes('Unused'))).toBe(false);
+      const result = validatePluralForms(value, 'en', 'items', {
+        checkUnused: false,
+      });
+      expect(result.warnings.some((w) => w.includes('Unused'))).toBe(false);
     });
   });
 
@@ -106,8 +136,12 @@ describe('Plural Validation', () => {
         one: '{count} {name} item',
         other: '{count} items',
       };
-      const result = validatePluralForms(value, 'en', 'items', { checkVariables: true });
-      expect(result.warnings.some(w => w.includes('missing variables'))).toBe(true);
+      const result = validatePluralForms(value, 'en', 'items', {
+        checkVariables: true,
+      });
+      expect(result.warnings.some((w) => w.includes('missing variables'))).toBe(
+        true,
+      );
     });
 
     it('should pass with consistent variables', () => {
@@ -115,8 +149,12 @@ describe('Plural Validation', () => {
         one: '{count} {name} item',
         other: '{count} {name} items',
       };
-      const result = validatePluralForms(value, 'en', 'items', { checkVariables: true });
-      expect(result.warnings.some(w => w.includes('missing variables'))).toBe(false);
+      const result = validatePluralForms(value, 'en', 'items', {
+        checkVariables: true,
+      });
+      expect(result.warnings.some((w) => w.includes('missing variables'))).toBe(
+        false,
+      );
     });
 
     it('should not check when checkVariables is false', () => {
@@ -124,8 +162,12 @@ describe('Plural Validation', () => {
         one: '{count} {name} item',
         other: '{count} items',
       };
-      const result = validatePluralForms(value, 'en', 'items', { checkVariables: false });
-      expect(result.warnings.some(w => w.includes('missing variables'))).toBe(false);
+      const result = validatePluralForms(value, 'en', 'items', {
+        checkVariables: false,
+      });
+      expect(result.warnings.some((w) => w.includes('missing variables'))).toBe(
+        false,
+      );
     });
   });
 
@@ -133,13 +175,17 @@ describe('Plural Validation', () => {
     it('should warn when plural forms used without count', () => {
       const value: PluralString = { one: 'item', other: 'items' };
       const result = validateCountVariable(value, undefined, 'items');
-      expect(result.warnings).toContain("Plural forms used in key 'items' but no 'count' variable provided");
+      expect(result.warnings).toContain(
+        "Plural forms used in key 'items' but no 'count' variable provided",
+      );
     });
 
     it('should warn when count is missing from variables', () => {
       const value: PluralString = { one: 'item', other: 'items' };
       const result = validateCountVariable(value, { name: 'test' }, 'items');
-      expect(result.warnings).toContain("Plural forms used in key 'items' but no 'count' variable provided");
+      expect(result.warnings).toContain(
+        "Plural forms used in key 'items' but no 'count' variable provided",
+      );
     });
 
     it('should pass when count is provided', () => {

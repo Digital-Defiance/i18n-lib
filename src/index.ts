@@ -1,3 +1,4 @@
+/* eslint-disable import/export */
 // V2 Exports (primary)
 export * from './builders';
 export * from './core';
@@ -8,32 +9,16 @@ export * from './pluralization';
 export * from './types';
 export * from './utils';
 export * from './validation';
-
-// Explicit exports for type safety
-export type { GenderedString } from './gender/gender-categories';
-export type { PluralString } from './types/plural-types';
-export { CurrencyCode, getCurrencyFormat } from './utils/currency';
-export type {
-  CurrencyData,
-  CurrencyFormat,
-  CurrencyPosition,
-} from './utils/currency';
-export {
-  createGenderedString,
-  createPluralString,
-} from './utils/plural-helpers';
-export { isValidTimezone, Timezone } from './utils/timezone';
-
+// Note: Most exports are handled by wildcard exports above
+// Only add explicit exports here if they need special handling
 // Convenience aliases
 export { I18nBuilder as Builder } from './builders/i18n-builder';
 export { I18nEngine as I18n } from './core/i18n-engine';
-
 // Reset utility
 import { I18nEngine } from './core/i18n-engine';
 export function resetAll(): void {
   I18nEngine.resetAll();
 }
-
 // Legacy exports (deprecated - for backwards compatibility)
 export * from './active-context';
 export * from './component-definition';
@@ -57,9 +42,7 @@ export * from './template';
 export * from './translation-engine';
 export * from './translation-request';
 export * from './translation-response';
-export * from './types';
 export * from './validation-config';
-
 // Legacy convenience exports
 export {
   createCorePluginI18nEngine as createCoreI18n,
@@ -70,7 +53,6 @@ export {
 // Export core plugin factory functions
 export * from './core-plugin-factory';
 export { PluginI18nEngine as PluginI18n } from './plugin-i18n-engine';
-
 // Legacy testing utilities
 import { PluginI18nEngine } from './plugin-i18n-engine';
 export function resetAllI18nEngines(): void {

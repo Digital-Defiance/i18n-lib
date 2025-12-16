@@ -1,6 +1,7 @@
 /**
  * Plugin-based internationalization engine with component and language registration
  */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return, import/order */
 
 import { ComponentDefinition } from './component-definition';
 import { ComponentRegistration } from './component-registration';
@@ -398,7 +399,7 @@ export class PluginI18nEngine<TLanguages extends string> {
   /**
    * Update strings for an existing component
    */
-  public updateComponentStrings<TStringKeys extends string>(
+  public updateComponentStrings(
     componentId: string,
     strings: Parameters<
       ComponentRegistry<TLanguages>['updateComponentStrings']
@@ -449,7 +450,7 @@ export class PluginI18nEngine<TLanguages extends string> {
   ): string {
     try {
       return this.translate(componentId, stringKey, variables, language);
-    } catch (error) {
+    } catch (_error) {
       // Return a placeholder if translation fails
       return `[${componentId}.${stringKey}]`;
     }

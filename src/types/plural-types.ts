@@ -15,7 +15,9 @@ export type PluralString = string | Partial<Record<PluralCategory, string>>;
  * @param value - The value to check
  * @returns True if the value is a plural string object, false if it's a simple string
  */
-export function isPluralString(value: any): value is Record<PluralCategory, string> {
+export function isPluralString(
+  value: unknown,
+): value is Record<PluralCategory, string> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
@@ -28,22 +30,22 @@ export function isPluralString(value: any): value is Record<PluralCategory, stri
  */
 export function resolvePluralString(
   value: PluralString,
-  category: PluralCategory
+  category: PluralCategory,
 ): string | undefined {
   if (typeof value === 'string') {
     return value;
   }
-  
+
   // Try exact match first
   if (value[category]) {
     return value[category];
   }
-  
+
   // Fallback to 'other'
   if (value.other) {
     return value.other;
   }
-  
+
   // Fallback to first available form
   const forms = Object.values(value);
   return forms.length > 0 ? forms[0] : undefined;
