@@ -13,6 +13,9 @@ export {
   createGenderedString,
   createPluralString,
 } from './utils/plural-helpers'; // Export plural helpers (excluding getRequiredPluralForms to avoid conflict)
+// Explicit exports for commonly used classes
+export { CurrencyCode, getCurrencyFormat } from './utils/currency';
+export { isValidTimezone, Timezone } from './utils/timezone';
 export * from './validation';
 // Note: Most exports are handled by wildcard exports above
 // Only add explicit exports here if they need special handling
