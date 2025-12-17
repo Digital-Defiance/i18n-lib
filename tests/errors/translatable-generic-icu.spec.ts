@@ -5,6 +5,7 @@
  */
 
 import { I18nEngine } from '../../src/core/i18n-engine';
+import { TranslatableGenericError } from '../../src/errors/translatable-generic';
 import { formatICUMessage } from '../../src/icu/helpers';
 import { createPluralString } from '../../src/utils/plural-helpers';
 
