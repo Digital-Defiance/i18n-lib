@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports, import/order */
-// prettier-ignore
-const LRUCache = require('lru-cache');
 import { Compiler } from './compiler';
 import { FormatterRegistry } from './formatter-registry';
 import { FormatterContext } from './formatters/base-formatter';
 import { parse } from './parser';
 import { validate } from './validator';
+
+// lru-cache v5 exports constructor directly as default
+// Using typed require for compatibility with Jest and TypeScript
+// prettier-ignore
+const LRUCache: any = require('lru-cache');
 
 // Wrapper to provide consistent API across lru-cache versions
 class CacheWrapper {
