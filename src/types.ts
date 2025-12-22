@@ -110,9 +110,8 @@ export type EnumLanguageTranslation<
 /**
  * Type utility to extract string keys from a component definition
  */
-export type ExtractStringKeys<T> = T extends ComponentDefinition<infer K>
-  ? K
-  : never;
+export type ExtractStringKeys<T> =
+  T extends ComponentDefinition<infer K> ? K : never;
 
 /**
  * Type utility to extract languages from registry

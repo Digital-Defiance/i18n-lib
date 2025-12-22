@@ -56,9 +56,9 @@ import { CompleteReasonMap } from './typed';
  * ```
  */
 export class TypedHandleableError<
-    TEnum extends Record<string, string>,
-    TStringKey extends string,
-  >
+  TEnum extends Record<string, string>,
+  TStringKey extends string,
+>
   extends HandleableError
   implements IHandleable
 {

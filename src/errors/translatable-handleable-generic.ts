@@ -48,8 +48,8 @@ import { TranslatableGenericError } from './translatable-generic';
  * ```
  */
 export class TranslatableHandleableGenericError<
-    TStringKey extends string = string,
-  >
+  TStringKey extends string = string,
+>
   extends TranslatableGenericError<TStringKey>
   implements IHandleable
 {

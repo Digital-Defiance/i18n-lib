@@ -16,7 +16,10 @@ import {
 import { Token, Tokenizer, TokenType } from './tokenizer';
 
 export class ParseError extends Error {
-  constructor(message: string, public position: number) {
+  constructor(
+    message: string,
+    public position: number,
+  ) {
     super(`Parse error at position ${position}: ${message}`);
     this.name = 'ParseError';
   }

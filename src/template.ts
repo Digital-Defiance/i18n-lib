@@ -50,7 +50,7 @@ export function createTemplateProcessor<
       const needsVars = (enumValue as string)
         .toLowerCase()
         .endsWith('template');
-      const vars = needsVars ? otherVars[varIndex++] ?? {} : {};
+      const vars = needsVars ? (otherVars[varIndex++] ?? {}) : {};
       return translateFn(enumValue, vars, language);
     });
 

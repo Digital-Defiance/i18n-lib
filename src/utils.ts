@@ -94,12 +94,12 @@ type BuildStringKey<
 > = TPrefixes extends readonly []
   ? `${TEnumValue}${TIsTemplate extends true ? 'Template' : ''}`
   : TPrefixes extends readonly [infer First, ...infer Rest]
-  ? First extends string
-    ? Rest extends readonly string[]
-      ? `${First}_${BuildStringKey<TEnumValue, Rest, TIsTemplate>}`
+    ? First extends string
+      ? Rest extends readonly string[]
+        ? `${First}_${BuildStringKey<TEnumValue, Rest, TIsTemplate>}`
+        : never
       : never
-    : never
-  : never;
+    : never;
 
 /**
  * Type that maps all enum values to their corresponding string keys

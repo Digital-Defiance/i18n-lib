@@ -13,8 +13,7 @@ import { Timezone } from './utils/timezone';
 export class GlobalActiveContext<
   TLanguage extends string,
   TActiveContext extends IActiveContext<TLanguage>,
-> implements IGlobalActiveContext<TLanguage, TActiveContext>
-{
+> implements IGlobalActiveContext<TLanguage, TActiveContext> {
   protected static _contextMap: Map<string, IActiveContext<string>> = new Map();
   public static readonly defaultContextKey = 'default';
   public static readonly defaultLanguage: string = 'en-US';
