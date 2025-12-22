@@ -1,6 +1,6 @@
 {
   "name": "@digitaldefiance/i18n-lib",
-  "version": "3.8.10",
+  "version": "3.8.11",
   "description": "i18n library with enum translation support",
   "homepage": "https://github.com/Digital-Defiance/i18n-lib",
   "repository": {
