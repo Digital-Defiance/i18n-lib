@@ -5,17 +5,63 @@ import { FormatterContext } from './formatters/base-formatter';
 import { parse } from './parser';
 import { validate } from './validator';
 
-// lru-cache v5 exports constructor directly as default
-// Using typed require for compatibility with Jest and TypeScript
-// prettier-ignore
-const LRUCache: any = require('lru-cache');
-
-// Wrapper to provide consistent API across lru-cache versions
-class CacheWrapper {
-  private cache: any;
+// Simple LRU cache implementation to avoid dependency issues in tests
+class SimpleLRUCache {
+  private cache: Map<string, any>;
+  private max: number;
 
   constructor(options: { max: number }) {
-    this.cache = new LRUCache(options);
+    this.cache = new Map();
+    this.max = options.max;
+  }
+
+  get(key: string): any {
+    const value = this.cache.get(key);
+    if (value !== undefined) {
+      // Move to end (most recently used)
+      this.cache.delete(key);
+      this.cache.set(key, value);
+    }
+    return value;
+  }
+
+  set(key: string, value: any): void {
+    // Delete if exists to update position
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    } else if (this.cache.size >= this.max) {
+      // Remove least recently used (first item)
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey !== undefined) {
+        this.cache.delete(firstKey);
+      }
+    }
+    this.cache.set(key, value);
+  }
+
+  has(key: string): boolean {
+    return this.cache.has(key);
+  }
+
+  delete(key: string): boolean {
+    return this.cache.delete(key);
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+
+  get size(): number {
+    return this.cache.size;
+  }
+}
+
+// Wrapper to provide consistent API across cache implementations
+class CacheWrapper {
+  private cache: SimpleLRUCache;
+
+  constructor(options: { max: number }) {
+    this.cache = new SimpleLRUCache(options);
   }
 
   get(key: string): any {
@@ -27,25 +73,20 @@ class CacheWrapper {
   }
 
   clear(): void {
-    if (typeof this.cache.clear === 'function') {
-      this.cache.clear();
-    } else if (typeof this.cache.reset === 'function') {
-      this.cache.reset();
-    }
+    this.cache.clear();
   }
 
   get size(): number {
-    return this.cache.length !== undefined
-      ? this.cache.length
-      : this.cache.size;
+    return this.cache.size;
   }
 }
 
 export class Runtime {
   private compiler: Compiler;
-  private cache: CacheWrapper = new CacheWrapper({ max: 1000 });
+  private cache: CacheWrapper;
 
   constructor(registry?: FormatterRegistry) {
+    this.cache = new CacheWrapper({ max: 1000 });
     this.compiler = new Compiler(registry);
   }
 

@@ -11,11 +11,18 @@ module.exports = {
     '^.+\\.(ts|tsx)$': [
       'ts-jest',
       {
-        tsconfig: '<rootDir>/tsconfig.spec.json',
+        tsconfig: {
+          ...require('./tsconfig.spec.json').compilerOptions,
+          esModuleInterop: true,
+          allowSyntheticDefaultImports: true,
+        },
       },
     ],
   },
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
-    prefix: '<rootDir>/../../',
-  }),
+  moduleNameMapper: {
+    '^lru-cache$': '<rootDir>/__mocks__/lru-cache.js',
+    ...pathsToModuleNameMapper(compilerOptions.paths, {
+      prefix: '<rootDir>/../../',
+    }),
+  },
 };
