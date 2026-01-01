@@ -73,7 +73,7 @@ const Hero = ({ scrollY }: HeroProps) => {
           transition={{ delay: 0.9, duration: 0.8 }}
         >
           <a
-            href="https://github.com/Digital-Defiance/express-suite/tree/main/packages/digitaldefiance-i18n-lib"
+            href="https://github.com/Digital-Defiance/i18n-lib"
             className="btn btn-secondary"
             target="_blank"
             rel="noopener noreferrer"
