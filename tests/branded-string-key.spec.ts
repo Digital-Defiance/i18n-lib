@@ -57,6 +57,20 @@ describe('Branded String Keys', () => {
       const value: TestKeyValue = TestKeys.A;
       expect(value).toBe('type.a');
     });
+
+    it('should be idempotent - return existing enum when called with same componentId', () => {
+      const Keys1 = createI18nStringKeys('idempotent-test', {
+        Key: 'idempotent.key',
+      } as const);
+
+      const Keys2 = createI18nStringKeys('idempotent-test', {
+        Key: 'idempotent.key',
+      } as const);
+
+      // Should return the same reference (idempotent behavior)
+      expect(Keys1).toBe(Keys2);
+      expect(Keys1.Key).toBe('idempotent.key');
+    });
   });
 
   describe('createI18nStringKeysFromEnum', () => {

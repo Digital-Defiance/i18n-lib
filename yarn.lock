@@ -5,10 +5,18 @@ __metadata:
   version: 8
   cacheKey: 10c0
 
+"@digitaldefiance/branded-enum@npm:0.0.6":
+  version: 0.0.6
+  resolution: "@digitaldefiance/branded-enum@npm:0.0.6"
+  checksum: 10c0/1b70a5a3089c1a4673df9ea4f51cb9d3818291c3170e56fb211372dd4ac7e95b941b0bd95f4982d1f927ae13fca7ad156d360eca1053adbe066af1b282877230
+  languageName: node
+  linkType: hard
+
 "@digitaldefiance/i18n-lib@workspace:.":
   version: 0.0.0-use.local
   resolution: "@digitaldefiance/i18n-lib@workspace:."
   dependencies:
+    "@digitaldefiance/branded-enum": "npm:0.0.6"
     "@typescript-eslint/eslint-plugin": "npm:^8.53.1"
     "@typescript-eslint/parser": "npm:^8.53.1"
     currency-codes: "npm:^2.2.0"

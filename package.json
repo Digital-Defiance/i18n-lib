@@ -1,6 +1,6 @@
 {
   "name": "@digitaldefiance/i18n-lib",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "description": "i18n library with enum translation support",
   "homepage": "https://github.com/Digital-Defiance/i18n-lib",
   "repository": {
@@ -42,7 +42,7 @@
   "license": "MIT",
   "packageManager": "yarn@4.10.3",
   "dependencies": {
-    "@digitaldefiance/branded-enum": "0.0.5",
+    "@digitaldefiance/branded-enum": "0.0.6",
     "currency-codes": "^2.2.0",
     "lru-cache": "^5.1.1",
     "moment": "^2.30.1",
