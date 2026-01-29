@@ -130,12 +130,21 @@ export function createI18nStringKeysFromEnum<
   TEnum extends Record<string, string>,
 >(componentId: string, enumObj: TEnum): BrandedStringKeys<TEnum> {
   // Filter out reverse mappings (numeric enums have value -> key mappings)
+  // For a numeric enum like { A: 0, 0: 'A' }, we need to filter out the { 0: 'A' } entry
+  // We keep string-valued entries, filtering out numeric keys that are reverse mappings
   const filteredObj = Object.fromEntries(
-    Object.entries(enumObj).filter(
-      ([_key, value]) =>
-        typeof value === 'string' &&
-        !Object.prototype.hasOwnProperty.call(enumObj, value),
-    ),
+    Object.entries(enumObj).filter(([key, value]) => {
+      // Only keep string values
+      if (typeof value !== 'string') {
+        return false;
+      }
+      // Filter out numeric keys (these are reverse mappings from numeric enums)
+      // A key like '0' that maps to 'A' is a reverse mapping
+      if (!isNaN(Number(key))) {
+        return false;
+      }
+      return true;
+    }),
   ) as TEnum;
 
   return createI18nStringKeys(componentId, filteredObj);
