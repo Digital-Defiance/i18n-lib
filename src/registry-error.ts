@@ -1,19 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-// CoreLanguageCode is deprecated - using string
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { CoreI18nComponentId } from './core-component-id';
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { CoreStringKey } from './core-string-key';
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { CoreStringKeys } from './core-string-key';
 import { RegistryErrorType } from './registry-error-type';
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Minimal translation engine interface to avoid circular dependencies
  */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface RegistryTranslationEngine {
   safeTranslate(
     componentId: string,
@@ -28,19 +20,19 @@ export interface RegistryTranslationEngine {
  */
 const REGISTRY_ERROR_REASON_MAP = {
   [RegistryErrorType.ComponentNotFound]:
-    CoreStringKey.Error_ComponentNotFoundTemplate,
+    CoreStringKeys.Error_ComponentNotFoundTemplate,
   [RegistryErrorType.DuplicateComponent]:
-    CoreStringKey.Error_DuplicateComponentTemplate,
+    CoreStringKeys.Error_DuplicateComponentTemplate,
   [RegistryErrorType.DuplicateLanguage]:
-    CoreStringKey.Error_DuplicateLanguageTemplate,
+    CoreStringKeys.Error_DuplicateLanguageTemplate,
   [RegistryErrorType.IncompleteRegistration]:
-    CoreStringKey.Error_IncompleteRegistrationTemplate,
+    CoreStringKeys.Error_IncompleteRegistrationTemplate,
   [RegistryErrorType.LanguageNotFound]:
-    CoreStringKey.Error_LanguageNotFoundTemplate,
+    CoreStringKeys.Error_LanguageNotFoundTemplate,
   [RegistryErrorType.StringKeyNotFound]:
-    CoreStringKey.Error_StringKeyNotFoundTemplate,
+    CoreStringKeys.Error_StringKeyNotFoundTemplate,
   [RegistryErrorType.ValidationFailed]:
-    CoreStringKey.Error_ValidationFailedTemplate,
+    CoreStringKeys.Error_ValidationFailedTemplate,
 } as const;
 
 /**

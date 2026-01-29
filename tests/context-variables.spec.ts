@@ -8,6 +8,7 @@ import {
 } from '../src';
 import { CurrencyCode } from '../src/utils/currency';
 import { Timezone } from '../src/utils/timezone';
+import { createI18nStringKeys } from '../src/branded-string-key';
 
 describe('Context Variables in Templates', () => {
   const englishLang: LanguageDefinition = {
@@ -23,6 +24,10 @@ describe('Context Variables in Templates', () => {
     code: 'fr',
   };
 
+  const MessageStrings = createI18nStringKeys('test', {
+    message: 'message',
+  } as const);
+
   let engine: PluginI18nEngine<'en' | 'fr'>;
 
   beforeEach(() => {
@@ -36,17 +41,17 @@ describe('Context Variables in Templates', () => {
 
   describe('timezone context variables', () => {
     it('should inject timezone into template variables', () => {
-      const component: ComponentDefinition<'message'> = {
+      const component: ComponentDefinition<typeof MessageStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['message'],
+        stringKeys: MessageStrings,
       };
 
-      const registration: ComponentRegistration<'message', 'en' | 'fr'> = {
+      const registration: ComponentRegistration<typeof MessageStrings, 'en' | 'fr'> = {
         component,
         strings: {
-          en: { message: 'Current timezone: {timezone}' },
-          fr: { message: 'Fuseau horaire actuel: {timezone}' },
+          en: { [MessageStrings.message]: 'Current timezone: {timezone}' },
+          fr: { [MessageStrings.message]: 'Fuseau horaire actuel: {timezone}' },
         },
       };
 
@@ -62,17 +67,17 @@ describe('Context Variables in Templates', () => {
         timezone: new Timezone('America/New_York'),
       });
 
-      const component: ComponentDefinition<'message'> = {
+      const component: ComponentDefinition<typeof MessageStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['message'],
+        stringKeys: MessageStrings,
       };
 
-      const registration: ComponentRegistration<'message', 'en' | 'fr'> = {
+      const registration: ComponentRegistration<typeof MessageStrings, 'en' | 'fr'> = {
         component,
         strings: {
-          en: { message: 'Your timezone: {timezone}' },
-          fr: { message: 'Votre fuseau horaire: {timezone}' },
+          en: { [MessageStrings.message]: 'Your timezone: {timezone}' },
+          fr: { [MessageStrings.message]: 'Votre fuseau horaire: {timezone}' },
         },
       };
 
@@ -89,17 +94,17 @@ describe('Context Variables in Templates', () => {
         currentContext: 'admin',
       });
 
-      const component: ComponentDefinition<'message'> = {
+      const component: ComponentDefinition<typeof MessageStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['message'],
+        stringKeys: MessageStrings,
       };
 
-      const registration: ComponentRegistration<'message', 'en' | 'fr'> = {
+      const registration: ComponentRegistration<typeof MessageStrings, 'en' | 'fr'> = {
         component,
         strings: {
-          en: { message: 'Admin timezone: {timezone}' },
-          fr: { message: 'Fuseau horaire admin: {timezone}' },
+          en: { [MessageStrings.message]: 'Admin timezone: {timezone}' },
+          fr: { [MessageStrings.message]: 'Fuseau horaire admin: {timezone}' },
         },
       };
 
@@ -115,18 +120,18 @@ describe('Context Variables in Templates', () => {
         adminTimezone: new Timezone('UTC'),
       });
 
-      const component: ComponentDefinition<'message'> = {
+      const component: ComponentDefinition<typeof MessageStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['message'],
+        stringKeys: MessageStrings,
       };
 
-      const registration: ComponentRegistration<'message', 'en' | 'fr'> = {
+      const registration: ComponentRegistration<typeof MessageStrings, 'en' | 'fr'> = {
         component,
         strings: {
-          en: { message: 'User: {userTimezone}, Admin: {adminTimezone}' },
+          en: { [MessageStrings.message]: 'User: {userTimezone}, Admin: {adminTimezone}' },
           fr: {
-            message: 'Utilisateur: {userTimezone}, Admin: {adminTimezone}',
+            [MessageStrings.message]: 'Utilisateur: {userTimezone}, Admin: {adminTimezone}',
           },
         },
       };
@@ -140,17 +145,17 @@ describe('Context Variables in Templates', () => {
 
   describe('currency code context variables', () => {
     it('should inject currencyCode into template variables', () => {
-      const component: ComponentDefinition<'message'> = {
+      const component: ComponentDefinition<typeof MessageStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['message'],
+        stringKeys: MessageStrings,
       };
 
-      const registration: ComponentRegistration<'message', 'en' | 'fr'> = {
+      const registration: ComponentRegistration<typeof MessageStrings, 'en' | 'fr'> = {
         component,
         strings: {
-          en: { message: 'Currency: {currencyCode}' },
-          fr: { message: 'Devise: {currencyCode}' },
+          en: { [MessageStrings.message]: 'Currency: {currencyCode}' },
+          fr: { [MessageStrings.message]: 'Devise: {currencyCode}' },
         },
       };
 
@@ -166,17 +171,17 @@ describe('Context Variables in Templates', () => {
         currencyCode: new CurrencyCode('EUR'),
       });
 
-      const component: ComponentDefinition<'message'> = {
+      const component: ComponentDefinition<typeof MessageStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['message'],
+        stringKeys: MessageStrings,
       };
 
-      const registration: ComponentRegistration<'message', 'en' | 'fr'> = {
+      const registration: ComponentRegistration<typeof MessageStrings, 'en' | 'fr'> = {
         component,
         strings: {
-          en: { message: 'Price in {currencyCode}' },
-          fr: { message: 'Prix en {currencyCode}' },
+          en: { [MessageStrings.message]: 'Price in {currencyCode}' },
+          fr: { [MessageStrings.message]: 'Prix en {currencyCode}' },
         },
       };
 
@@ -187,17 +192,17 @@ describe('Context Variables in Templates', () => {
     });
 
     it('should work with multiple currency codes', () => {
-      const component: ComponentDefinition<'message'> = {
+      const component: ComponentDefinition<typeof MessageStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['message'],
+        stringKeys: MessageStrings,
       };
 
-      const registration: ComponentRegistration<'message', 'en' | 'fr'> = {
+      const registration: ComponentRegistration<typeof MessageStrings, 'en' | 'fr'> = {
         component,
         strings: {
-          en: { message: 'Currencies: {currencyCode}' },
-          fr: { message: 'Devises: {currencyCode}' },
+          en: { [MessageStrings.message]: 'Currencies: {currencyCode}' },
+          fr: { [MessageStrings.message]: 'Devises: {currencyCode}' },
         },
       };
 
@@ -221,17 +226,17 @@ describe('Context Variables in Templates', () => {
 
   describe('language context variables', () => {
     it('should inject language into template variables', () => {
-      const component: ComponentDefinition<'message'> = {
+      const component: ComponentDefinition<typeof MessageStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['message'],
+        stringKeys: MessageStrings,
       };
 
-      const registration: ComponentRegistration<'message', 'en' | 'fr'> = {
+      const registration: ComponentRegistration<typeof MessageStrings, 'en' | 'fr'> = {
         component,
         strings: {
-          en: { message: 'Current language: {language}' },
-          fr: { message: 'Langue actuelle: {language}' },
+          en: { [MessageStrings.message]: 'Current language: {language}' },
+          fr: { [MessageStrings.message]: 'Langue actuelle: {language}' },
         },
       };
 
@@ -244,17 +249,17 @@ describe('Context Variables in Templates', () => {
     it('should respect user language in user context', () => {
       engine.updateContext({ language: 'fr' });
 
-      const component: ComponentDefinition<'message'> = {
+      const component: ComponentDefinition<typeof MessageStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['message'],
+        stringKeys: MessageStrings,
       };
 
-      const registration: ComponentRegistration<'message', 'en' | 'fr'> = {
+      const registration: ComponentRegistration<typeof MessageStrings, 'en' | 'fr'> = {
         component,
         strings: {
-          en: { message: 'Language: {language}' },
-          fr: { message: 'Langue: {language}' },
+          en: { [MessageStrings.message]: 'Language: {language}' },
+          fr: { [MessageStrings.message]: 'Langue: {language}' },
         },
       };
 
@@ -271,17 +276,17 @@ describe('Context Variables in Templates', () => {
         currentContext: 'admin',
       });
 
-      const component: ComponentDefinition<'message'> = {
+      const component: ComponentDefinition<typeof MessageStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['message'],
+        stringKeys: MessageStrings,
       };
 
-      const registration: ComponentRegistration<'message', 'en' | 'fr'> = {
+      const registration: ComponentRegistration<typeof MessageStrings, 'en' | 'fr'> = {
         component,
         strings: {
-          en: { message: 'Admin language: {language}' },
-          fr: { message: 'Langue admin: {language}' },
+          en: { [MessageStrings.message]: 'Admin language: {language}' },
+          fr: { [MessageStrings.message]: 'Langue admin: {language}' },
         },
       };
 
@@ -297,18 +302,18 @@ describe('Context Variables in Templates', () => {
         adminLanguage: 'en',
       });
 
-      const component: ComponentDefinition<'message'> = {
+      const component: ComponentDefinition<typeof MessageStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['message'],
+        stringKeys: MessageStrings,
       };
 
-      const registration: ComponentRegistration<'message', 'en' | 'fr'> = {
+      const registration: ComponentRegistration<typeof MessageStrings, 'en' | 'fr'> = {
         component,
         strings: {
-          en: { message: 'User: {userLanguage}, Admin: {adminLanguage}' },
+          en: { [MessageStrings.message]: 'User: {userLanguage}, Admin: {adminLanguage}' },
           fr: {
-            message: 'Utilisateur: {userLanguage}, Admin: {adminLanguage}',
+            [MessageStrings.message]: 'Utilisateur: {userLanguage}, Admin: {adminLanguage}',
           },
         },
       };
@@ -328,21 +333,21 @@ describe('Context Variables in Templates', () => {
         timezone: new Timezone('Europe/Paris'),
       });
 
-      const component: ComponentDefinition<'message'> = {
+      const component: ComponentDefinition<typeof MessageStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['message'],
+        stringKeys: MessageStrings,
       };
 
-      const registration: ComponentRegistration<'message', 'en' | 'fr'> = {
+      const registration: ComponentRegistration<typeof MessageStrings, 'en' | 'fr'> = {
         component,
         strings: {
           en: {
-            message:
+            [MessageStrings.message]:
               'Language: {language}, Currency: {currencyCode}, Timezone: {timezone}',
           },
           fr: {
-            message:
+            [MessageStrings.message]:
               'Langue: {language}, Devise: {currencyCode}, Fuseau: {timezone}',
           },
         },
@@ -361,17 +366,17 @@ describe('Context Variables in Templates', () => {
         currencyCode: new CurrencyCode('USD'),
       });
 
-      const component: ComponentDefinition<'message'> = {
+      const component: ComponentDefinition<typeof MessageStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['message'],
+        stringKeys: MessageStrings,
       };
 
-      const registration: ComponentRegistration<'message', 'en' | 'fr'> = {
+      const registration: ComponentRegistration<typeof MessageStrings, 'en' | 'fr'> = {
         component,
         strings: {
-          en: { message: 'Currency: {currencyCode}' },
-          fr: { message: 'Devise: {currencyCode}' },
+          en: { [MessageStrings.message]: 'Currency: {currencyCode}' },
+          fr: { [MessageStrings.message]: 'Devise: {currencyCode}' },
         },
       };
 
@@ -391,21 +396,21 @@ describe('Context Variables in Templates', () => {
         timezone: new Timezone('America/New_York'),
       });
 
-      const component: ComponentDefinition<'message'> = {
+      const component: ComponentDefinition<typeof MessageStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['message'],
+        stringKeys: MessageStrings,
       };
 
-      const registration: ComponentRegistration<'message', 'en' | 'fr'> = {
+      const registration: ComponentRegistration<typeof MessageStrings, 'en' | 'fr'> = {
         component,
         strings: {
           en: {
-            message:
+            [MessageStrings.message]:
               'Hello {name}! Language: {language}, Currency: {currencyCode}, Timezone: {timezone}, Amount: {amount}',
           },
           fr: {
-            message:
+            [MessageStrings.message]:
               'Bonjour {name}! Langue: {language}, Devise: {currencyCode}, Fuseau: {timezone}, Montant: {amount}',
           },
         },

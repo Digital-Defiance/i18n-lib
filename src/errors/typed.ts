@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return, import/order */
-// New plugin architecture imports
-// CoreLanguageCode is deprecated - using string for flexibility
 import { CoreI18nComponentId } from '../core-component-id';
-import { CoreStringKey } from '../core-string-key';
+import { CoreStringKeys, CoreStringKeyValue } from '../core-string-key';
 import { I18nEngine } from '../core/i18n-engine';
 import { TranslationEngine } from '../translation-engine';
 import { TypedError as SimpleTypedError } from './simple-typed-error';
@@ -172,7 +170,7 @@ export abstract class AbstractTypedError<
       throw new Error(
         engine.safeTranslate(
           CoreI18nComponentId,
-          CoreStringKey.Error_MissingTranslationKeyTemplate,
+          CoreStringKeys.Error_MissingTranslationKeyTemplate,
           { type },
           language,
         ),
@@ -217,7 +215,7 @@ export abstract class PluginTypedError<
     if (!key) {
       const errorMsg = engine.safeTranslate(
         CoreI18nComponentId,
-        CoreStringKey.Error_StringKeyNotFoundTemplate,
+        CoreStringKeys.Error_StringKeyNotFoundTemplate,
         {
           stringKey: String(type),
           componentId: componentId,
@@ -295,7 +293,7 @@ export abstract class ComponentTypedError<
     if (!key) {
       const errorMsg = engine.safeTranslate(
         CoreI18nComponentId,
-        CoreStringKey.Error_StringKeyNotFoundTemplate,
+        CoreStringKeys.Error_StringKeyNotFoundTemplate,
         {
           stringKey: String(type),
           componentId: componentId,
@@ -321,7 +319,7 @@ export abstract class ComponentTypedError<
 /**
  * Core system TypedError using core component strings with full i18n support.
  *
- * **Supported i18n Features** (via CoreStringKey translations):
+ * **Supported i18n Features** (via CoreStringKeys translations):
  * - ICU MessageFormat: plural, select, selectordinal
  * - Pluralization: 37 languages with CLDR rules
  * - Gender support: male, female, neutral, other
@@ -337,9 +335,9 @@ export abstract class ComponentTypedError<
  * }
  *
  * // Core strings already registered with ICU features
- * const reasonMap: CompleteReasonMap<typeof CoreErrorType, CoreStringKey> = {
- *   [CoreErrorType.InvalidOperation]: CoreStringKey.Error_InvalidOperation,
- *   [CoreErrorType.ResourceNotFound]: CoreStringKey.Error_ResourceNotFound
+ * const reasonMap: CompleteReasonMap<typeof CoreErrorType, CoreStringKeyValue> = {
+ *   [CoreErrorType.InvalidOperation]: CoreStringKeys.Error_InvalidOperation,
+ *   [CoreErrorType.ResourceNotFound]: CoreStringKeys.Error_ResourceNotFound
  * };
  *
  * // Use core typed error
@@ -351,7 +349,10 @@ export abstract class CoreTypedError<
 > extends Error {
   constructor(
     public override readonly type: TEnum[keyof TEnum],
-    public override readonly reasonMap: CompleteReasonMap<TEnum, CoreStringKey>,
+    public override readonly reasonMap: CompleteReasonMap<
+      TEnum,
+      CoreStringKeyValue
+    >,
     public readonly language?: string,
     public readonly otherVars?: Record<string, string | number>,
   ) {
@@ -364,7 +365,7 @@ export abstract class CoreTypedError<
     if (!key) {
       const errorMsg = engine.safeTranslate(
         CoreI18nComponentId,
-        CoreStringKey.Error_StringKeyNotFoundTemplate,
+        CoreStringKeys.Error_StringKeyNotFoundTemplate,
         {
           stringKey: String(type),
           componentId: CoreI18nComponentId,
@@ -451,7 +452,7 @@ export function createComponentTypedError<
  */
 export function createCoreTypedError<TEnum extends Record<string, string>>(
   type: TEnum[keyof TEnum],
-  reasonMap: CompleteReasonMap<TEnum, CoreStringKey>,
+  reasonMap: CompleteReasonMap<TEnum, CoreStringKeyValue>,
   otherVars?: Record<string, string | number>,
   language?: string,
   instanceKey?: string,
@@ -531,7 +532,7 @@ export function createTranslatedError<
  * Example usage of the new plugin-based TypedError system
  */
 
-// Example 1: Core system error using CoreStringKey
+// Example 1: Core system error using CoreStringKeys
 /*
 enum DatabaseErrorType {
   ConnectionFailed = 'connectionFailed',
@@ -539,10 +540,10 @@ enum DatabaseErrorType {
   AccessDenied = 'accessDenied'
 }
 
-const coreErrorReasonMap: CompleteReasonMap<typeof DatabaseErrorType, CoreStringKey> = {
-  [DatabaseErrorType.ConnectionFailed]: CoreStringKey.Error_NetworkError,
-  [DatabaseErrorType.QueryTimeout]: CoreStringKey.Error_InternalServer,
-  [DatabaseErrorType.AccessDenied]: CoreStringKey.Error_AccessDenied
+const coreErrorReasonMap: CompleteReasonMap<typeof DatabaseErrorType, CoreStringKeyValue> = {
+  [DatabaseErrorType.ConnectionFailed]: CoreStringKeys.Error_NetworkError,
+  [DatabaseErrorType.QueryTimeout]: CoreStringKeys.Error_InternalServer,
+  [DatabaseErrorType.AccessDenied]: CoreStringKeys.Error_AccessDenied
 };
 
 class DatabaseError extends CoreTypedError<typeof DatabaseErrorType> {
@@ -601,9 +602,9 @@ enum ApiErrorType {
   NotFound = 'notFound'
 }
 
-const apiErrorMap: CompleteReasonMap<typeof ApiErrorType, CoreStringKey> = {
-  [ApiErrorType.Timeout]: CoreStringKey.Error_NetworkError,
-  [ApiErrorType.NotFound]: CoreStringKey.Error_NotFound
+const apiErrorMap: CompleteReasonMap<typeof ApiErrorType, CoreStringKeyValue> = {
+  [ApiErrorType.Timeout]: CoreStringKeys.Error_NetworkError,
+  [ApiErrorType.NotFound]: CoreStringKeys.Error_NotFound
 };
 
 // Create errors using helper functions

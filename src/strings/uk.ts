@@ -1,74 +1,74 @@
-import { CoreStringKey } from '../core-string-key';
+import { CoreStringKeys, CoreStringKeyValue } from '../core-string-key';
 
-export const ukrainianStrings: Record<CoreStringKey, string> = {
+export const ukrainianStrings: Record<CoreStringKeyValue, string> = {
   // Common/General
-  [CoreStringKey.Common_Yes]: 'Так',
-  [CoreStringKey.Common_No]: 'Ні',
-  [CoreStringKey.Common_Cancel]: 'Скасувати',
-  [CoreStringKey.Common_OK]: 'OK',
-  [CoreStringKey.Common_Save]: 'Зберегти',
-  [CoreStringKey.Common_Delete]: 'Видалити',
-  [CoreStringKey.Common_Edit]: 'Редагувати',
-  [CoreStringKey.Common_Create]: 'Створити',
-  [CoreStringKey.Common_Update]: 'Оновити',
-  [CoreStringKey.Common_Loading]: 'Завантаження...',
-  [CoreStringKey.Common_Error]: 'Помилка',
-  [CoreStringKey.Common_Success]: 'Успіх',
-  [CoreStringKey.Common_Warning]: 'Попередження',
-  [CoreStringKey.Common_Info]: 'Інформація',
-  [CoreStringKey.Common_Disposed]: "Об'єкт було звільнено",
-  [CoreStringKey.Common_Test]: 'Тест',
+  [CoreStringKeys.Common_Yes]: 'Так',
+  [CoreStringKeys.Common_No]: 'Ні',
+  [CoreStringKeys.Common_Cancel]: 'Скасувати',
+  [CoreStringKeys.Common_OK]: 'OK',
+  [CoreStringKeys.Common_Save]: 'Зберегти',
+  [CoreStringKeys.Common_Delete]: 'Видалити',
+  [CoreStringKeys.Common_Edit]: 'Редагувати',
+  [CoreStringKeys.Common_Create]: 'Створити',
+  [CoreStringKeys.Common_Update]: 'Оновити',
+  [CoreStringKeys.Common_Loading]: 'Завантаження...',
+  [CoreStringKeys.Common_Error]: 'Помилка',
+  [CoreStringKeys.Common_Success]: 'Успіх',
+  [CoreStringKeys.Common_Warning]: 'Попередження',
+  [CoreStringKeys.Common_Info]: 'Інформація',
+  [CoreStringKeys.Common_Disposed]: "Об'єкт було звільнено",
+  [CoreStringKeys.Common_Test]: 'Тест',
 
   // Error Messages
-  [CoreStringKey.Error_InvalidInput]: 'Надано неправильний ввід',
-  [CoreStringKey.Error_NetworkError]: "Помилка мережевого з'єднання",
-  [CoreStringKey.Error_NotFound]: 'Ресурс не знайдено',
-  [CoreStringKey.Error_AccessDenied]: 'Доступ заборонено',
-  [CoreStringKey.Error_InternalServer]: 'Внутрішня помилка сервера',
-  [CoreStringKey.Error_ValidationFailed]: 'Перевірка не вдалася',
-  [CoreStringKey.Error_RequiredField]: "Це поле є обов'язковим",
-  [CoreStringKey.Error_InvalidContext]: 'Неправильний контекст',
-  [CoreStringKey.Error_InvalidContextTemplate]:
+  [CoreStringKeys.Error_InvalidInput]: 'Надано неправильний ввід',
+  [CoreStringKeys.Error_NetworkError]: "Помилка мережевого з'єднання",
+  [CoreStringKeys.Error_NotFound]: 'Ресурс не знайдено',
+  [CoreStringKeys.Error_AccessDenied]: 'Доступ заборонено',
+  [CoreStringKeys.Error_InternalServer]: 'Внутрішня помилка сервера',
+  [CoreStringKeys.Error_ValidationFailed]: 'Перевірка не вдалася',
+  [CoreStringKeys.Error_RequiredField]: "Це поле є обов'язковим",
+  [CoreStringKeys.Error_InvalidContext]: 'Неправильний контекст',
+  [CoreStringKeys.Error_InvalidContextTemplate]:
     'Неправильний контекст: {contextKey}',
-  [CoreStringKey.Error_MissingTranslationKeyTemplate]:
+  [CoreStringKeys.Error_MissingTranslationKeyTemplate]:
     'Відсутній ключ перекладу: {stringKey}',
-  [CoreStringKey.Error_InvalidCurrencyCodeTemplate]:
+  [CoreStringKeys.Error_InvalidCurrencyCodeTemplate]:
     'Неправильний код валюти: {value}',
 
   // Registry Error Templates
-  [CoreStringKey.Error_ComponentNotFoundTemplate]:
+  [CoreStringKeys.Error_ComponentNotFoundTemplate]:
     'Компонент "{componentId}" не знайдено',
-  [CoreStringKey.Error_LanguageNotFoundTemplate]:
+  [CoreStringKeys.Error_LanguageNotFoundTemplate]:
     'Мову "{language}" не знайдено',
-  [CoreStringKey.Error_StringKeyNotFoundTemplate]:
+  [CoreStringKeys.Error_StringKeyNotFoundTemplate]:
     'Ключ рядка "{stringKey}" не знайдено для компонента "{componentId}"',
-  [CoreStringKey.Error_IncompleteRegistrationTemplate]:
+  [CoreStringKeys.Error_IncompleteRegistrationTemplate]:
     'Неповна реєстрація для компонента "{componentId}": не вистачає {missingCount} рядків',
-  [CoreStringKey.Error_DuplicateComponentTemplate]:
+  [CoreStringKeys.Error_DuplicateComponentTemplate]:
     'Компонент "{componentId}" вже зареєстровано',
-  [CoreStringKey.Error_DuplicateLanguageTemplate]:
+  [CoreStringKeys.Error_DuplicateLanguageTemplate]:
     'Мову "{languageId}" вже зареєстровано',
-  [CoreStringKey.Error_ValidationFailedTemplate]:
+  [CoreStringKeys.Error_ValidationFailedTemplate]:
     'Перевірка не вдалася для компонента "{componentId}": {errorCount} помилок',
 
   // System Messages
-  [CoreStringKey.System_Welcome]: 'Ласкаво просимо',
-  [CoreStringKey.System_Goodbye]: 'До побачення',
-  [CoreStringKey.System_PleaseWait]: 'Будь ласка, зачекайте...',
-  [CoreStringKey.System_ProcessingRequest]: 'Обробка вашого запиту...',
-  [CoreStringKey.System_OperationComplete]: 'Операція успішно завершена',
-  [CoreStringKey.System_NoDataAvailable]: 'Дані недоступні',
+  [CoreStringKeys.System_Welcome]: 'Ласкаво просимо',
+  [CoreStringKeys.System_Goodbye]: 'До побачення',
+  [CoreStringKeys.System_PleaseWait]: 'Будь ласка, зачекайте...',
+  [CoreStringKeys.System_ProcessingRequest]: 'Обробка вашого запиту...',
+  [CoreStringKeys.System_OperationComplete]: 'Операція успішно завершена',
+  [CoreStringKeys.System_NoDataAvailable]: 'Дані недоступні',
 
-  [CoreStringKey.Error_InstanceAlreadyExistsTemplate]:
+  [CoreStringKeys.Error_InstanceAlreadyExistsTemplate]:
     "Екземпляр з ключем '{key}' вже існує",
-  [CoreStringKey.Error_InstanceNotFoundTemplate]:
+  [CoreStringKeys.Error_InstanceNotFoundTemplate]:
     "Екземпляр з ключем '{key}' не знайдено",
-  [CoreStringKey.Error_MissingStringCollectionTemplate]:
+  [CoreStringKeys.Error_MissingStringCollectionTemplate]:
     'Відсутня колекція рядків для мови: {language}',
-  [CoreStringKey.Error_MissingTranslationTemplate]:
+  [CoreStringKeys.Error_MissingTranslationTemplate]:
     "Відсутній переклад для ключа '{key}' в мові '{language}'",
-  [CoreStringKey.Error_DefaultLanguageNoCollectionTemplate]:
+  [CoreStringKeys.Error_DefaultLanguageNoCollectionTemplate]:
     "Мова за замовчуванням '{language}' не має колекції рядків",
-  [CoreStringKey.Error_MissingTranslationKeyForTypeTemplate]:
+  [CoreStringKeys.Error_MissingTranslationKeyForTypeTemplate]:
     'Відсутній ключ перекладу для типу: {type}',
 };

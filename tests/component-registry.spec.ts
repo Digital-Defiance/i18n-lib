@@ -4,12 +4,13 @@ import { ComponentRegistration } from '../src/component-registration';
 import { ComponentRegistry } from '../src/component-registry';
 import { RegistryError } from '../src/registry-error';
 import { ValidationConfig } from '../src/validation-config';
+import { createI18nStringKeys } from '../src/branded-string-key';
 
-enum TestStringKey {
-  Hello = 'hello',
-  Goodbye = 'goodbye',
-  Template = 'template',
-}
+const TestStringKey = createI18nStringKeys('test', {
+  Hello: 'hello',
+  Goodbye: 'goodbye',
+  Template: 'template',
+} as const);
 
 const validationConfig: ValidationConfig = {
   requireCompleteStrings: false,
@@ -25,15 +26,23 @@ describe('ComponentRegistry', () => {
   });
 
   it('should register a component', () => {
-    const registration: ComponentRegistration<TestStringKey, 'en' | 'fr'> = {
+    const registration: ComponentRegistration<typeof TestStringKey, 'en' | 'fr'> = {
       component: {
         id: 'test',
         name: 'Test Component',
-        stringKeys: [TestStringKey.Hello],
+        stringKeys: TestStringKey,
       },
       strings: {
-        en: { [TestStringKey.Hello]: 'Hello' },
-        fr: { [TestStringKey.Hello]: 'Bonjour' },
+        en: { 
+          [TestStringKey.Hello]: 'Hello',
+          [TestStringKey.Goodbye]: 'Goodbye',
+          [TestStringKey.Template]: 'Template',
+        },
+        fr: { 
+          [TestStringKey.Hello]: 'Bonjour',
+          [TestStringKey.Goodbye]: 'Au revoir',
+          [TestStringKey.Template]: 'Modèle',
+        },
       },
     };
 
@@ -43,11 +52,11 @@ describe('ComponentRegistry', () => {
   });
 
   it('should throw on duplicate component', () => {
-    const registration: ComponentRegistration<TestStringKey, 'en' | 'fr'> = {
+    const registration: ComponentRegistration<typeof TestStringKey, 'en' | 'fr'> = {
       component: {
         id: 'test',
         name: 'Test',
-        stringKeys: [TestStringKey.Hello],
+        stringKeys: TestStringKey,
       },
       strings: { en: { [TestStringKey.Hello]: 'Hello' } },
     };
@@ -59,11 +68,11 @@ describe('ComponentRegistry', () => {
   });
 
   it('should get translation', () => {
-    const registration: ComponentRegistration<TestStringKey, 'en' | 'fr'> = {
+    const registration: ComponentRegistration<typeof TestStringKey, 'en' | 'fr'> = {
       component: {
         id: 'test',
         name: 'Test',
-        stringKeys: [TestStringKey.Hello],
+        stringKeys: TestStringKey,
       },
       strings: {
         en: { [TestStringKey.Hello]: 'Hello' },
@@ -84,11 +93,11 @@ describe('ComponentRegistry', () => {
   });
 
   it('should use fallback language', () => {
-    const registration: ComponentRegistration<TestStringKey, 'en' | 'fr'> = {
+    const registration: ComponentRegistration<typeof TestStringKey, 'en' | 'fr'> = {
       component: {
         id: 'test',
         name: 'Test',
-        stringKeys: [TestStringKey.Hello],
+        stringKeys: TestStringKey,
       },
       strings: { en: { [TestStringKey.Hello]: 'Hello' } },
     };
@@ -106,11 +115,11 @@ describe('ComponentRegistry', () => {
   });
 
   it('should replace variables in template', () => {
-    const registration: ComponentRegistration<TestStringKey, 'en' | 'fr'> = {
+    const registration: ComponentRegistration<typeof TestStringKey, 'en' | 'fr'> = {
       component: {
         id: 'test',
         name: 'Test',
-        stringKeys: [TestStringKey.Template],
+        stringKeys: TestStringKey,
       },
       strings: { en: { [TestStringKey.Template]: 'Hello {name}' } },
     };
@@ -134,11 +143,11 @@ describe('ComponentRegistry', () => {
       constants,
     );
 
-    const registration: ComponentRegistration<TestStringKey, 'en'> = {
+    const registration: ComponentRegistration<typeof TestStringKey, 'en'> = {
       component: {
         id: 'test',
         name: 'Test',
-        stringKeys: [TestStringKey.Template],
+        stringKeys: TestStringKey,
       },
       strings: { en: { [TestStringKey.Template]: 'Welcome to {Site}' } },
     };
@@ -161,11 +170,11 @@ describe('ComponentRegistry', () => {
       constants,
     );
 
-    const registration: ComponentRegistration<TestStringKey, 'en'> = {
+    const registration: ComponentRegistration<typeof TestStringKey, 'en'> = {
       component: {
         id: 'test',
         name: 'Test',
-        stringKeys: [TestStringKey.Template],
+        stringKeys: TestStringKey,
       },
       strings: { en: { [TestStringKey.Template]: 'Hello {name}' } },
     };
@@ -182,11 +191,11 @@ describe('ComponentRegistry', () => {
   });
 
   it('should update component strings', () => {
-    const registration: ComponentRegistration<TestStringKey, 'en' | 'fr'> = {
+    const registration: ComponentRegistration<typeof TestStringKey, 'en' | 'fr'> = {
       component: {
         id: 'test',
         name: 'Test',
-        stringKeys: [TestStringKey.Hello],
+        stringKeys: TestStringKey,
       },
       strings: { en: { [TestStringKey.Hello]: 'Hello' } },
     };
@@ -216,11 +225,11 @@ describe('ComponentRegistry', () => {
   });
 
   it('should get all components', () => {
-    const registration: ComponentRegistration<TestStringKey, 'en' | 'fr'> = {
+    const registration: ComponentRegistration<typeof TestStringKey, 'en' | 'fr'> = {
       component: {
         id: 'test',
         name: 'Test',
-        stringKeys: [TestStringKey.Hello],
+        stringKeys: TestStringKey,
       },
       strings: { en: { [TestStringKey.Hello]: 'Hello' } },
     };
@@ -232,11 +241,11 @@ describe('ComponentRegistry', () => {
   });
 
   it('should clear all components', () => {
-    const registration: ComponentRegistration<TestStringKey, 'en' | 'fr'> = {
+    const registration: ComponentRegistration<typeof TestStringKey, 'en' | 'fr'> = {
       component: {
         id: 'test',
         name: 'Test',
-        stringKeys: [TestStringKey.Hello],
+        stringKeys: TestStringKey,
       },
       strings: { en: { [TestStringKey.Hello]: 'Hello' } },
     };

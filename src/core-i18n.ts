@@ -5,7 +5,7 @@
 import { ComponentDefinition } from './component-definition';
 import { ComponentRegistration } from './component-registration';
 import { CoreI18nComponentId } from './core-component-id';
-import { CoreStringKey } from './core-string-key';
+import { CoreStringKeys, CoreStringKeyValue } from './core-string-key';
 // eslint-disable-next-line import/order
 import { I18nEngine } from './core/i18n-engine';
 import { ComponentConfig, EngineConfig } from './interfaces';
@@ -107,19 +107,21 @@ export function createDefaultLanguages(): LanguageDefinition[] {
 }
 
 /**
- * Core component definition
+ * Core component definition using branded string keys
  */
-export const CoreComponentDefinition: ComponentDefinition<CoreStringKey> = {
+export const CoreComponentDefinition: ComponentDefinition<
+  typeof CoreStringKeys
+> = {
   id: CoreI18nComponentId,
   name: 'Core I18n System',
-  stringKeys: Object.values(CoreStringKey),
+  stringKeys: CoreStringKeys,
 };
 
 /**
  * Core component strings for all default languages
  */
 export function createCoreComponentStrings() {
-  return createCompleteComponentStrings<CoreStringKey, string>({
+  return createCompleteComponentStrings<CoreStringKeyValue, string>({
     [LanguageCodes.EN_US]: americanEnglishString,
     [LanguageCodes.EN_GB]: BritishEnglishStrings,
     [LanguageCodes.FR]: frenchStrings,
@@ -135,7 +137,7 @@ export function createCoreComponentStrings() {
  * Create core component registration (for PluginI18nEngine)
  */
 export function createCoreComponentRegistration(): ComponentRegistration<
-  CoreStringKey,
+  typeof CoreStringKeys,
   string
 > {
   return {
@@ -243,7 +245,7 @@ export function resetCoreI18nEngine(): void {
  * Helper to translate Core strings
  */
 export function getCoreTranslation(
-  stringKey: CoreStringKey,
+  stringKey: CoreStringKeyValue,
   variables?: Record<string, string | number>,
   language?: string,
 ): string {
@@ -259,7 +261,7 @@ export function getCoreTranslation(
  * Safe translation with fallback
  */
 export function safeCoreTranslation(
-  stringKey: CoreStringKey,
+  stringKey: CoreStringKeyValue,
   variables?: Record<string, string | number>,
   language?: string,
 ): string {

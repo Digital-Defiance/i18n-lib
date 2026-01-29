@@ -1,74 +1,75 @@
-import { CoreStringKey } from '../core-string-key';
+import { CoreStringKeys, CoreStringKeyValue } from '../core-string-key';
 
-export const spanishStrings: Record<CoreStringKey, string> = {
+export const spanishStrings: Record<CoreStringKeyValue, string> = {
   // Common/General
-  [CoreStringKey.Common_Yes]: 'Sí',
-  [CoreStringKey.Common_No]: 'No',
-  [CoreStringKey.Common_Cancel]: 'Cancelar',
-  [CoreStringKey.Common_OK]: 'OK',
-  [CoreStringKey.Common_Save]: 'Guardar',
-  [CoreStringKey.Common_Delete]: 'Eliminar',
-  [CoreStringKey.Common_Edit]: 'Editar',
-  [CoreStringKey.Common_Create]: 'Crear',
-  [CoreStringKey.Common_Update]: 'Actualizar',
-  [CoreStringKey.Common_Loading]: 'Cargando...',
-  [CoreStringKey.Common_Error]: 'Error',
-  [CoreStringKey.Common_Success]: 'Éxito',
-  [CoreStringKey.Common_Warning]: 'Advertencia',
-  [CoreStringKey.Common_Info]: 'Información',
-  [CoreStringKey.Common_Disposed]: 'El objeto ha sido eliminado',
-  [CoreStringKey.Common_Test]: 'Test',
+  [CoreStringKeys.Common_Yes]: 'Sí',
+  [CoreStringKeys.Common_No]: 'No',
+  [CoreStringKeys.Common_Cancel]: 'Cancelar',
+  [CoreStringKeys.Common_OK]: 'OK',
+  [CoreStringKeys.Common_Save]: 'Guardar',
+  [CoreStringKeys.Common_Delete]: 'Eliminar',
+  [CoreStringKeys.Common_Edit]: 'Editar',
+  [CoreStringKeys.Common_Create]: 'Crear',
+  [CoreStringKeys.Common_Update]: 'Actualizar',
+  [CoreStringKeys.Common_Loading]: 'Cargando...',
+  [CoreStringKeys.Common_Error]: 'Error',
+  [CoreStringKeys.Common_Success]: 'Éxito',
+  [CoreStringKeys.Common_Warning]: 'Advertencia',
+  [CoreStringKeys.Common_Info]: 'Información',
+  [CoreStringKeys.Common_Disposed]: 'El objeto ha sido eliminado',
+  [CoreStringKeys.Common_Test]: 'Test',
 
   // Error Messages
-  [CoreStringKey.Error_InvalidInput]: 'Entrada inválida proporcionada',
-  [CoreStringKey.Error_NetworkError]: 'Error de conexión de red',
-  [CoreStringKey.Error_NotFound]: 'Recurso no encontrado',
-  [CoreStringKey.Error_AccessDenied]: 'Acceso denegado',
-  [CoreStringKey.Error_InternalServer]: 'Error interno del servidor',
-  [CoreStringKey.Error_ValidationFailed]: 'Error de validación',
-  [CoreStringKey.Error_RequiredField]: 'Este campo es obligatorio',
-  [CoreStringKey.Error_InvalidContext]: 'Contexto inválido',
-  [CoreStringKey.Error_InvalidContextTemplate]:
+  [CoreStringKeys.Error_InvalidInput]: 'Entrada inválida proporcionada',
+  [CoreStringKeys.Error_NetworkError]: 'Error de conexión de red',
+  [CoreStringKeys.Error_NotFound]: 'Recurso no encontrado',
+  [CoreStringKeys.Error_AccessDenied]: 'Acceso denegado',
+  [CoreStringKeys.Error_InternalServer]: 'Error interno del servidor',
+  [CoreStringKeys.Error_ValidationFailed]: 'Error de validación',
+  [CoreStringKeys.Error_RequiredField]: 'Este campo es obligatorio',
+  [CoreStringKeys.Error_InvalidContext]: 'Contexto inválido',
+  [CoreStringKeys.Error_InvalidContextTemplate]:
     'Contexte invalide : {contextKey}',
-  [CoreStringKey.Error_MissingTranslationKeyTemplate]:
+  [CoreStringKeys.Error_MissingTranslationKeyTemplate]:
     'Clave de traducción faltante: {stringKey}',
-  [CoreStringKey.Error_InvalidCurrencyCodeTemplate]:
+  [CoreStringKeys.Error_InvalidCurrencyCodeTemplate]:
     'Código de divisa inválido: {value}',
 
   // Registry Error Templates
-  [CoreStringKey.Error_ComponentNotFoundTemplate]:
+  [CoreStringKeys.Error_ComponentNotFoundTemplate]:
     'Componente "{componentId}" no encontrado',
-  [CoreStringKey.Error_LanguageNotFoundTemplate]:
+  [CoreStringKeys.Error_LanguageNotFoundTemplate]:
     'Idioma "{language}" no encontrado',
-  [CoreStringKey.Error_StringKeyNotFoundTemplate]:
+  [CoreStringKeys.Error_StringKeyNotFoundTemplate]:
     'Clave de cadena "{stringKey}" no encontrada para el componente "{componentId}"',
-  [CoreStringKey.Error_IncompleteRegistrationTemplate]:
+  [CoreStringKeys.Error_IncompleteRegistrationTemplate]:
     'Registro incompleto para el componente "{componentId}": faltan {missingCount} cadenas',
-  [CoreStringKey.Error_DuplicateComponentTemplate]:
+  [CoreStringKeys.Error_DuplicateComponentTemplate]:
     'El componente "{componentId}" ya está registrado',
-  [CoreStringKey.Error_DuplicateLanguageTemplate]:
+  [CoreStringKeys.Error_DuplicateLanguageTemplate]:
     'El idioma "{languageId}" ya está registrado',
-  [CoreStringKey.Error_ValidationFailedTemplate]:
+  [CoreStringKeys.Error_ValidationFailedTemplate]:
     'Error de validación para el componente "{componentId}": {errorCount} errores',
 
   // System Messages
-  [CoreStringKey.System_Welcome]: 'Bienvenido',
-  [CoreStringKey.System_Goodbye]: 'Adiós',
-  [CoreStringKey.System_PleaseWait]: 'Por favor espere...',
-  [CoreStringKey.System_ProcessingRequest]: 'Procesando su solicitud...',
-  [CoreStringKey.System_OperationComplete]: 'Operación completada exitosamente',
-  [CoreStringKey.System_NoDataAvailable]: 'No hay datos disponibles',
+  [CoreStringKeys.System_Welcome]: 'Bienvenido',
+  [CoreStringKeys.System_Goodbye]: 'Adiós',
+  [CoreStringKeys.System_PleaseWait]: 'Por favor espere...',
+  [CoreStringKeys.System_ProcessingRequest]: 'Procesando su solicitud...',
+  [CoreStringKeys.System_OperationComplete]:
+    'Operación completada exitosamente',
+  [CoreStringKeys.System_NoDataAvailable]: 'No hay datos disponibles',
 
-  [CoreStringKey.Error_InstanceAlreadyExistsTemplate]:
+  [CoreStringKeys.Error_InstanceAlreadyExistsTemplate]:
     "La instancia con clave '{key}' ya existe",
-  [CoreStringKey.Error_InstanceNotFoundTemplate]:
+  [CoreStringKeys.Error_InstanceNotFoundTemplate]:
     "Instancia con clave '{key}' no encontrada",
-  [CoreStringKey.Error_MissingStringCollectionTemplate]:
+  [CoreStringKeys.Error_MissingStringCollectionTemplate]:
     'Falta colección de cadenas para el idioma: {language}',
-  [CoreStringKey.Error_MissingTranslationTemplate]:
+  [CoreStringKeys.Error_MissingTranslationTemplate]:
     "Falta traducción para la clave '{key}' en el idioma '{language}'",
-  [CoreStringKey.Error_DefaultLanguageNoCollectionTemplate]:
+  [CoreStringKeys.Error_DefaultLanguageNoCollectionTemplate]:
     "El idioma predeterminado '{language}' no tiene colección de cadenas",
-  [CoreStringKey.Error_MissingTranslationKeyForTypeTemplate]:
+  [CoreStringKeys.Error_MissingTranslationKeyForTypeTemplate]:
     'Falta clave de traducción para el tipo: {type}',
 };

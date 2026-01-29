@@ -3,11 +3,12 @@
 import { createDefaultLanguages } from '../src/core-i18n';
 import { createTranslationAdapter } from '../src/create-translation-adapter';
 import { PluginI18nEngine } from '../src/plugin-i18n-engine';
+import { createI18nStringKeys } from '../src/branded-string-key';
 
-enum TestStringKey {
-  Key1 = 'key1',
-  Key2 = 'key2',
-}
+const TestStringKey = createI18nStringKeys('test-comp', {
+  Key1: 'key1',
+  Key2: 'key2',
+} as const);
 
 describe('createTranslationAdapter coverage', () => {
   let engine: PluginI18nEngine<string>;
@@ -19,7 +20,7 @@ describe('createTranslationAdapter coverage', () => {
       component: {
         id: 'test-comp',
         name: 'Test',
-        stringKeys: Object.values(TestStringKey),
+        stringKeys: TestStringKey,
       },
       strings: {
         'en-US': {

@@ -1,74 +1,74 @@
-import { CoreStringKey } from '../core-string-key';
+import { CoreStringKeys, CoreStringKeyValue } from '../core-string-key';
 
-export const japaneseStrings: Record<CoreStringKey, string> = {
+export const japaneseStrings: Record<CoreStringKeyValue, string> = {
   // Common/General
-  [CoreStringKey.Common_Yes]: 'はい',
-  [CoreStringKey.Common_No]: 'いいえ',
-  [CoreStringKey.Common_Cancel]: 'キャンセル',
-  [CoreStringKey.Common_OK]: 'OK',
-  [CoreStringKey.Common_Save]: '保存',
-  [CoreStringKey.Common_Delete]: '削除',
-  [CoreStringKey.Common_Edit]: '編集',
-  [CoreStringKey.Common_Create]: '作成',
-  [CoreStringKey.Common_Update]: '更新',
-  [CoreStringKey.Common_Loading]: '読み込み中...',
-  [CoreStringKey.Common_Error]: 'エラー',
-  [CoreStringKey.Common_Success]: '成功',
-  [CoreStringKey.Common_Warning]: '警告',
-  [CoreStringKey.Common_Info]: '情報',
-  [CoreStringKey.Common_Disposed]: 'オブジェクトは破棄されました',
-  [CoreStringKey.Common_Test]: 'テスト',
+  [CoreStringKeys.Common_Yes]: 'はい',
+  [CoreStringKeys.Common_No]: 'いいえ',
+  [CoreStringKeys.Common_Cancel]: 'キャンセル',
+  [CoreStringKeys.Common_OK]: 'OK',
+  [CoreStringKeys.Common_Save]: '保存',
+  [CoreStringKeys.Common_Delete]: '削除',
+  [CoreStringKeys.Common_Edit]: '編集',
+  [CoreStringKeys.Common_Create]: '作成',
+  [CoreStringKeys.Common_Update]: '更新',
+  [CoreStringKeys.Common_Loading]: '読み込み中...',
+  [CoreStringKeys.Common_Error]: 'エラー',
+  [CoreStringKeys.Common_Success]: '成功',
+  [CoreStringKeys.Common_Warning]: '警告',
+  [CoreStringKeys.Common_Info]: '情報',
+  [CoreStringKeys.Common_Disposed]: 'オブジェクトは破棄されました',
+  [CoreStringKeys.Common_Test]: 'テスト',
 
   // Error Messages
-  [CoreStringKey.Error_InvalidInput]: '無効な入力が提供されました',
-  [CoreStringKey.Error_NetworkError]: 'ネットワーク接続エラー',
-  [CoreStringKey.Error_NotFound]: 'リソースが見つかりません',
-  [CoreStringKey.Error_AccessDenied]: 'アクセスが拒否されました',
-  [CoreStringKey.Error_InternalServer]: '内部サーバーエラー',
-  [CoreStringKey.Error_ValidationFailed]: '検証に失敗しました',
-  [CoreStringKey.Error_RequiredField]: 'このフィールドは必須です',
-  [CoreStringKey.Error_InvalidContext]: '無効なコンテキスト',
-  [CoreStringKey.Error_InvalidContextTemplate]:
+  [CoreStringKeys.Error_InvalidInput]: '無効な入力が提供されました',
+  [CoreStringKeys.Error_NetworkError]: 'ネットワーク接続エラー',
+  [CoreStringKeys.Error_NotFound]: 'リソースが見つかりません',
+  [CoreStringKeys.Error_AccessDenied]: 'アクセスが拒否されました',
+  [CoreStringKeys.Error_InternalServer]: '内部サーバーエラー',
+  [CoreStringKeys.Error_ValidationFailed]: '検証に失敗しました',
+  [CoreStringKeys.Error_RequiredField]: 'このフィールドは必須です',
+  [CoreStringKeys.Error_InvalidContext]: '無効なコンテキスト',
+  [CoreStringKeys.Error_InvalidContextTemplate]:
     '無効なコンテキスト：{contextKey}',
-  [CoreStringKey.Error_MissingTranslationKeyTemplate]:
+  [CoreStringKeys.Error_MissingTranslationKeyTemplate]:
     '翻訳キーが見つかりません：{stringKey}',
-  [CoreStringKey.Error_InvalidCurrencyCodeTemplate]:
+  [CoreStringKeys.Error_InvalidCurrencyCodeTemplate]:
     '無効な通貨コード：{value}',
 
   // Registry Error Templates
-  [CoreStringKey.Error_ComponentNotFoundTemplate]:
+  [CoreStringKeys.Error_ComponentNotFoundTemplate]:
     'コンポーネント "{componentId}" が見つかりません',
-  [CoreStringKey.Error_LanguageNotFoundTemplate]:
+  [CoreStringKeys.Error_LanguageNotFoundTemplate]:
     '言語 "{language}" が見つかりません',
-  [CoreStringKey.Error_StringKeyNotFoundTemplate]:
+  [CoreStringKeys.Error_StringKeyNotFoundTemplate]:
     'コンポーネント "{componentId}" の文字列キー "{stringKey}" が見つかりません',
-  [CoreStringKey.Error_IncompleteRegistrationTemplate]:
+  [CoreStringKeys.Error_IncompleteRegistrationTemplate]:
     'コンポーネント "{componentId}" の登録が不完全です：{missingCount} 個の文字列が不足しています',
-  [CoreStringKey.Error_DuplicateComponentTemplate]:
+  [CoreStringKeys.Error_DuplicateComponentTemplate]:
     'コンポーネント "{componentId}" は既に登録されています',
-  [CoreStringKey.Error_DuplicateLanguageTemplate]:
+  [CoreStringKeys.Error_DuplicateLanguageTemplate]:
     '言語 "{languageId}" は既に登録されています',
-  [CoreStringKey.Error_ValidationFailedTemplate]:
+  [CoreStringKeys.Error_ValidationFailedTemplate]:
     'コンポーネント "{componentId}" の検証に失敗しました：{errorCount} 個のエラー',
 
   // System Messages
-  [CoreStringKey.System_Welcome]: 'ようこそ',
-  [CoreStringKey.System_Goodbye]: 'さようなら',
-  [CoreStringKey.System_PleaseWait]: 'お待ちください...',
-  [CoreStringKey.System_ProcessingRequest]: 'リクエストを処理中...',
-  [CoreStringKey.System_OperationComplete]: '操作が正常に完了しました',
-  [CoreStringKey.System_NoDataAvailable]: '利用可能なデータがありません',
+  [CoreStringKeys.System_Welcome]: 'ようこそ',
+  [CoreStringKeys.System_Goodbye]: 'さようなら',
+  [CoreStringKeys.System_PleaseWait]: 'お待ちください...',
+  [CoreStringKeys.System_ProcessingRequest]: 'リクエストを処理中...',
+  [CoreStringKeys.System_OperationComplete]: '操作が正常に完了しました',
+  [CoreStringKeys.System_NoDataAvailable]: '利用可能なデータがありません',
 
-  [CoreStringKey.Error_InstanceAlreadyExistsTemplate]:
+  [CoreStringKeys.Error_InstanceAlreadyExistsTemplate]:
     "キー'{key}'のインスタンスは既に存在します",
-  [CoreStringKey.Error_InstanceNotFoundTemplate]:
+  [CoreStringKeys.Error_InstanceNotFoundTemplate]:
     "キー'{key}'のインスタンスが見つかりません",
-  [CoreStringKey.Error_MissingStringCollectionTemplate]:
+  [CoreStringKeys.Error_MissingStringCollectionTemplate]:
     '言語の文字列コレクションがありません: {language}',
-  [CoreStringKey.Error_MissingTranslationTemplate]:
+  [CoreStringKeys.Error_MissingTranslationTemplate]:
     "言語'{language}'でキー'{key}'の翻訳がありません",
-  [CoreStringKey.Error_DefaultLanguageNoCollectionTemplate]:
+  [CoreStringKeys.Error_DefaultLanguageNoCollectionTemplate]:
     "デフォルト言語'{language}'に文字列コレクションがありません",
-  [CoreStringKey.Error_MissingTranslationKeyForTypeTemplate]:
+  [CoreStringKeys.Error_MissingTranslationKeyForTypeTemplate]:
     'タイプの翻訳キーがありません: {type}',
 };

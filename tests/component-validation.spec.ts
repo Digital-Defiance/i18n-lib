@@ -7,6 +7,7 @@ import {
   PluginI18nEngine,
   RegistryError,
 } from '../src';
+import { createI18nStringKeys } from '../src/branded-string-key';
 
 describe('Component Registration Validation', () => {
   // Define test languages
@@ -35,17 +36,26 @@ describe('Component Registration Validation', () => {
     code: 'de',
   };
 
-  // Test string enums
-  enum ComponentAStrings {
-    Welcome = 'welcome',
-    Goodbye = 'goodbye',
-  }
+  // Test string enums using branded enums
+  const ComponentAStrings = createI18nStringKeys('component-a', {
+    Welcome: 'welcome',
+    Goodbye: 'goodbye',
+  } as const);
 
-  enum ComponentBStrings {
-    Save = 'save',
-    Cancel = 'cancel',
-    Delete = 'delete',
-  }
+  const ComponentBStrings = createI18nStringKeys('component-b', {
+    Save: 'save',
+    Cancel: 'cancel',
+    Delete: 'delete',
+  } as const);
+
+  const CoreStrings = createI18nStringKeys('test-core', {
+    error: 'error',
+    success: 'success',
+  } as const);
+
+  const TemplateVarsStrings = createI18nStringKeys('test-template-vars', {
+    greeting: 'greeting',
+  } as const);
 
   let engine: PluginI18nEngine<'en' | 'fr' | 'es' | 'de'>;
 
@@ -58,14 +68,14 @@ describe('Component Registration Validation', () => {
 
   describe('Complete registration validation', () => {
     it('should accept complete registration for all system languages', () => {
-      const componentA: ComponentDefinition<ComponentAStrings> = {
+      const componentA: ComponentDefinition<typeof ComponentAStrings> = {
         id: 'component-a',
         name: 'Component A',
-        stringKeys: Object.values(ComponentAStrings),
+        stringKeys: ComponentAStrings,
       };
 
       const registrationA: ComponentRegistration<
-        ComponentAStrings,
+        typeof ComponentAStrings,
         'en' | 'fr' | 'es'
       > = {
         component: componentA,
@@ -93,15 +103,15 @@ describe('Component Registration Validation', () => {
     });
 
     it('should detect missing languages in component registration', () => {
-      const componentA: ComponentDefinition<ComponentAStrings> = {
+      const componentA: ComponentDefinition<typeof ComponentAStrings> = {
         id: 'component-a-incomplete',
         name: 'Component A Incomplete',
-        stringKeys: Object.values(ComponentAStrings),
+        stringKeys: ComponentAStrings,
       };
 
       // Missing Spanish translations
       const registrationA: ComponentRegistration<
-        ComponentAStrings,
+        typeof ComponentAStrings,
         'en' | 'fr' | 'es'
       > = {
         component: componentA,
@@ -139,14 +149,14 @@ describe('Component Registration Validation', () => {
     });
 
     it('should detect missing string keys within provided languages', () => {
-      const componentB: ComponentDefinition<ComponentBStrings> = {
+      const componentB: ComponentDefinition<typeof ComponentBStrings> = {
         id: 'component-b-partial',
         name: 'Component B Partial',
-        stringKeys: Object.values(ComponentBStrings),
+        stringKeys: ComponentBStrings,
       };
 
       const registrationB: ComponentRegistration<
-        ComponentBStrings,
+        typeof ComponentBStrings,
         'en' | 'fr' | 'es'
       > = {
         component: componentB,
@@ -194,14 +204,14 @@ describe('Component Registration Validation', () => {
 
     it('should allow components with different language coverage when allowPartialRegistration is true', () => {
       // Component A only supports EN and FR
-      const componentA: ComponentDefinition<ComponentAStrings> = {
+      const componentA: ComponentDefinition<typeof ComponentAStrings> = {
         id: 'component-a-limited',
         name: 'Component A Limited',
-        stringKeys: Object.values(ComponentAStrings),
+        stringKeys: ComponentAStrings,
       };
 
       const registrationA: ComponentRegistration<
-        ComponentAStrings,
+        typeof ComponentAStrings,
         'en' | 'fr' | 'es'
       > = {
         component: componentA,
@@ -233,14 +243,14 @@ describe('Component Registration Validation', () => {
       expect(translation).toBe('Welcome'); // Falls back to English
 
       // Component B supports EN and ES only
-      const componentB: ComponentDefinition<ComponentBStrings> = {
+      const componentB: ComponentDefinition<typeof ComponentBStrings> = {
         id: 'component-b-different',
         name: 'Component B Different Languages',
-        stringKeys: Object.values(ComponentBStrings),
+        stringKeys: ComponentBStrings,
       };
 
       const registrationB: ComponentRegistration<
-        ComponentBStrings,
+        typeof ComponentBStrings,
         'en' | 'fr' | 'es'
       > = {
         component: componentB,
@@ -293,14 +303,14 @@ describe('Component Registration Validation', () => {
 
     it('should handle dynamic language addition', () => {
       // Register a component first
-      const componentA: ComponentDefinition<ComponentAStrings> = {
+      const componentA: ComponentDefinition<typeof ComponentAStrings> = {
         id: 'component-dynamic',
         name: 'Component for Dynamic Language Test',
-        stringKeys: Object.values(ComponentAStrings),
+        stringKeys: ComponentAStrings,
       };
 
       const initialRegistration: ComponentRegistration<
-        ComponentAStrings,
+        typeof ComponentAStrings,
         'en' | 'fr' | 'es'
       > = {
         component: componentA,
@@ -327,14 +337,14 @@ describe('Component Registration Validation', () => {
       engine.registerLanguage(germanLang);
 
       // Verify validation now requires German for new registrations
-      const componentB: ComponentDefinition<ComponentBStrings> = {
+      const componentB: ComponentDefinition<typeof ComponentBStrings> = {
         id: 'component-after-german',
         name: 'Component After German Added',
-        stringKeys: Object.values(ComponentBStrings),
+        stringKeys: ComponentBStrings,
       };
 
       const postGermanRegistration: ComponentRegistration<
-        ComponentBStrings,
+        typeof ComponentBStrings,
         'en' | 'fr' | 'es' | 'de'
       > = {
         component: componentB,
@@ -395,14 +405,14 @@ describe('Component Registration Validation', () => {
         },
       });
 
-      const component: ComponentDefinition<ComponentAStrings> = {
+      const component: ComponentDefinition<typeof ComponentAStrings> = {
         id: 'strict-component',
         name: 'Strict Component',
-        stringKeys: Object.values(ComponentAStrings),
+        stringKeys: ComponentAStrings,
       };
 
       const incompleteRegistration: ComponentRegistration<
-        ComponentAStrings,
+        typeof ComponentAStrings,
         'en' | 'fr'
       > = {
         component,
@@ -424,29 +434,29 @@ describe('Component Registration Validation', () => {
   describe('Template Processing (t function)', () => {
     beforeEach(() => {
       // Register a core component for t function testing
-      const coreComponent: ComponentDefinition<'error' | 'success'> = {
-        id: 'core',
+      const coreComponent: ComponentDefinition<typeof CoreStrings> = {
+        id: 'test-core',
         name: 'Core Component',
-        stringKeys: ['error', 'success'],
+        stringKeys: CoreStrings,
       };
 
       const coreRegistration: ComponentRegistration<
-        'error' | 'success',
+        typeof CoreStrings,
         'en' | 'fr' | 'es'
       > = {
         component: coreComponent,
         strings: {
           en: {
-            error: 'Error occurred',
-            success: 'Operation successful',
+            [CoreStrings.error]: 'Error occurred',
+            [CoreStrings.success]: 'Operation successful',
           },
           fr: {
-            error: 'Erreur survenue',
-            success: 'Opération réussie',
+            [CoreStrings.error]: 'Erreur survenue',
+            [CoreStrings.success]: 'Opération réussie',
           },
           es: {
-            error: 'Error ocurrido',
-            success: 'Operación exitosa',
+            [CoreStrings.error]: 'Error ocurrido',
+            [CoreStrings.success]: 'Operación exitosa',
           },
         },
       };
@@ -465,38 +475,38 @@ describe('Component Registration Validation', () => {
     });
 
     it('should process component-based template patterns', () => {
-      const result = engine.t('{{core.error}}');
+      const result = engine.t('{{test-core.error}}');
       expect(result).toBe('Error occurred');
     });
 
     it('should process template patterns with specified language', () => {
-      const result = engine.t('{{core.success}}', 'fr');
+      const result = engine.t('{{test-core.success}}', 'fr');
       expect(result).toBe('Opération réussie');
     });
 
     it('should handle non-existent patterns gracefully', () => {
-      const result = engine.t('{{core.nonexistent}}');
-      expect(result).toBe('[core.nonexistent]');
+      const result = engine.t('{{test-core.nonexistent}}');
+      expect(result).toBe('[test-core.nonexistent]');
     });
 
     it('should process multiple template patterns', () => {
-      const result = engine.t('{{core.error}} - {{core.success}}');
+      const result = engine.t('{{test-core.error}} - {{test-core.success}}');
       expect(result).toBe('Error occurred - Operation successful');
     });
 
     it('should merge multiple variable objects', () => {
       // Register a component with template variables
-      const templateComponent: ComponentDefinition<'greeting'> = {
-        id: 'template-vars',
+      const templateComponent: ComponentDefinition<typeof TemplateVarsStrings> = {
+        id: 'test-template-vars',
         name: 'Template Variables',
-        stringKeys: ['greeting'],
+        stringKeys: TemplateVarsStrings,
       };
 
-      const templateRegistration: ComponentRegistration<'greeting', 'en'> = {
+      const templateRegistration: ComponentRegistration<typeof TemplateVarsStrings, 'en'> = {
         component: templateComponent,
         strings: {
           en: {
-            greeting: '{salutation}, {name}! Today is {day}.',
+            [TemplateVarsStrings.greeting]: '{salutation}, {name}! Today is {day}.',
           },
         },
       };
@@ -504,7 +514,7 @@ describe('Component Registration Validation', () => {
       engine.registerComponent(templateRegistration);
 
       const result = engine.t(
-        '{{template-vars.greeting}}',
+        '{{test-template-vars.greeting}}',
         'en',
         { salutation: 'Hello' },
         { name: 'John' },
@@ -573,14 +583,14 @@ describe('Component Registration Validation', () => {
         const engine2 = PluginI18nEngine.createInstance('test', [englishLang]);
 
         // Register some components
-        const component: ComponentDefinition<ComponentAStrings> = {
+        const component: ComponentDefinition<typeof ComponentAStrings> = {
           id: 'test-component',
           name: 'Test Component',
-          stringKeys: Object.values(ComponentAStrings),
+          stringKeys: ComponentAStrings,
         };
 
         const registration: ComponentRegistration<
-          ComponentAStrings,
+          typeof ComponentAStrings,
           'en' | 'fr'
         > = {
           component,
@@ -669,13 +679,13 @@ describe('Component Registration Validation', () => {
       it('should clear component registrations when clearing instances', () => {
         const engine = new PluginI18nEngine([englishLang]);
 
-        const component: ComponentDefinition<ComponentAStrings> = {
+        const component: ComponentDefinition<typeof ComponentAStrings> = {
           id: 'cleanup-test',
           name: 'Cleanup Test',
-          stringKeys: Object.values(ComponentAStrings),
+          stringKeys: ComponentAStrings,
         };
 
-        const registration: ComponentRegistration<ComponentAStrings, 'en'> = {
+        const registration: ComponentRegistration<typeof ComponentAStrings, 'en'> = {
           component,
           strings: {
             en: {

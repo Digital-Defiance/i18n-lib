@@ -3,7 +3,14 @@
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { ComponentDefinition } from './component-definition';
+import type {
+  AnyBrandedEnum,
+  BrandedEnumValue,
+} from '@digitaldefiance/branded-enum';
+import {
+  ComponentDefinition,
+  getComponentStringKeys,
+} from './component-definition';
 import { ComponentRegistration } from './component-registration';
 import { RegistryError } from './registry-error';
 import { RegistryErrorType } from './registry-error-type';
@@ -17,13 +24,16 @@ import {
 } from './types';
 import { isTemplate, replaceVariables } from './utils';
 import { ValidationConfig } from './validation-config';
-import { ValidationResult } from './validation-result';
+import { ValidationResult, CollisionWarning } from './validation-result';
 
 /**
  * Registry for managing components and their translations
  */
 export class ComponentRegistry<TLanguages extends string> {
-  private readonly components = new Map<string, ComponentDefinition<string>>();
+  private readonly components = new Map<
+    string,
+    ComponentDefinition<AnyBrandedEnum>
+  >();
   private readonly componentStrings = new Map<
     string,
     ComponentLanguageStrings<string, TLanguages>
@@ -58,13 +68,14 @@ export class ComponentRegistry<TLanguages extends string> {
   }
 
   /**
-   * Register a new component with its translations.
+   * Register a new component with its translations using branded string keys.
+   *
    * @param registration - Component registration payload.
-   * @returns ValidationResult indicating success or errors.
+   * @returns ValidationResult indicating success or errors, including collision warnings.
    * @throws RegistryError if component is already registered or validation fails.
    */
-  public registerComponent<TStringKeys extends string>(
-    registration: ComponentRegistration<TStringKeys, TLanguages>,
+  public registerComponent<TBrandedEnum extends AnyBrandedEnum>(
+    registration: ComponentRegistration<TBrandedEnum, TLanguages>,
   ): ValidationResult {
     const { component, strings } = registration;
 
@@ -77,8 +88,22 @@ export class ComponentRegistry<TLanguages extends string> {
       );
     }
 
+    // Get string key values from branded enum
+    const stringKeyValues = getComponentStringKeys(component);
+
+    // Check for string key collisions with existing components
+    const collisionWarnings = this.checkForCollisions(
+      stringKeyValues,
+      component.id,
+    );
+
     // Validate the registration
     const validationResult = this.validateComponentRegistration(registration);
+
+    // Add collision warnings to the result
+    if (collisionWarnings.length > 0) {
+      validationResult.collisionWarnings = collisionWarnings;
+    }
 
     if (
       !validationResult.isValid &&
@@ -104,7 +129,10 @@ export class ComponentRegistry<TLanguages extends string> {
     );
 
     // Register the component
-    this.components.set(component.id, component);
+    this.components.set(
+      component.id,
+      component as ComponentDefinition<AnyBrandedEnum>,
+    );
     this.componentStrings.set(component.id, completeStrings);
 
     return validationResult;
@@ -130,9 +158,16 @@ export class ComponentRegistry<TLanguages extends string> {
       );
     }
 
-    const registration: ComponentRegistration<TStringKeys, TLanguages> = {
-      component: component as ComponentDefinition<TStringKeys>,
-      strings,
+    // Create a synthetic registration for validation
+    const registration: ComponentRegistration<
+      typeof component.stringKeys,
+      TLanguages
+    > = {
+      component,
+      strings: strings as PartialComponentLanguageStrings<
+        BrandedEnumValue<typeof component.stringKeys>,
+        TLanguages
+      >,
     };
 
     const validationResult = this.validateComponentRegistration(registration);
@@ -146,8 +181,11 @@ export class ComponentRegistry<TLanguages extends string> {
         ({} as ComponentLanguageStrings<TStringKeys, TLanguages>);
       const updatedStrings = this.mergeStrings(existingStrings, strings);
       const completeStrings = this.completeStringsWithFallbacks(
-        component as ComponentDefinition<TStringKeys>,
-        updatedStrings,
+        component,
+        updatedStrings as PartialComponentLanguageStrings<
+          BrandedEnumValue<typeof component.stringKeys>,
+          TLanguages
+        >,
       );
 
       this.componentStrings.set(componentId, completeStrings);
@@ -244,7 +282,7 @@ export class ComponentRegistry<TLanguages extends string> {
    * Get all registered components.
    * @returns Array of all registered ComponentDefinition objects.
    */
-  public getComponents(): ReadonlyArray<ComponentDefinition<string>> {
+  public getComponents(): ReadonlyArray<ComponentDefinition<AnyBrandedEnum>> {
     return Array.from(this.components.values());
   }
 
@@ -253,11 +291,11 @@ export class ComponentRegistry<TLanguages extends string> {
    * @param componentId - The ID of the component to retrieve.
    * @returns The ComponentDefinition or undefined if not found.
    */
-  public getComponent<TStringKeys extends string>(
+  public getComponent<TBrandedEnum extends AnyBrandedEnum>(
     componentId: string,
-  ): ComponentDefinition<TStringKeys> | undefined {
+  ): ComponentDefinition<TBrandedEnum> | undefined {
     return this.components.get(componentId) as
-      | ComponentDefinition<TStringKeys>
+      | ComponentDefinition<TBrandedEnum>
       | undefined;
   }
 
@@ -288,10 +326,11 @@ export class ComponentRegistry<TLanguages extends string> {
    * @param registration - Component registration to validate.
    * @returns ValidationResult with details of missing keys and errors.
    */
-  private validateComponentRegistration<TStringKeys extends string>(
-    registration: ComponentRegistration<TStringKeys, TLanguages>,
+  private validateComponentRegistration<TBrandedEnum extends AnyBrandedEnum>(
+    registration: ComponentRegistration<TBrandedEnum, TLanguages>,
   ): ValidationResult {
     const { component, strings } = registration;
+    const stringKeyValues = getComponentStringKeys(component);
     const missingKeys: Array<{
       languageId: string;
       componentId: string;
@@ -310,7 +349,7 @@ export class ComponentRegistry<TLanguages extends string> {
           );
         }
         // Add all missing keys for this language
-        for (const stringKey of component.stringKeys) {
+        for (const stringKey of stringKeyValues) {
           missingKeys.push({
             languageId,
             componentId: component.id,
@@ -321,7 +360,7 @@ export class ComponentRegistry<TLanguages extends string> {
       }
 
       // Check individual string keys
-      for (const stringKey of component.stringKeys) {
+      for (const stringKey of stringKeyValues) {
         if (!languageStrings[stringKey]) {
           missingKeys.push({
             languageId,
@@ -351,16 +390,21 @@ export class ComponentRegistry<TLanguages extends string> {
    * @param strings - Partial strings provided.
    * @returns Complete strings with fallbacks filled in.
    */
-  private completeStringsWithFallbacks<TStringKeys extends string>(
-    component: ComponentDefinition<TStringKeys>,
-    strings: PartialComponentLanguageStrings<TStringKeys, TLanguages>,
-  ): ComponentLanguageStrings<TStringKeys, TLanguages> {
+  private completeStringsWithFallbacks<TBrandedEnum extends AnyBrandedEnum>(
+    component: ComponentDefinition<TBrandedEnum>,
+    strings: PartialComponentLanguageStrings<
+      BrandedEnumValue<TBrandedEnum>,
+      TLanguages
+    >,
+  ): ComponentLanguageStrings<BrandedEnumValue<TBrandedEnum>, TLanguages> {
+    type TStringKeys = BrandedEnumValue<TBrandedEnum>;
     const result: Partial<{
       [L in TLanguages]: ComponentStrings<TStringKeys>;
     }> = {};
     const fallbackLanguage = this.validationConfig
       .fallbackLanguageId as TLanguages;
     const fallbackStrings = strings[fallbackLanguage];
+    const stringKeyValues = getComponentStringKeys(component);
 
     // Ensure all languages have all required keys
     for (const languageId of this.registeredLanguages) {
@@ -368,7 +412,7 @@ export class ComponentRegistry<TLanguages extends string> {
         strings[languageId] || ({} as PartialComponentStrings<TStringKeys>);
       const languageStrings: Partial<{ [K in TStringKeys]: string }> = {};
 
-      for (const stringKey of component.stringKeys) {
+      for (const stringKey of stringKeyValues) {
         if (existingLanguageStrings[stringKey]) {
           languageStrings[stringKey] = existingLanguageStrings[stringKey]!;
         } else if (fallbackStrings && fallbackStrings[stringKey]) {
@@ -429,5 +473,97 @@ export class ComponentRegistry<TLanguages extends string> {
   public clearAllComponents(): void {
     this.components.clear();
     this.componentStrings.clear();
+  }
+
+  /**
+   * Check for string key collisions with already registered components.
+   *
+   * @param stringKeys - The string keys to check for collisions
+   * @param newComponentId - The ID of the component being registered
+   * @returns Array of collision warnings
+   */
+  private checkForCollisions(
+    stringKeys: readonly string[],
+    newComponentId: string,
+  ): CollisionWarning[] {
+    const warnings: CollisionWarning[] = [];
+
+    // Build a map of existing string keys to component IDs
+    const existingKeyToComponents = new Map<string, string[]>();
+
+    for (const [componentId, component] of this.components) {
+      const keys = getComponentStringKeys(component);
+      for (const key of keys) {
+        const existing = existingKeyToComponents.get(key) || [];
+        existing.push(componentId);
+        existingKeyToComponents.set(key, existing);
+      }
+    }
+
+    // Check the new component's keys for collisions
+    for (const key of stringKeys) {
+      const existingComponents = existingKeyToComponents.get(key);
+      if (existingComponents && existingComponents.length > 0) {
+        warnings.push({
+          stringKey: key,
+          componentIds: [...existingComponents, newComponentId],
+          message:
+            `String key '${key}' is already registered by component(s): ${existingComponents.join(', ')}. ` +
+            `Consider using namespaced keys (e.g., '${newComponentId}.${key}') to avoid conflicts.`,
+        });
+      }
+    }
+
+    return warnings;
+  }
+
+  /**
+   * Get all components that have a specific string key.
+   * Useful for debugging collision issues.
+   *
+   * @param stringKey - The string key to look up
+   * @returns Array of component IDs that have this key
+   */
+  public getComponentsWithKey(stringKey: string): string[] {
+    const componentIds: string[] = [];
+
+    for (const [componentId, component] of this.components) {
+      const keys = getComponentStringKeys(component);
+      if (keys.includes(stringKey)) {
+        componentIds.push(componentId);
+      }
+    }
+
+    return componentIds;
+  }
+
+  /**
+   * Check all registered components for collisions.
+   * Returns a report of all string keys that appear in multiple components.
+   *
+   * @returns Map of string keys to component IDs that share them
+   */
+  public getCollisionReport(): Map<string, string[]> {
+    const keyToComponents = new Map<string, string[]>();
+
+    // Collect all keys from all components
+    for (const [componentId, component] of this.components) {
+      const keys = getComponentStringKeys(component);
+      for (const key of keys) {
+        const existing = keyToComponents.get(key) || [];
+        existing.push(componentId);
+        keyToComponents.set(key, existing);
+      }
+    }
+
+    // Filter to only collisions (more than one component)
+    const collisions = new Map<string, string[]>();
+    for (const [key, components] of keyToComponents) {
+      if (components.length > 1) {
+        collisions.set(key, components);
+      }
+    }
+
+    return collisions;
   }
 }

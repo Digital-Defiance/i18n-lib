@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 import { ContextErrorType } from '../context-error-type';
 import { CoreI18nComponentId } from '../core-component-id';
-import { CoreStringKey } from '../core-string-key';
+import { CoreStringKeys } from '../core-string-key';
 import { EnhancedErrorHelper } from './enhanced-error-base';
 
 // Lazy reference to I18nEngine to avoid circular dependencies
@@ -64,13 +64,13 @@ export class ContextError extends Error {
       message = contextKey
         ? engine.safeTranslate(
             CoreI18nComponentId,
-            CoreStringKey.Error_InvalidContextTemplate,
+            CoreStringKeys.Error_InvalidContextTemplate,
             allVars,
             language,
           )
         : engine.safeTranslate(
             CoreI18nComponentId,
-            CoreStringKey.Error_InvalidContext,
+            CoreStringKeys.Error_InvalidContext,
             allVars,
             language,
           );

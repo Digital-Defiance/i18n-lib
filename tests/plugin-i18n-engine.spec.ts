@@ -8,6 +8,7 @@ import {
   LanguageRegistry,
   PluginI18nEngine,
 } from '../src';
+import { createI18nStringKeys } from '../src/branded-string-key';
 import { CurrencyCode } from '../src/utils/currency';
 import { Timezone } from '../src/utils/timezone';
 
@@ -32,17 +33,18 @@ describe('PluginI18nEngine', () => {
     code: 'es',
   };
 
-  // Test string enums
-  enum TestStrings {
-    Welcome = 'welcome',
-    Goodbye = 'goodbye',
-    Template = 'template',
-  }
+  // Test string enums (using branded enums)
+  // Use unique test-prefixed IDs to avoid conflicts with globally registered enums
+  const TestStrings = createI18nStringKeys('test-plugin-i18n-engine-test-component', {
+    Welcome: 'welcome',
+    Goodbye: 'goodbye',
+    Template: 'template',
+  } as const);
 
-  enum CoreStrings {
-    Error = 'error',
-    Success = 'success',
-  }
+  const CoreStrings = createI18nStringKeys('test-plugin-i18n-engine-core', {
+    Error: 'error',
+    Success: 'success',
+  } as const);
 
   let engine: PluginI18nEngine<'en' | 'fr' | 'es'>;
 
@@ -91,14 +93,14 @@ describe('PluginI18nEngine', () => {
 
   describe('component registration and translation', () => {
     beforeEach(() => {
-      const testComponent: ComponentDefinition<TestStrings> = {
+      const testComponent: ComponentDefinition<typeof TestStrings> = {
         id: 'test-component',
         name: 'Test Component',
-        stringKeys: Object.values(TestStrings),
+        stringKeys: TestStrings,
       };
 
       const registration: ComponentRegistration<
-        TestStrings,
+        typeof TestStrings,
         'en' | 'fr' | 'es'
       > = {
         component: testComponent,
@@ -125,13 +127,13 @@ describe('PluginI18nEngine', () => {
     });
 
     it('should not throw when using registerComponentIfNotExists on duplicate', () => {
-      const testComponent: ComponentDefinition<TestStrings> = {
+      const testComponent: ComponentDefinition<typeof TestStrings> = {
         id: 'test-component',
         name: 'Test Component',
-        stringKeys: Object.values(TestStrings),
+        stringKeys: TestStrings,
       };
 
-      const registration: ComponentRegistration<TestStrings, 'en'> = {
+      const registration: ComponentRegistration<typeof TestStrings, 'en'> = {
         component: testComponent,
         strings: { en: { [TestStrings.Welcome]: 'Welcome' } },
       };
@@ -143,14 +145,14 @@ describe('PluginI18nEngine', () => {
     });
 
     it('should register component when using registerComponentIfNotExists on new component', () => {
-      const newComponent: ComponentDefinition<TestStrings> = {
+      const newComponent: ComponentDefinition<typeof TestStrings> = {
         id: 'new-component',
         name: 'New Component',
-        stringKeys: Object.values(TestStrings),
+        stringKeys: TestStrings,
       };
 
       const registration: ComponentRegistration<
-        TestStrings,
+        typeof TestStrings,
         'en' | 'fr' | 'es'
       > = {
         component: newComponent,
@@ -222,20 +224,20 @@ describe('PluginI18nEngine', () => {
   });
 
   describe('component alias resolution', () => {
-    enum AliasStrings {
-      WelcomeMessage = 'welcomeMessage',
-      FarewellTemplate = 'farewellTemplate',
-    }
+    const AliasStrings = createI18nStringKeys('test-plugin-i18n-engine-alias', {
+      WelcomeMessage: 'welcomeMessage',
+      FarewellTemplate: 'farewellTemplate',
+    } as const);
 
     beforeEach(() => {
-      const aliasComponent: ComponentDefinition<AliasStrings> = {
+      const aliasComponent: ComponentDefinition<typeof AliasStrings> = {
         id: 'alias-component',
         name: 'Alias Component',
-        stringKeys: Object.values(AliasStrings),
+        stringKeys: AliasStrings,
       };
 
       const aliasRegistration: ComponentRegistration<
-        AliasStrings,
+        typeof AliasStrings,
         'en' | 'fr' | 'es'
       > = {
         component: aliasComponent,
@@ -253,9 +255,7 @@ describe('PluginI18nEngine', () => {
             [AliasStrings.FarewellTemplate]: '¡Adiós, {name}!',
           },
         },
-        enumName: 'AliasStrings',
-        enumObject: AliasStrings,
-        aliases: ['AliasComponent'],
+        aliases: ['AliasComponent', 'AliasStrings'],
       };
 
       engine.registerComponent(aliasRegistration);
@@ -294,21 +294,25 @@ describe('PluginI18nEngine', () => {
         constants,
       });
 
-      const component: ComponentDefinition<'siteTemplate'> = {
+      const SiteTemplateStrings = createI18nStringKeys('test-plugin-i18n-engine-site-template', {
+        siteTemplate: 'siteTemplate',
+      } as const);
+
+      const component: ComponentDefinition<typeof SiteTemplateStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['siteTemplate'],
+        stringKeys: SiteTemplateStrings,
       };
 
-      const registration: ComponentRegistration<'siteTemplate', 'en'> = {
+      const registration: ComponentRegistration<typeof SiteTemplateStrings, 'en'> = {
         component,
         strings: {
-          en: { siteTemplate: 'Welcome to {Site} v{Version}' },
+          en: { [SiteTemplateStrings.siteTemplate]: 'Welcome to {Site} v{Version}' },
         },
       };
 
       engineWithConstants.registerComponent(registration);
-      const result = engineWithConstants.translate('test', 'siteTemplate');
+      const result = engineWithConstants.translate('test', SiteTemplateStrings.siteTemplate);
       expect(result).toBe('Welcome to TestSite.com v1.0');
     });
 
@@ -319,21 +323,25 @@ describe('PluginI18nEngine', () => {
         constants,
       });
 
-      const component: ComponentDefinition<'greetingTemplate'> = {
+      const GreetingTemplateStrings = createI18nStringKeys('test-plugin-i18n-engine-greeting-template', {
+        greetingTemplate: 'greetingTemplate',
+      } as const);
+
+      const component: ComponentDefinition<typeof GreetingTemplateStrings> = {
         id: 'test',
         name: 'Test',
-        stringKeys: ['greetingTemplate'],
+        stringKeys: GreetingTemplateStrings,
       };
 
-      const registration: ComponentRegistration<'greetingTemplate', 'en'> = {
+      const registration: ComponentRegistration<typeof GreetingTemplateStrings, 'en'> = {
         component,
         strings: {
-          en: { greetingTemplate: 'Hello {name}' },
+          en: { [GreetingTemplateStrings.greetingTemplate]: 'Hello {name}' },
         },
       };
 
       engineWithConstants.registerComponent(registration);
-      const result = engineWithConstants.translate('test', 'greetingTemplate', {
+      const result = engineWithConstants.translate('test', GreetingTemplateStrings.greetingTemplate, {
         name: 'VariableName',
       });
       expect(result).toBe('Hello VariableName');
@@ -343,14 +351,14 @@ describe('PluginI18nEngine', () => {
   describe('t function (template processor)', () => {
     beforeEach(() => {
       // Register core component for t function testing
-      const coreComponent: ComponentDefinition<CoreStrings> = {
+      const coreComponent: ComponentDefinition<typeof CoreStrings> = {
         id: CoreI18nComponentId,
         name: 'Core Component',
-        stringKeys: Object.values(CoreStrings),
+        stringKeys: CoreStrings,
       };
 
       const coreRegistration: ComponentRegistration<
-        CoreStrings,
+        typeof CoreStrings,
         'en' | 'fr' | 'es'
       > = {
         component: coreComponent,
@@ -390,26 +398,30 @@ describe('PluginI18nEngine', () => {
 
     it('should process template patterns with variables', () => {
       // Register a component with template strings for this test
-      const templateComponent: ComponentDefinition<'greeting'> = {
+      const GreetingStrings = createI18nStringKeys('test-plugin-i18n-engine-template-test', {
+        greeting: 'greeting',
+      } as const);
+
+      const templateComponent: ComponentDefinition<typeof GreetingStrings> = {
         id: 'template-test',
         name: 'Template Test',
-        stringKeys: ['greeting'],
+        stringKeys: GreetingStrings,
       };
 
       const templateRegistration: ComponentRegistration<
-        'greeting',
+        typeof GreetingStrings,
         'en' | 'fr' | 'es'
       > = {
         component: templateComponent,
         strings: {
           en: {
-            greeting: 'Hello, {name}!',
+            [GreetingStrings.greeting]: 'Hello, {name}!',
           },
           fr: {
-            greeting: 'Bonjour, {name}!',
+            [GreetingStrings.greeting]: 'Bonjour, {name}!',
           },
           es: {
-            greeting: '¡Hola, {name}!',
+            [GreetingStrings.greeting]: '¡Hola, {name}!',
           },
         },
       };
@@ -434,17 +446,21 @@ describe('PluginI18nEngine', () => {
 
     it('should merge multiple variable objects', () => {
       // Register a component with multiple variables
-      const multiVarComponent: ComponentDefinition<'multi'> = {
+      const MultiStrings = createI18nStringKeys('test-plugin-i18n-engine-multi-var', {
+        multi: 'multi',
+      } as const);
+
+      const multiVarComponent: ComponentDefinition<typeof MultiStrings> = {
         id: 'multi-var',
         name: 'Multi Variable',
-        stringKeys: ['multi'],
+        stringKeys: MultiStrings,
       };
 
-      const multiVarRegistration: ComponentRegistration<'multi', 'en'> = {
+      const multiVarRegistration: ComponentRegistration<typeof MultiStrings, 'en'> = {
         component: multiVarComponent,
         strings: {
           en: {
-            multi: '{greeting}, {name}! Today is {day}.',
+            [MultiStrings.multi]: '{greeting}, {name}! Today is {day}.',
           },
         },
       };
@@ -471,20 +487,24 @@ describe('PluginI18nEngine', () => {
 
     it('should handle template strings with variables correctly', () => {
       // Register a component with a template string
-      const greetingComponent: ComponentDefinition<'greetingTemplate'> = {
+      const GreetingTemplateStrings = createI18nStringKeys('test-plugin-i18n-engine-greeting', {
+        greetingTemplate: 'greetingTemplate',
+      } as const);
+
+      const greetingComponent: ComponentDefinition<typeof GreetingTemplateStrings> = {
         id: 'greeting',
         name: 'Greeting',
-        stringKeys: ['greetingTemplate'],
+        stringKeys: GreetingTemplateStrings,
       };
 
       const greetingRegistration: ComponentRegistration<
-        'greetingTemplate',
+        typeof GreetingTemplateStrings,
         'en'
       > = {
         component: greetingComponent,
         strings: {
           en: {
-            greetingTemplate: 'Welcome, {name}!',
+            [GreetingTemplateStrings.greetingTemplate]: 'Welcome, {name}!',
           },
         },
       };
@@ -618,13 +638,13 @@ describe('PluginI18nEngine', () => {
     it('should check if component exists', () => {
       expect(engine.hasComponent('nonexistent')).toBe(false);
 
-      const component: ComponentDefinition<TestStrings> = {
+      const component: ComponentDefinition<typeof TestStrings> = {
         id: 'test-exists',
         name: 'Test Exists',
-        stringKeys: Object.values(TestStrings),
+        stringKeys: TestStrings,
       };
 
-      const registration: ComponentRegistration<TestStrings, 'en'> = {
+      const registration: ComponentRegistration<typeof TestStrings, 'en'> = {
         component,
         strings: {
           en: {
@@ -645,13 +665,13 @@ describe('PluginI18nEngine', () => {
     });
 
     it('should update component strings', () => {
-      const component: ComponentDefinition<TestStrings> = {
+      const component: ComponentDefinition<typeof TestStrings> = {
         id: 'update-test',
         name: 'Update Test',
-        stringKeys: Object.values(TestStrings),
+        stringKeys: TestStrings,
       };
 
-      const registration: ComponentRegistration<TestStrings, 'en'> = {
+      const registration: ComponentRegistration<typeof TestStrings, 'en'> = {
         component,
         strings: {
           en: {
@@ -683,13 +703,13 @@ describe('PluginI18nEngine', () => {
     });
 
     it('should clear all components', () => {
-      const component: ComponentDefinition<TestStrings> = {
+      const component: ComponentDefinition<typeof TestStrings> = {
         id: 'clear-test',
         name: 'Clear Test',
-        stringKeys: Object.values(TestStrings),
+        stringKeys: TestStrings,
       };
 
-      const registration: ComponentRegistration<TestStrings, 'en'> = {
+      const registration: ComponentRegistration<typeof TestStrings, 'en'> = {
         component,
         strings: {
           en: {
@@ -710,14 +730,14 @@ describe('PluginI18nEngine', () => {
 
   describe('validation', () => {
     it('should validate all components', () => {
-      const component: ComponentDefinition<TestStrings> = {
+      const component: ComponentDefinition<typeof TestStrings> = {
         id: 'validation-test',
         name: 'Validation Test',
-        stringKeys: Object.values(TestStrings),
+        stringKeys: TestStrings,
       };
 
       const completeRegistration: ComponentRegistration<
-        TestStrings,
+        typeof TestStrings,
         'en' | 'fr' | 'es'
       > = {
         component,
@@ -748,14 +768,14 @@ describe('PluginI18nEngine', () => {
     });
 
     it('should detect validation errors', () => {
-      const component: ComponentDefinition<TestStrings> = {
+      const component: ComponentDefinition<typeof TestStrings> = {
         id: 'incomplete-test',
         name: 'Incomplete Test',
-        stringKeys: Object.values(TestStrings),
+        stringKeys: TestStrings,
       };
 
       const incompleteRegistration: ComponentRegistration<
-        TestStrings,
+        typeof TestStrings,
         'en' | 'fr' | 'es'
       > = {
         component,
@@ -907,48 +927,56 @@ describe('PluginI18nEngine', () => {
     });
 
     it('should return actual translation when component exists', () => {
-      const component: ComponentDefinition<'testKey'> = {
+      const TestKeyStrings = createI18nStringKeys('test-plugin-i18n-engine-safe-test', {
+        testKey: 'testKey',
+      } as const);
+
+      const component: ComponentDefinition<typeof TestKeyStrings> = {
         id: 'safe-test',
         name: 'Safe Test',
-        stringKeys: ['testKey'],
+        stringKeys: TestKeyStrings,
       };
 
-      const registration: ComponentRegistration<'testKey', 'en'> = {
+      const registration: ComponentRegistration<typeof TestKeyStrings, 'en'> = {
         component,
         strings: {
           en: {
-            testKey: 'Test Value',
+            [TestKeyStrings.testKey]: 'Test Value',
           },
         },
       };
 
       engine.registerComponent(registration);
 
-      const result = engine.safeTranslate('safe-test', 'testKey');
+      const result = engine.safeTranslate('safe-test', TestKeyStrings.testKey);
       expect(result).toBe('Test Value');
       expect(result).not.toContain('[');
       expect(result).not.toContain(']');
     });
 
     it('should handle variables in safe translate', () => {
-      const component: ComponentDefinition<'template'> = {
+      const TemplateStrings = createI18nStringKeys('test-plugin-i18n-engine-var-test', {
+        template: 'template',
+      } as const);
+
+      const component: ComponentDefinition<typeof TemplateStrings> = {
         id: 'var-test',
         name: 'Variable Test',
-        stringKeys: ['template'],
+        stringKeys: TemplateStrings,
       };
 
-      const registration: ComponentRegistration<'template', 'en'> = {
+      const registration: ComponentRegistration<typeof TemplateStrings, 'en'> = {
         component,
         strings: {
           en: {
-            template: 'Hello, {name}!',
+            [TemplateStrings.template]: 'Hello, {name}!',
           },
         },
       };
 
       engine.registerComponent(registration);
 
-      const result = engine.safeTranslate('var-test', 'template', {
+      const result = engine.safeTranslate('var-test', TemplateStrings.template, {
         name: 'World',
       });
       expect(result).toBe('Hello, World!');

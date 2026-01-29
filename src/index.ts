@@ -27,6 +27,17 @@ import { I18nEngine } from './core/i18n-engine';
 export function resetAll(): void {
   I18nEngine.resetAll();
 }
+// =============================================================================
+// Branded Enum Integration (New in v4)
+// =============================================================================
+// These exports provide runtime-identifiable string keys for i18n
+export * from './branded-string-key';
+// Re-export key types from branded-enum for convenience
+export type {
+  BrandedEnum,
+  BrandedEnumValue,
+  AnyBrandedEnum,
+} from '@digitaldefiance/branded-enum';
 // Legacy exports (deprecated - for backwards compatibility)
 export * from './active-context';
 export * from './component-definition';

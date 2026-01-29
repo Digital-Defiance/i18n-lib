@@ -5,13 +5,14 @@ import { createTranslationAdapter } from '../src/create-translation-adapter';
 import { LanguageCodes } from '../src/language-codes';
 import { LanguageDefinition } from '../src/language-definition';
 import { PluginI18nEngine } from '../src/plugin-i18n-engine';
+import { createI18nStringKeys } from '../src/branded-string-key';
 
 describe('createTranslationAdapter', () => {
-  enum TestStringKey {
-    TestKey1 = 'test_key_1',
-    TestKey2 = 'test_key_2',
-    TestKeyWithVars = 'test_key_with_vars',
-  }
+  const TestStringKey = createI18nStringKeys('test-component', {
+    TestKey1: 'test_key_1',
+    TestKey2: 'test_key_2',
+    TestKeyWithVars: 'test_key_with_vars',
+  } as const);
 
   const testLanguages: LanguageDefinition[] = [
     {
@@ -50,13 +51,13 @@ describe('createTranslationAdapter', () => {
     pluginEngine = new PluginI18nEngine(testLanguages);
 
     const registration: ComponentRegistration<
-      TestStringKey,
+      typeof TestStringKey,
       typeof LanguageCodes.EN_US | typeof LanguageCodes.FR
     > = {
       component: {
         id: 'test-component',
         name: 'Test Component',
-        stringKeys: Object.values(TestStringKey),
+        stringKeys: TestStringKey,
       },
       strings: testStrings,
     };
@@ -157,13 +158,13 @@ describe('createTranslationAdapter', () => {
   describe('Multiple components', () => {
     beforeEach(() => {
       const secondRegistration: ComponentRegistration<
-        TestStringKey,
+        typeof TestStringKey,
         typeof LanguageCodes.EN_US | typeof LanguageCodes.FR
       > = {
         component: {
           id: 'second-component',
           name: 'Second Component',
-          stringKeys: Object.values(TestStringKey),
+          stringKeys: TestStringKey,
         },
         strings: {
           [LanguageCodes.EN_US]: {
@@ -221,27 +222,32 @@ describe('createTranslationAdapter', () => {
 
   describe('Type safety', () => {
     it('should work with generic string key types', () => {
-      type CustomKey = 'custom_key_1' | 'custom_key_2';
+      const CustomKeys = createI18nStringKeys('custom-component', {
+        CustomKey1: 'custom_key_1',
+        CustomKey2: 'custom_key_2',
+      } as const);
+
+      type CustomKey = typeof CustomKeys[keyof typeof CustomKeys];
 
       const customStrings = {
         [LanguageCodes.EN_US]: {
-          custom_key_1: 'Custom 1',
-          custom_key_2: 'Custom 2',
+          [CustomKeys.CustomKey1]: 'Custom 1',
+          [CustomKeys.CustomKey2]: 'Custom 2',
         },
         [LanguageCodes.FR]: {
-          custom_key_1: 'Personnalisé 1',
-          custom_key_2: 'Personnalisé 2',
+          [CustomKeys.CustomKey1]: 'Personnalisé 1',
+          [CustomKeys.CustomKey2]: 'Personnalisé 2',
         },
       };
 
       const customRegistration: ComponentRegistration<
-        CustomKey,
+        typeof CustomKeys,
         typeof LanguageCodes.EN_US | typeof LanguageCodes.FR
       > = {
         component: {
           id: 'custom-component',
           name: 'Custom Component',
-          stringKeys: ['custom_key_1', 'custom_key_2'],
+          stringKeys: CustomKeys,
         },
         strings: customStrings,
       };
@@ -253,7 +259,7 @@ describe('createTranslationAdapter', () => {
         typeof LanguageCodes.EN_US | typeof LanguageCodes.FR
       >(pluginEngine, 'custom-component');
 
-      const result = adapter.translate('custom_key_1' as CustomKey);
+      const result = adapter.translate(CustomKeys.CustomKey1);
       expect(result).toBe('Custom 1');
     });
   });
@@ -302,13 +308,13 @@ describe('createTranslationAdapter', () => {
   describe('Edge cases', () => {
     it('should handle component ID with special characters', () => {
       const specialRegistration: ComponentRegistration<
-        TestStringKey,
+        typeof TestStringKey,
         typeof LanguageCodes.EN_US | typeof LanguageCodes.FR
       > = {
         component: {
           id: 'test-component-with-dashes_and_underscores',
           name: 'Special Component',
-          stringKeys: Object.values(TestStringKey),
+          stringKeys: TestStringKey,
         },
         strings: testStrings,
       };
@@ -326,7 +332,7 @@ describe('createTranslationAdapter', () => {
 
     it('should handle empty string key gracefully', () => {
       const adapter = createTranslationAdapter(pluginEngine, 'test-component');
-      const result = adapter.safeTranslate('' as TestStringKey);
+      const result = adapter.safeTranslate('' as typeof TestStringKey[keyof typeof TestStringKey]);
 
       expect(result).toBeDefined();
       expect(typeof result).toBe('string');
@@ -334,7 +340,7 @@ describe('createTranslationAdapter', () => {
 
     it('should handle numeric-like string keys', () => {
       const adapter = createTranslationAdapter(pluginEngine, 'test-component');
-      const result = adapter.safeTranslate('123' as TestStringKey);
+      const result = adapter.safeTranslate('123' as typeof TestStringKey[keyof typeof TestStringKey]);
 
       expect(result).toBeDefined();
       expect(typeof result).toBe('string');

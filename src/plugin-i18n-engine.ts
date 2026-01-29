@@ -3,6 +3,8 @@
  */
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return, import/order */
 
+import type { AnyBrandedEnum } from '@digitaldefiance/branded-enum';
+import { getEnumValues } from '@digitaldefiance/branded-enum';
 import { ComponentDefinition } from './component-definition';
 import { ComponentRegistration } from './component-registration';
 import { ComponentRegistry } from './component-registry';
@@ -20,6 +22,11 @@ import { TranslationResponse } from './translation-response';
 import { EnumLanguageTranslation } from './types';
 import { CurrencyCode } from './utils/currency';
 import { Timezone } from './utils/timezone';
+import { ValidationResult } from './validation-result';
+import {
+  findStringKeySources,
+  resolveStringKeyComponent,
+} from './branded-string-key';
 
 /**
  * Plugin-based I18n Engine with registration capabilities
@@ -223,18 +230,15 @@ export class PluginI18nEngine<TLanguages extends string> {
     return { componentId, stringKey: rawKey };
   }
 
-  private registerComponentMetadata<TStringKeys extends string>(
-    registration: ComponentRegistration<TStringKeys, TLanguages>,
+  private registerComponentMetadata<TBrandedEnum extends AnyBrandedEnum>(
+    registration: ComponentRegistration<TBrandedEnum, TLanguages>,
   ): void {
-    const { component, enumName, enumObject, aliases } = registration;
+    const { component, aliases } = registration;
     const componentId = component.id;
 
     const aliasSet = new Set<string>();
     if (componentId) {
       aliasSet.add(componentId);
-    }
-    if (enumName) {
-      aliasSet.add(enumName);
     }
     aliases?.forEach((alias) => {
       if (alias) aliasSet.add(alias);
@@ -261,16 +265,17 @@ export class PluginI18nEngine<TLanguages extends string> {
       }
     };
 
-    component.stringKeys.forEach((key) => {
+    // Get string key values from branded enum
+    const stringKeyValues = getEnumValues(component.stringKeys) ?? [];
+    stringKeyValues.forEach((key) => {
       addKeyVariant(key, key);
     });
 
-    if (enumObject) {
-      Object.entries(enumObject).forEach(([enumKey, enumValue]) => {
-        if (typeof enumValue === 'string') {
-          addKeyVariant(enumKey, enumValue);
-        }
-      });
+    // Also map enum keys (e.g., 'Welcome') to their values (e.g., 'welcome')
+    for (const [enumKey, enumValue] of Object.entries(component.stringKeys)) {
+      if (typeof enumValue === 'string') {
+        addKeyVariant(enumKey, enumValue);
+      }
     }
   }
 
@@ -373,11 +378,30 @@ export class PluginI18nEngine<TLanguages extends string> {
   }
 
   /**
-   * Register a component with its translations
+   * Register a component with its translations using branded string keys
+   *
+   * @example
+   * ```typescript
+   * const MyKeys = createI18nStringKeys('my-component', {
+   *   Welcome: 'my.welcome',
+   *   Goodbye: 'my.goodbye',
+   * } as const);
+   *
+   * engine.registerComponent({
+   *   component: {
+   *     id: 'my-component',
+   *     name: 'My Component',
+   *     stringKeys: MyKeys,
+   *   },
+   *   strings: {
+   *     'en-US': { 'my.welcome': 'Welcome!', 'my.goodbye': 'Goodbye!' },
+   *   },
+   * });
+   * ```
    */
-  public registerComponent<TStringKeys extends string>(
-    registration: ComponentRegistration<TStringKeys, TLanguages>,
-  ) {
+  public registerComponent<TBrandedEnum extends AnyBrandedEnum>(
+    registration: ComponentRegistration<TBrandedEnum, TLanguages>,
+  ): ValidationResult {
     const validationResult =
       this.componentRegistry.registerComponent(registration);
     this.registerComponentMetadata(registration);
@@ -385,10 +409,19 @@ export class PluginI18nEngine<TLanguages extends string> {
   }
 
   /**
+   * @deprecated Use registerComponent instead - all components now use branded string keys
+   */
+  public registerBrandedComponent<TBrandedEnum extends AnyBrandedEnum>(
+    registration: ComponentRegistration<TBrandedEnum, TLanguages>,
+  ): ValidationResult {
+    return this.registerComponent(registration);
+  }
+
+  /**
    * Register a component only if it doesn't already exist
    */
-  public registerComponentIfNotExists<TStringKeys extends string>(
-    registration: ComponentRegistration<TStringKeys, TLanguages>,
+  public registerComponentIfNotExists<TBrandedEnum extends AnyBrandedEnum>(
+    registration: ComponentRegistration<TBrandedEnum, TLanguages>,
   ) {
     if (this.hasComponent(registration.component.id)) {
       return { isValid: true, errors: [], warnings: [] };
@@ -646,7 +679,8 @@ export class PluginI18nEngine<TLanguages extends string> {
           continue;
         }
 
-        for (const stringKey of component.stringKeys) {
+        const stringKeyValues = getEnumValues(component.stringKeys) ?? [];
+        for (const stringKey of stringKeyValues) {
           if (!languageStrings[stringKey]) {
             warnings.push(
               `Component '${component.id}' missing key '${stringKey}' for language '${language}'`,
@@ -657,6 +691,62 @@ export class PluginI18nEngine<TLanguages extends string> {
     }
 
     return { isValid, errors, warnings };
+  }
+
+  /**
+   * Get a collision report for all registered components.
+   *
+   * Returns a map of string keys that appear in multiple components,
+   * which can help identify potential routing issues.
+   *
+   * @example
+   * ```typescript
+   * const collisions = engine.getCollisionReport();
+   * for (const [key, componentIds] of collisions) {
+   *   console.warn(`Key "${key}" found in: ${componentIds.join(', ')}`);
+   * }
+   * ```
+   */
+  public getCollisionReport(): Map<string, string[]> {
+    return this.componentRegistry.getCollisionReport();
+  }
+
+  /**
+   * Find which components contain a specific string key.
+   *
+   * Useful for debugging when a key appears in multiple components.
+   *
+   * @param stringKey - The string key to look up
+   * @returns Array of component IDs that contain this key
+   */
+  public findComponentsWithKey(stringKey: string): string[] {
+    return this.componentRegistry.getComponentsWithKey(stringKey);
+  }
+
+  /**
+   * Resolve a string key to its owning component.
+   *
+   * Uses the branded enum registry to identify the source component.
+   * Returns null if the key is not found or is ambiguous (multiple sources).
+   *
+   * @param stringKey - The string key to resolve
+   * @returns The component ID, or null if not found or ambiguous
+   */
+  public resolveKeyToComponent(stringKey: string): string | null {
+    return resolveStringKeyComponent(stringKey);
+  }
+
+  /**
+   * Find all registered branded enum sources for a string key.
+   *
+   * This searches the global branded enum registry for components
+   * that have registered this key via branded enums.
+   *
+   * @param stringKey - The string key to look up
+   * @returns Array of component IDs (from branded enum registry)
+   */
+  public findBrandedKeySources(stringKey: string): string[] {
+    return findStringKeySources(stringKey);
   }
 
   /**

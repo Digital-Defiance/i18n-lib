@@ -1,73 +1,74 @@
-import { CoreStringKey } from '../core-string-key';
+import { CoreStringKeys, CoreStringKeyValue } from '../core-string-key';
 
-export const americanEnglishString: Record<CoreStringKey, string> = {
+export const americanEnglishString: Record<CoreStringKeyValue, string> = {
   // Common/General
-  [CoreStringKey.Common_Yes]: 'Yes',
-  [CoreStringKey.Common_No]: 'No',
-  [CoreStringKey.Common_Cancel]: 'Cancel',
-  [CoreStringKey.Common_OK]: 'OK',
-  [CoreStringKey.Common_Save]: 'Save',
-  [CoreStringKey.Common_Delete]: 'Delete',
-  [CoreStringKey.Common_Edit]: 'Edit',
-  [CoreStringKey.Common_Create]: 'Create',
-  [CoreStringKey.Common_Update]: 'Update',
-  [CoreStringKey.Common_Loading]: 'Loading...',
-  [CoreStringKey.Common_Error]: 'Error',
-  [CoreStringKey.Common_Success]: 'Success',
-  [CoreStringKey.Common_Warning]: 'Warning',
-  [CoreStringKey.Common_Info]: 'Information',
-  [CoreStringKey.Common_Disposed]: 'Object has been disposed',
-  [CoreStringKey.Common_Test]: 'Test',
+  [CoreStringKeys.Common_Yes]: 'Yes',
+  [CoreStringKeys.Common_No]: 'No',
+  [CoreStringKeys.Common_Cancel]: 'Cancel',
+  [CoreStringKeys.Common_OK]: 'OK',
+  [CoreStringKeys.Common_Save]: 'Save',
+  [CoreStringKeys.Common_Delete]: 'Delete',
+  [CoreStringKeys.Common_Edit]: 'Edit',
+  [CoreStringKeys.Common_Create]: 'Create',
+  [CoreStringKeys.Common_Update]: 'Update',
+  [CoreStringKeys.Common_Loading]: 'Loading...',
+  [CoreStringKeys.Common_Error]: 'Error',
+  [CoreStringKeys.Common_Success]: 'Success',
+  [CoreStringKeys.Common_Warning]: 'Warning',
+  [CoreStringKeys.Common_Info]: 'Information',
+  [CoreStringKeys.Common_Disposed]: 'Object has been disposed',
+  [CoreStringKeys.Common_Test]: 'Test',
 
   // Error Messages
-  [CoreStringKey.Error_InvalidInput]: 'Invalid input provided',
-  [CoreStringKey.Error_NetworkError]: 'Network connection error',
-  [CoreStringKey.Error_NotFound]: 'Resource not found',
-  [CoreStringKey.Error_AccessDenied]: 'Access denied',
-  [CoreStringKey.Error_InternalServer]: 'Internal server error',
-  [CoreStringKey.Error_ValidationFailed]: 'Validation failed',
-  [CoreStringKey.Error_RequiredField]: 'This field is required',
-  [CoreStringKey.Error_InvalidContext]: 'Invalid context',
-  [CoreStringKey.Error_InvalidContextTemplate]: 'Invalid context: {contextKey}',
-  [CoreStringKey.Error_MissingTranslationKeyTemplate]:
+  [CoreStringKeys.Error_InvalidInput]: 'Invalid input provided',
+  [CoreStringKeys.Error_NetworkError]: 'Network connection error',
+  [CoreStringKeys.Error_NotFound]: 'Resource not found',
+  [CoreStringKeys.Error_AccessDenied]: 'Access denied',
+  [CoreStringKeys.Error_InternalServer]: 'Internal server error',
+  [CoreStringKeys.Error_ValidationFailed]: 'Validation failed',
+  [CoreStringKeys.Error_RequiredField]: 'This field is required',
+  [CoreStringKeys.Error_InvalidContext]: 'Invalid context',
+  [CoreStringKeys.Error_InvalidContextTemplate]:
+    'Invalid context: {contextKey}',
+  [CoreStringKeys.Error_MissingTranslationKeyTemplate]:
     'Missing translation key: {stringKey}',
-  [CoreStringKey.Error_InvalidCurrencyCodeTemplate]:
+  [CoreStringKeys.Error_InvalidCurrencyCodeTemplate]:
     'Invalid currency code: {value}',
 
   // Registry Error Templates
-  [CoreStringKey.Error_ComponentNotFoundTemplate]:
+  [CoreStringKeys.Error_ComponentNotFoundTemplate]:
     'Component "{componentId}" not found',
-  [CoreStringKey.Error_LanguageNotFoundTemplate]:
+  [CoreStringKeys.Error_LanguageNotFoundTemplate]:
     'Language "{language}" not found',
-  [CoreStringKey.Error_StringKeyNotFoundTemplate]:
+  [CoreStringKeys.Error_StringKeyNotFoundTemplate]:
     'String key "{stringKey}" not found for component "{componentId}"',
-  [CoreStringKey.Error_IncompleteRegistrationTemplate]:
+  [CoreStringKeys.Error_IncompleteRegistrationTemplate]:
     'Incomplete registration for component "{componentId}": missing {missingCount} strings',
-  [CoreStringKey.Error_DuplicateComponentTemplate]:
+  [CoreStringKeys.Error_DuplicateComponentTemplate]:
     'Component "{componentId}" is already registered',
-  [CoreStringKey.Error_DuplicateLanguageTemplate]:
+  [CoreStringKeys.Error_DuplicateLanguageTemplate]:
     'Language "{languageId}" is already registered',
-  [CoreStringKey.Error_ValidationFailedTemplate]:
+  [CoreStringKeys.Error_ValidationFailedTemplate]:
     'Validation failed for component "{componentId}": {errorCount} errors',
 
   // System Messages
-  [CoreStringKey.System_Welcome]: 'Welcome',
-  [CoreStringKey.System_Goodbye]: 'Goodbye',
-  [CoreStringKey.System_PleaseWait]: 'Please wait...',
-  [CoreStringKey.System_ProcessingRequest]: 'Processing your request...',
-  [CoreStringKey.System_OperationComplete]: 'Operation completed successfully',
-  [CoreStringKey.System_NoDataAvailable]: 'No data available',
+  [CoreStringKeys.System_Welcome]: 'Welcome',
+  [CoreStringKeys.System_Goodbye]: 'Goodbye',
+  [CoreStringKeys.System_PleaseWait]: 'Please wait...',
+  [CoreStringKeys.System_ProcessingRequest]: 'Processing your request...',
+  [CoreStringKeys.System_OperationComplete]: 'Operation completed successfully',
+  [CoreStringKeys.System_NoDataAvailable]: 'No data available',
 
-  [CoreStringKey.Error_InstanceAlreadyExistsTemplate]:
+  [CoreStringKeys.Error_InstanceAlreadyExistsTemplate]:
     "Instance with key '{key}' already exists",
-  [CoreStringKey.Error_InstanceNotFoundTemplate]:
+  [CoreStringKeys.Error_InstanceNotFoundTemplate]:
     "Instance with key '{key}' not found",
-  [CoreStringKey.Error_MissingStringCollectionTemplate]:
+  [CoreStringKeys.Error_MissingStringCollectionTemplate]:
     'Missing string collection for language: {language}',
-  [CoreStringKey.Error_MissingTranslationTemplate]:
+  [CoreStringKeys.Error_MissingTranslationTemplate]:
     "Missing translation for key '{key}' in language '{language}'",
-  [CoreStringKey.Error_DefaultLanguageNoCollectionTemplate]:
+  [CoreStringKeys.Error_DefaultLanguageNoCollectionTemplate]:
     "Default language '{language}' has no string collection",
-  [CoreStringKey.Error_MissingTranslationKeyForTypeTemplate]:
+  [CoreStringKeys.Error_MissingTranslationKeyForTypeTemplate]:
     'Missing translation key for type: {type}',
 };

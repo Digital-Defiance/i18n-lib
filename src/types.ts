@@ -1,3 +1,4 @@
+import type { BrandedEnumValue } from '@digitaldefiance/branded-enum';
 import { ComponentDefinition } from './component-definition';
 import { LanguageDefinition } from './language-definition';
 
@@ -111,7 +112,7 @@ export type EnumLanguageTranslation<
  * Type utility to extract string keys from a component definition
  */
 export type ExtractStringKeys<T> =
-  T extends ComponentDefinition<infer K> ? K : never;
+  T extends ComponentDefinition<infer E> ? BrandedEnumValue<E> : never;
 
 /**
  * Type utility to extract languages from registry

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return, import/order */
 import { CoreI18nComponentId } from '../core-component-id';
-import { CoreStringKey } from '../core-string-key';
+import { CoreStringKeys } from '../core-string-key';
 import { I18nEngine } from '../core/i18n-engine';
 import { IHandleable } from '../interfaces/handleable';
 import { HandleableErrorOptions } from '../interfaces/handleable-error-options';
@@ -87,7 +87,7 @@ export class TypedHandleableError<
         throw new Error(
           coreEngine.translate(
             CoreI18nComponentId,
-            CoreStringKey.Error_MissingTranslationKeyTemplate,
+            CoreStringKeys.Error_MissingTranslationKeyTemplate,
             {
               stringKey: key as string,
             },
