@@ -31,6 +31,7 @@ Part of [Express Suite](https://github.com/Digital-Defiance/express-suite)
 - **Fluent Builder**: I18nBuilder for clean, chainable engine configuration
 - **Core System Strings**: Pre-built translations for common UI elements and errors
 - **Type Safety**: Full TypeScript support with generic types
+- **Branded Enums**: Runtime-identifiable string keys with collision detection and component routing
 - **Error Handling**: Comprehensive error classes with translation support and ICU formatting
 - **93.22% Test Coverage**: 1,738 tests covering all features
 - **Security Hardened**: See [SECURITY.md](SECURITY.md) for details
@@ -671,6 +672,21 @@ LanguageCodes.UK     // 'uk'
 - `switchToAdmin()` - Switch to admin context
 - `switchToUser()` - Switch to user context
 - `validate()` - Validate all components
+- `registerBrandedComponent(registration)` - Register component with branded string keys
+- `getCollisionReport()` - Get map of key collisions across components
+
+### Branded Enum Functions
+
+- `createI18nStringKeys(componentId, keys)` - Create a branded enum for i18n keys
+- `createI18nStringKeysFromEnum(componentId, enum)` - Convert legacy enum to branded enum
+- `mergeI18nStringKeys(newId, ...enums)` - Merge multiple branded enums
+- `findStringKeySources(key)` - Find components containing a key
+- `resolveStringKeyComponent(key)` - Resolve key to single component
+- `getStringKeysByComponentId(id)` - Get enum by component ID
+- `getRegisteredI18nComponents()` - List all registered components
+- `getStringKeyValues(enum)` - Get all values from enum
+- `isValidStringKey(value, enum)` - Type guard for key validation
+- `checkStringKeyCollisions(...enums)` - Check enums for collisions
 
 ### Core Functions
 
@@ -738,6 +754,176 @@ const registration: ComponentRegistration<MyStringKeys, MyLanguages> = {
 };
 ```
 
+## Branded Enums
+
+Branded enums enable runtime identification of string keys and collision detection between components. Unlike traditional TypeScript enums (erased at compile time), branded enums embed metadata for runtime component routing.
+
+### Why Branded Enums?
+
+- **Runtime Identification**: Determine which component a string key belongs to
+- **Collision Detection**: Detect key collisions between components automatically
+- **Component Routing**: Route translations to the correct handler when keys overlap
+- **Zero Overhead**: Values remain raw strings with embedded metadata
+
+### Creating Branded Enums
+
+```typescript
+import { createI18nStringKeys, BrandedStringKeyValue } from '@digitaldefiance/i18n-lib';
+
+// Create a branded enum for i18n keys
+export const UserKeys = createI18nStringKeys('user-component', {
+  Login: 'user.login',
+  Logout: 'user.logout',
+  Profile: 'user.profile',
+} as const);
+
+// Export the value type for type annotations
+export type UserKeyValue = BrandedStringKeyValue<typeof UserKeys>;
+```
+
+### Converting from Legacy Enums
+
+```typescript
+import { createI18nStringKeysFromEnum } from '@digitaldefiance/i18n-lib';
+
+// Legacy enum
+enum LegacyUserKeys {
+  Login = 'user.login',
+  Logout = 'user.logout',
+}
+
+// Convert to branded enum
+const BrandedUserKeys = createI18nStringKeysFromEnum('user-component', LegacyUserKeys);
+```
+
+### Registering Branded Components
+
+```typescript
+// Use registerBrandedComponent instead of registerComponent
+engine.registerBrandedComponent({
+  component: {
+    id: 'user-component',
+    name: 'User Component',
+    brandedStringKeys: UserKeys,
+  },
+  strings: {
+    [LanguageCodes.EN_US]: {
+      [UserKeys.Login]: 'Log In',
+      [UserKeys.Logout]: 'Log Out',
+      [UserKeys.Profile]: 'My Profile',
+    },
+  },
+});
+```
+
+### Collision Detection
+
+```typescript
+import { checkStringKeyCollisions } from '@digitaldefiance/i18n-lib';
+
+// Check specific enums for collisions
+const result = checkStringKeyCollisions(UserKeys, AdminKeys, CommonKeys);
+
+if (result.hasCollisions) {
+  console.warn('String key collisions detected:');
+  result.collisions.forEach(c => {
+    console.warn(`  "${c.value}" in: ${c.componentIds.join(', ')}`);
+  });
+}
+
+// Or use the engine's collision report
+const collisions = engine.getCollisionReport();
+for (const [key, componentIds] of collisions) {
+  console.warn(`Key "${key}" found in: ${componentIds.join(', ')}`);
+}
+```
+
+### Finding Key Sources
+
+```typescript
+import { findStringKeySources, resolveStringKeyComponent } from '@digitaldefiance/i18n-lib';
+
+// Find all components that have a specific key
+const sources = findStringKeySources('user.login');
+// Returns: ['i18n:user-component']
+
+// Resolve to a single component (null if ambiguous)
+const componentId = resolveStringKeyComponent('user.login');
+// Returns: 'user-component'
+```
+
+### Type Guards
+
+```typescript
+import { isValidStringKey } from '@digitaldefiance/i18n-lib';
+
+function handleKey(key: string) {
+  if (isValidStringKey(key, UserKeys)) {
+    // key is now typed as UserKeyValue
+    return translateUserKey(key);
+  }
+  if (isValidStringKey(key, AdminKeys)) {
+    // key is now typed as AdminKeyValue
+    return translateAdminKey(key);
+  }
+  return key; // Unknown key
+}
+```
+
+### Merging Enums
+
+```typescript
+import { mergeI18nStringKeys, getStringKeyValues } from '@digitaldefiance/i18n-lib';
+
+// Create a combined key set for the entire app
+const AllKeys = mergeI18nStringKeys('all-keys',
+  CoreStringKeys,
+  UserKeys,
+  AdminKeys,
+);
+
+// Get all values from an enum
+const allValues = getStringKeyValues(AllKeys);
+```
+
+### Best Practices
+
+1. **Use Namespaced Key Values**: Prevent collisions with prefixed values
+   ```typescript
+   // ✅ Good - namespaced values
+   const Keys = createI18nStringKeys('user', {
+     Welcome: 'user.welcome',
+   } as const);
+   
+   // ❌ Bad - generic values may collide
+   const Keys = createI18nStringKeys('user', {
+     Welcome: 'welcome',
+   } as const);
+   ```
+
+2. **Use Consistent Component IDs**: Match IDs across enum creation and registration
+
+3. **Always Use `as const`**: Preserve literal types
+   ```typescript
+   // ✅ Correct - literal types preserved
+   const Keys = createI18nStringKeys('id', { A: 'a' } as const);
+   
+   // ❌ Wrong - types widened to string
+   const Keys = createI18nStringKeys('id', { A: 'a' });
+   ```
+
+4. **Check for Collisions During Development**:
+   ```typescript
+   if (process.env.NODE_ENV === 'development') {
+     const collisions = engine.getCollisionReport();
+     if (collisions.size > 0) {
+       console.warn('⚠️ String key collisions detected!');
+     }
+   }
+   ```
+
+For complete migration guide, see [BRANDED_ENUM_MIGRATION.md](docs/BRANDED_ENUM_MIGRATION.md).
+
 ## Browser Support
 
 - Chrome/Edge: Latest 2 versions
@@ -766,6 +952,99 @@ Contributions welcome! Please:
 - **Examples**: See tests/ directory
 
 ## ChangeLog
+
+### Version 4.0.4
+
+**Branded Enums for Runtime String Key Identification**
+
+This release introduces branded enums - a powerful feature enabling runtime identification of i18n string keys, collision detection, and intelligent component routing.
+
+**Why Branded Enums?**
+
+Traditional TypeScript enums are erased at compile time, making it impossible to:
+- Determine which component a string key belongs to at runtime
+- Detect key collisions between components
+- Route translations to the correct handler when keys overlap
+
+Branded enums solve these problems by embedding metadata that enables runtime identification while maintaining zero overhead (values remain raw strings).
+
+**New Features:**
+
+- **`createI18nStringKeys()`**: Factory function to create branded enums with component metadata
+  ```typescript
+  const UserKeys = createI18nStringKeys('user-component', {
+    Login: 'user.login',
+    Logout: 'user.logout',
+  } as const);
+  ```
+
+- **`createI18nStringKeysFromEnum()`**: Convert existing TypeScript enums to branded enums for gradual migration
+
+- **`mergeI18nStringKeys()`**: Combine multiple branded enums into a single namespace
+
+- **Collision Detection**: Automatically detect when multiple components use the same string key
+  ```typescript
+  const result = checkStringKeyCollisions(UserKeys, AdminKeys);
+  if (result.hasCollisions) {
+    // Handle collisions
+  }
+  ```
+
+- **Key Source Resolution**: Find which component(s) a key belongs to
+  ```typescript
+  const sources = findStringKeySources('user.login'); // ['i18n:user-component']
+  const componentId = resolveStringKeyComponent('user.login'); // 'user-component'
+  ```
+
+- **Type Guards**: Runtime validation with TypeScript type narrowing
+  ```typescript
+  if (isValidStringKey(key, UserKeys)) {
+    // key is now typed as UserKeyValue
+  }
+  ```
+
+- **Engine Integration**: New `registerBrandedComponent()` method and `getCollisionReport()` for engine-level collision tracking
+
+**New Types:**
+
+- `BrandedStringKeys<T>` - Type alias for branded enum objects
+- `BrandedStringKeyValue<E>` - Extract value union from branded enum
+- `StringKeyCollisionResult` - Result type for collision detection
+
+**API Additions:**
+
+| Function | Description |
+|----------|-------------|
+| `createI18nStringKeys(componentId, keys)` | Create a branded enum for i18n keys |
+| `createI18nStringKeysFromEnum(componentId, enum)` | Convert legacy enum to branded enum |
+| `mergeI18nStringKeys(newId, ...enums)` | Merge multiple branded enums |
+| `findStringKeySources(key)` | Find components containing a key |
+| `resolveStringKeyComponent(key)` | Resolve key to single component |
+| `getStringKeysByComponentId(id)` | Get enum by component ID |
+| `getRegisteredI18nComponents()` | List all registered components |
+| `getStringKeyValues(enum)` | Get all values from enum |
+| `isValidStringKey(value, enum)` | Type guard for key validation |
+| `checkStringKeyCollisions(...enums)` | Check enums for collisions |
+
+**Documentation:**
+
+- **[BRANDED_ENUM_MIGRATION.md](docs/BRANDED_ENUM_MIGRATION.md)** - Complete migration guide with examples
+- Added Branded Enums section to README with usage examples
+- API reference updated with all new functions
+
+**Breaking Changes:**
+
+None - This release is fully backward compatible. Traditional enums continue to work with existing APIs. Branded enums are opt-in for new code or gradual migration.
+
+**Migration:**
+
+No migration required for existing code. To adopt branded enums:
+
+1. Convert enums using `createI18nStringKeys()` or `createI18nStringKeysFromEnum()`
+2. Use `registerBrandedComponent()` instead of `registerComponent()`
+3. Optionally enable collision detection during development
+
+See [BRANDED_ENUM_MIGRATION.md](docs/BRANDED_ENUM_MIGRATION.md) for detailed migration steps.
 
 ### Version 3.7.5
 
