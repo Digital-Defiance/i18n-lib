@@ -206,6 +206,7 @@
 import type { AnyBrandedEnum, BrandedEnumValue } from '@digitaldefiance/branded-enum';
 import { ComponentDefinition } from './component-definition';
 import { LanguageDefinition } from './language-definition';
+import type { PluralString } from './types/plural-types';
 
 /**
  * Standard language context spaces
@@ -394,6 +395,146 @@ export type BrandedMasterStringsCollection<
   E extends AnyBrandedEnum,
   TLanguage extends string,
 > = MasterStringsCollection<BrandedEnumValue<E>, TLanguage>;
+
+/**
+ * Collection of localized strings that supports both simple strings and plural forms.
+ * 
+ * Use this type when your translations include pluralization support via `PluralString`.
+ * For translations that only use simple strings, use {@link StringsCollection} instead.
+ * 
+ * @template TStringKey - The string key type (string literal union or BrandedEnumValue)
+ * 
+ * @example
+ * ```typescript
+ * import { createPluralString } from '@digitaldefiance/i18n-lib';
+ * 
+ * const strings: PluralStringsCollection<'items' | 'messages'> = {
+ *   items: createPluralString({
+ *     one: '{count} item',
+ *     other: '{count} items',
+ *   }),
+ *   messages: 'You have new messages',
+ * };
+ * ```
+ * 
+ * @see StringsCollection - For collections with only simple strings
+ * @see PluralString - The plural string type definition
+ */
+export type PluralStringsCollection<TStringKey extends string> = Partial<
+  Record<TStringKey, string | PluralString>
+>;
+
+/**
+ * Mapping of languages to their respective string collections with plural support.
+ * 
+ * Use this type when your translations include pluralization support via `PluralString`.
+ * For translations that only use simple strings, use {@link MasterStringsCollection} instead.
+ * 
+ * @template TStringKey - The string key type (first parameter)
+ * @template TLanguage - The language code type (second parameter)
+ * 
+ * @example
+ * ```typescript
+ * import { createPluralString } from '@digitaldefiance/i18n-lib';
+ * 
+ * const master: PluralMasterStringsCollection<'items', 'en' | 'es'> = {
+ *   en: {
+ *     items: createPluralString({
+ *       one: '{count} item',
+ *       other: '{count} items',
+ *     }),
+ *   },
+ *   es: {
+ *     items: createPluralString({
+ *       one: '{count} artículo',
+ *       other: '{count} artículos',
+ *     }),
+ *   },
+ * };
+ * ```
+ * 
+ * @see MasterStringsCollection - For collections with only simple strings
+ * @see PluralStringsCollection - For single-language collections with plurals
+ */
+export type PluralMasterStringsCollection<
+  TStringKey extends string,
+  TLanguage extends string,
+> = Partial<Record<TLanguage, PluralStringsCollection<TStringKey>>>;
+
+/**
+ * Ergonomic type alias for PluralStringsCollection with branded enums.
+ * 
+ * Use this when your component has translations that include `PluralString` values.
+ * 
+ * @template E - The branded enum type (use `typeof MyStringKeys`)
+ * 
+ * @example
+ * ```typescript
+ * import { createI18nStringKeys, createPluralString } from '@digitaldefiance/i18n-lib';
+ * 
+ * const MyKeys = createI18nStringKeys('my-component', {
+ *   ItemCount: 'my.item-count',
+ *   Welcome: 'my.welcome',
+ * } as const);
+ * 
+ * const strings: BrandedPluralStringsCollection<typeof MyKeys> = {
+ *   'my.item-count': createPluralString({
+ *     one: '{count} item',
+ *     other: '{count} items',
+ *   }),
+ *   'my.welcome': 'Welcome!',
+ * };
+ * ```
+ * 
+ * @see BrandedStringsCollection - For collections with only simple strings
+ */
+export type BrandedPluralStringsCollection<E extends AnyBrandedEnum> = 
+  PluralStringsCollection<BrandedEnumValue<E>>;
+
+/**
+ * Ergonomic type alias for PluralMasterStringsCollection with branded enums.
+ * 
+ * Use this when your component has translations that include `PluralString` values
+ * across multiple languages.
+ * 
+ * @template E - The branded enum type (use `typeof MyStringKeys`)
+ * @template TLanguage - The language code union type
+ * 
+ * @example
+ * ```typescript
+ * import { createI18nStringKeys, createPluralString } from '@digitaldefiance/i18n-lib';
+ * 
+ * const MyKeys = createI18nStringKeys('my-component', {
+ *   ItemCount: 'my.item-count',
+ *   Welcome: 'my.welcome',
+ * } as const);
+ * 
+ * type MyLanguages = 'en-US' | 'es';
+ * 
+ * const masterStrings: BrandedPluralMasterStringsCollection<typeof MyKeys, MyLanguages> = {
+ *   'en-US': {
+ *     'my.item-count': createPluralString({
+ *       one: '{count} item',
+ *       other: '{count} items',
+ *     }),
+ *     'my.welcome': 'Welcome!',
+ *   },
+ *   'es': {
+ *     'my.item-count': createPluralString({
+ *       one: '{count} artículo',
+ *       other: '{count} artículos',
+ *     }),
+ *     'my.welcome': '¡Bienvenido!',
+ *   },
+ * };
+ * ```
+ * 
+ * @see BrandedMasterStringsCollection - For collections with only simple strings
+ */
+export type BrandedPluralMasterStringsCollection<
+  E extends AnyBrandedEnum,
+  TLanguage extends string,
+> = PluralMasterStringsCollection<BrandedEnumValue<E>, TLanguage>;
 
 /**
  * Mapping of language codes to their respective languages
