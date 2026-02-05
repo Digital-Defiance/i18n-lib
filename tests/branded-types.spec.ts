@@ -11,6 +11,9 @@
  *
  * @module branded-types.spec
  */
+import type { BrandedEnumValue } from '@digitaldefiance/branded-enum';
+import { createI18nStringKeys } from '../src/branded-string-key';
+import type { ComponentDefinition } from '../src/component-definition';
 import type {
   StringsCollection,
   MasterStringsCollection,
@@ -20,9 +23,6 @@ import type {
   EnumLanguageTranslation,
   EnumTranslationMap,
 } from '../src/types';
-import type { ComponentDefinition } from '../src/component-definition';
-import type { BrandedEnumValue } from '@digitaldefiance/branded-enum';
-import { createI18nStringKeys } from '../src/branded-string-key';
 
 /**
  * Type-level utility to assert two types are exactly equal.
@@ -70,7 +70,7 @@ type TestLanguages = 'en-US' | 'es';
  * This definition is used to verify that ExtractStringKeys correctly
  * extracts BrandedEnumValue<E> from ComponentDefinition<E>.
  */
-const TestComponentDefinition: ComponentDefinition<typeof TestKeys> = {
+const _TestComponentDefinition: ComponentDefinition<typeof TestKeys> = {
   id: 'test-branded-types-spec',
   name: 'Test Component for Branded Types',
   stringKeys: TestKeys,
@@ -386,11 +386,14 @@ describe('Branded Enum Type Aliases', () => {
     // **Validates: Requirement 4.2**
     // ExtractStringKeys<ComponentDefinition<E>> should produce BrandedEnumValue<E>
     type ExtractedFromTestComponentDefinition = ExtractStringKeys<
-      typeof TestComponentDefinition
+      typeof _TestComponentDefinition
     >;
     type ExpectedBrandedEnumValue = BrandedEnumValue<typeof TestKeys>;
     type _AssertExtractStringKeysCorrectness = AssertTrue<
-      AssertEqual<ExtractedFromTestComponentDefinition, ExpectedBrandedEnumValue>
+      AssertEqual<
+        ExtractedFromTestComponentDefinition,
+        ExpectedBrandedEnumValue
+      >
     >;
 
     // **Validates: Requirement 4.3**
@@ -473,14 +476,16 @@ describe('Branded Enum Type Aliases', () => {
      */
     it('ExtractStringKeys should work with different ComponentDefinitions', () => {
       // Create a second component definition with OtherKeys
-      const OtherComponentDefinition: ComponentDefinition<typeof OtherKeys> = {
+      const _OtherComponentDefinition: ComponentDefinition<typeof OtherKeys> = {
         id: 'other-component-spec',
         name: 'Other Component for Testing',
         stringKeys: OtherKeys,
       };
 
       // Extract string keys from both definitions
-      type ExtractedFromOther = ExtractStringKeys<typeof OtherComponentDefinition>;
+      type ExtractedFromOther = ExtractStringKeys<
+        typeof _OtherComponentDefinition
+      >;
       type ExpectedOtherValue = BrandedEnumValue<typeof OtherKeys>;
 
       // Compile-time assertion for OtherKeys extraction
@@ -666,10 +671,10 @@ describe('Branded Enum Type Aliases', () => {
       expect(legacyTranslations).toBeDefined();
       expect(legacyTranslations['en']?.[LegacyStringKeys.Title]).toBe('Title');
       expect(legacyTranslations['es']?.[LegacyStringKeys.Description]).toBe(
-        'Descripción'
+        'Descripción',
       );
       expect(legacyTranslations['fr']?.[LegacyStringKeys.Submit]).toBe(
-        'Soumettre'
+        'Soumettre',
       );
     });
 
@@ -686,19 +691,21 @@ describe('Branded Enum Type Aliases', () => {
       // Note: This type is deprecated but must remain functional
       type LegacyLanguages = 'en' | 'es';
 
-      const deprecatedMap: EnumTranslationMap<LegacyStringKeys, LegacyLanguages> =
-        {
-          en: {
-            [LegacyStringKeys.Title]: 'Title',
-            [LegacyStringKeys.Description]: 'Description',
-            [LegacyStringKeys.Submit]: 'Submit',
-          },
-          es: {
-            [LegacyStringKeys.Title]: 'Título',
-            [LegacyStringKeys.Description]: 'Descripción',
-            [LegacyStringKeys.Submit]: 'Enviar',
-          },
-        };
+      const deprecatedMap: EnumTranslationMap<
+        LegacyStringKeys,
+        LegacyLanguages
+      > = {
+        en: {
+          [LegacyStringKeys.Title]: 'Title',
+          [LegacyStringKeys.Description]: 'Description',
+          [LegacyStringKeys.Submit]: 'Submit',
+        },
+        es: {
+          [LegacyStringKeys.Title]: 'Título',
+          [LegacyStringKeys.Description]: 'Descripción',
+          [LegacyStringKeys.Submit]: 'Enviar',
+        },
+      };
 
       expect(deprecatedMap).toBeDefined();
       expect(deprecatedMap['en']?.[LegacyStringKeys.Title]).toBe('Title');
