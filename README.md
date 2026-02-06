@@ -924,6 +924,176 @@ const allValues = getStringKeyValues(AllKeys);
 
 For complete migration guide, see [BRANDED_ENUM_MIGRATION.md](docs/BRANDED_ENUM_MIGRATION.md).
 
+### Branded Enum Translation
+
+The enum translation system supports branded enums from `@digitaldefiance/branded-enum`, enabling automatic name inference and type-safe enum value translations.
+
+#### Why Use Branded Enums for Enum Translation?
+
+- **Automatic Name Inference**: No need to provide an explicit enum name - it's extracted from the branded enum's component ID
+- **Type Safety**: Full TypeScript support for enum values and translations
+- **Consistent Naming**: Enum names in error messages match your component IDs
+- **Unified Pattern**: Use the same branded enum pattern for both string keys and enum translations
+
+#### Registering Branded Enums for Translation
+
+```typescript
+import { createBrandedEnum } from '@digitaldefiance/branded-enum';
+import { I18nEngine, LanguageCodes } from '@digitaldefiance/i18n-lib';
+
+// Create a branded enum
+const Status = createBrandedEnum('status', {
+  Active: 'active',
+  Inactive: 'inactive',
+  Pending: 'pending',
+});
+
+// Create engine
+const engine = new I18nEngine([
+  { id: LanguageCodes.EN_US, name: 'English', code: 'en-US', isDefault: true },
+  { id: LanguageCodes.ES, name: 'Spanish', code: 'es' },
+]);
+
+// Register branded enum - name is automatically inferred as 'status'
+engine.registerEnum(Status, {
+  [LanguageCodes.EN_US]: {
+    active: 'Active',
+    inactive: 'Inactive',
+    pending: 'Pending',
+  },
+  [LanguageCodes.ES]: {
+    active: 'Activo',
+    inactive: 'Inactivo',
+    pending: 'Pendiente',
+  },
+});
+
+// Translate enum values
+engine.translateEnum(Status, Status.Active, LanguageCodes.EN_US); // 'Active'
+engine.translateEnum(Status, Status.Active, LanguageCodes.ES);    // 'Activo'
+```
+
+#### Comparison: Traditional vs Branded Enum Registration
+
+```typescript
+// Traditional enum - requires explicit name
+enum TraditionalStatus {
+  Active = 'active',
+  Inactive = 'inactive',
+}
+engine.registerEnum(TraditionalStatus, translations, 'Status'); // Name required
+
+// Branded enum - name inferred from component ID
+const BrandedStatus = createBrandedEnum('status', {
+  Active: 'active',
+  Inactive: 'inactive',
+});
+engine.registerEnum(BrandedStatus, translations); // Name 'status' inferred automatically
+```
+
+#### Using with PluginI18nEngine
+
+The `PluginI18nEngine` also supports branded enum translation with language validation:
+
+```typescript
+import { PluginI18nEngine, LanguageCodes } from '@digitaldefiance/i18n-lib';
+import { createBrandedEnum } from '@digitaldefiance/branded-enum';
+
+const Priority = createBrandedEnum('priority', {
+  High: 'high',
+  Medium: 'medium',
+  Low: 'low',
+});
+
+const engine = PluginI18nEngine.createInstance('myapp', [
+  { id: LanguageCodes.EN_US, name: 'English', code: 'en-US', isDefault: true },
+  { id: LanguageCodes.FR, name: 'French', code: 'fr' },
+]);
+
+// Register with automatic name inference
+engine.registerEnum(Priority, {
+  [LanguageCodes.EN_US]: {
+    high: 'High Priority',
+    medium: 'Medium Priority',
+    low: 'Low Priority',
+  },
+  [LanguageCodes.FR]: {
+    high: 'Haute Priorité',
+    medium: 'Priorité Moyenne',
+    low: 'Basse Priorité',
+  },
+});
+
+// Translate
+engine.translateEnum(Priority, Priority.High); // Uses current language
+engine.translateEnum(Priority, Priority.High, LanguageCodes.FR); // 'Haute Priorité'
+```
+
+#### Utility Functions
+
+The library provides utility functions for working with branded enums:
+
+```typescript
+import { 
+  isBrandedEnum, 
+  getBrandedEnumComponentId, 
+  getBrandedEnumId 
+} from '@digitaldefiance/i18n-lib';
+
+// Check if an enum is branded
+if (isBrandedEnum(Status)) {
+  // TypeScript knows Status is a branded enum here
+  const componentId = getBrandedEnumComponentId(Status);
+  console.log(componentId); // 'status'
+}
+
+// Get the raw brand ID (includes 'i18n:' prefix for i18n string keys)
+const rawId = getBrandedEnumId(Status); // 'status'
+```
+
+#### Error Messages with Branded Enums
+
+When translation errors occur, the enum name in error messages is automatically derived from the branded enum's component ID:
+
+```typescript
+const Status = createBrandedEnum('user-status', { Active: 'active' });
+engine.registerEnum(Status, { en: { active: 'Active' } });
+
+// If translation fails, error message includes the inferred name:
+// "No translations found for enum: user-status"
+// "Translation missing for enum value 'unknown' in language 'en'"
+```
+
+#### Type Definitions
+
+New types are available for working with branded enum translations:
+
+```typescript
+import type {
+  BrandedEnumTranslation,
+  RegisterableEnum,
+  TranslatableEnumValue,
+} from '@digitaldefiance/i18n-lib';
+
+// Type for branded enum translation maps
+type MyTranslations = BrandedEnumTranslation<typeof Status, 'en' | 'es'>;
+
+// Union type accepting both traditional and branded enums
+function registerAnyEnum<T extends string | number>(
+  enumObj: RegisterableEnum<T>,
+  translations: Record<string, Record<string, string>>,
+): void {
+  // Works with both enum types
+}
+
+// Union type for translatable values
+function translateAnyValue<T extends string | number>(
+  value: TranslatableEnumValue<T>,
+): string {
+  // Works with both traditional and branded enum values
+}
+```
+
 ## Browser Support
 
 - Chrome/Edge: Latest 2 versions

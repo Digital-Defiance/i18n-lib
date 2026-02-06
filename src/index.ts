@@ -32,6 +32,8 @@ export function resetAll(): void {
 // =============================================================================
 // These exports provide runtime-identifiable string keys for i18n
 export * from './branded-string-key';
+// Branded enum utilities for detection and extraction
+export * from './branded-enum-utils';
 // Re-export key types from branded-enum for convenience
 export type {
   BrandedEnum,

@@ -855,3 +855,72 @@ export function createTranslations<
 ): EnumLanguageTranslation<T, TLanguage> {
   return translations;
 }
+
+// =============================================================================
+// Branded Enum Translation Types
+// =============================================================================
+
+/**
+ * Translation map for branded enum values.
+ * Maps language codes to translations keyed by branded enum values.
+ *
+ * @template E - The branded enum type (use `typeof YourBrandedEnum`)
+ * @template TLanguage - The language code union type
+ *
+ * @example
+ * ```typescript
+ * const Status = createBrandedEnum('status', { Active: 'active', Inactive: 'inactive' });
+ *
+ * const translations: BrandedEnumTranslation<typeof Status, 'en-US' | 'es'> = {
+ *   'en-US': { active: 'Active', inactive: 'Inactive' },
+ *   'es': { active: 'Activo', inactive: 'Inactivo' },
+ * };
+ * ```
+ */
+export type BrandedEnumTranslation<
+  E extends AnyBrandedEnum,
+  TLanguage extends string,
+> = Partial<{
+  [L in TLanguage]: Record<BrandedEnumValue<E>, string>;
+}>;
+
+/**
+ * Union type for enum objects that can be registered with the enum translation system.
+ * Accepts both traditional TypeScript enums and branded enums.
+ *
+ * @template TEnum - The enum value type (string or number)
+ *
+ * @example
+ * ```typescript
+ * function registerEnum<TEnum extends string | number>(
+ *   enumObj: RegisterableEnum<TEnum>,
+ *   translations: Record<string, Record<string, string>>,
+ * ): void {
+ *   // Works with both traditional and branded enums
+ * }
+ * ```
+ */
+export type RegisterableEnum<TEnum extends string | number = string | number> =
+  | Record<string, TEnum>
+  | AnyBrandedEnum;
+
+/**
+ * Union type for enum values that can be translated.
+ * Accepts both traditional enum values and branded enum values.
+ *
+ * @template TEnum - The enum value type (string or number)
+ *
+ * @example
+ * ```typescript
+ * function translateEnum<TEnum extends string | number>(
+ *   enumObj: RegisterableEnum<TEnum>,
+ *   value: TranslatableEnumValue<TEnum>,
+ *   language: string,
+ * ): string {
+ *   // Works with both traditional and branded enum values
+ * }
+ * ```
+ */
+export type TranslatableEnumValue<
+  TEnum extends string | number = string | number,
+> = TEnum | BrandedEnumValue<AnyBrandedEnum>;

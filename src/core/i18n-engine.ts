@@ -5,6 +5,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 // Note: This file uses 'any' for variable dictionaries which is appropriate for dynamic i18n substitution
 
+import type {
+  AnyBrandedEnum,
+  BrandedEnumValue,
+} from '@digitaldefiance/branded-enum';
 import { CoreI18nComponentId } from '../core-component-id';
 import { I18nError } from '../errors/i18n-error';
 import {
@@ -575,28 +579,124 @@ export class I18nEngine implements II18nEngine {
 
   /**
    * Registers an enum for translation.
-   * @param enumObj - Enum object to register.
-   * @param translations - Language keyed translations for enum values.
-   * @param enumName - Name to identify the enum in templates.
+   *
+   * Supports both traditional TypeScript enums and branded enums from
+   * `@digitaldefiance/branded-enum`. For branded enums, the `enumName` parameter
+   * is optional and will be automatically inferred from the branded enum's
+   * component ID.
+   *
+   * ## Name Resolution
+   *
+   * The enum name is resolved in the following order:
+   * 1. Explicit `enumName` parameter (if provided)
+   * 2. Component ID from branded enum (if branded)
+   * 3. `'UnknownEnum'` (fallback for traditional enums without name)
+   *
+   * ## Translation Structure
+   *
+   * The `translations` object should map language codes to objects that map
+   * enum values to their translated strings:
+   *
+   * ```typescript
+   * {
+   *   'en': { 'value1': 'Translation 1', 'value2': 'Translation 2' },
+   *   'es': { 'value1': 'Traducción 1', 'value2': 'Traducción 2' },
+   * }
+   * ```
+   *
+   * @template TEnum - The enum value type (string or number)
+   * @param enumObj - Enum object to register (traditional or branded)
+   * @param translations - Language keyed translations for enum values
+   * @param enumName - Name to identify the enum (optional for branded enums)
+   *
+   * @example Traditional enum (name required)
+   * ```typescript
+   * enum Status { Active = 'active', Inactive = 'inactive' }
+   *
+   * engine.registerEnum(Status, {
+   *   en: { active: 'Active', inactive: 'Inactive' },
+   *   es: { active: 'Activo', inactive: 'Inactivo' },
+   * }, 'Status');
+   * ```
+   *
+   * @example Branded enum (name inferred)
+   * ```typescript
+   * const Status = createBrandedEnum('status', { Active: 'active', Inactive: 'inactive' });
+   *
+   * // Name 'status' is automatically inferred from the branded enum
+   * engine.registerEnum(Status, {
+   *   en: { active: 'Active', inactive: 'Inactive' },
+   * });
+   * ```
+   *
+   * @example Branded enum with explicit name override
+   * ```typescript
+   * const Status = createBrandedEnum('status', { Active: 'active' });
+   *
+   * // Override the inferred name with a custom name
+   * engine.registerEnum(Status, {
+   *   en: { active: 'Active' },
+   * }, 'UserStatus');
+   * ```
+   *
+   * @see {@link translateEnum} - Translate registered enum values
+   * @see {@link hasEnum} - Check if an enum is registered
    */
   registerEnum<TEnum extends string | number>(
-    enumObj: Record<string, TEnum>,
-    translations: Record<string, Record<TEnum, string>>,
-    enumName: string,
+    enumObj: Record<string, TEnum> | AnyBrandedEnum,
+    translations: Record<string, Record<TEnum | string, string>>,
+    enumName?: string,
   ): void {
     this.enumRegistry.register(enumObj, translations, enumName);
   }
 
   /**
    * Translates an enum value for the current or specified language.
-   * @param enumObj - Enum object.
-   * @param value - Enum value to translate.
-   * @param language - Optional language code.
-   * @returns Translated enum string.
+   *
+   * Supports both traditional enum values and branded enum values. The method
+   * performs multiple lookup strategies to find the correct translation:
+   *
+   * ## Lookup Strategy
+   *
+   * 1. **Direct value lookup**: Try the string representation of the value
+   * 2. **Numeric enum reverse mapping**: For numeric enums, find the string key
+   * 3. **Branded enum key lookup**: For branded enums, find the enum key name
+   *
+   * ## Language Resolution
+   *
+   * If no language is specified, the current language from the engine's
+   * context manager is used.
+   *
+   * @template TEnum - The enum value type (string or number)
+   * @param enumObj - Enum object (traditional or branded)
+   * @param value - Enum value to translate
+   * @param language - Optional language code (defaults to current language)
+   * @returns Translated enum string
+   * @throws {I18nError} If the enum, language, or value is not found
+   *
+   * @example Basic translation
+   * ```typescript
+   * const Status = createBrandedEnum('status', { Active: 'active' });
+   * engine.registerEnum(Status, { en: { active: 'Active' }, es: { active: 'Activo' } });
+   *
+   * engine.translateEnum(Status, Status.Active);       // Uses current language
+   * engine.translateEnum(Status, Status.Active, 'es'); // 'Activo'
+   * ```
+   *
+   * @example With traditional enum
+   * ```typescript
+   * enum Priority { High = 'high', Low = 'low' }
+   * engine.registerEnum(Priority, { en: { high: 'High', low: 'Low' } }, 'Priority');
+   *
+   * engine.translateEnum(Priority, Priority.High, 'en'); // 'High'
+   * ```
+   *
+   * @see {@link registerEnum} - Register enums for translation
+   * @see {@link hasEnum} - Check if an enum is registered
    */
   translateEnum<TEnum extends string | number>(
-    enumObj: Record<string, TEnum>,
-    value: TEnum,
+    enumObj: Record<string, TEnum> | AnyBrandedEnum,
+    value: TEnum | BrandedEnumValue<AnyBrandedEnum>,
     language?: string,
   ): string {
     const lang = language || this.getCurrentLanguage();
@@ -605,8 +705,24 @@ export class I18nEngine implements II18nEngine {
 
   /**
    * Checks if an enum is registered.
-   * @param enumObj - Enum object to check.
-   * @returns True if the enum is registered.
+   *
+   * Works with both traditional and branded enums. Uses object reference
+   * equality to check registration status.
+   *
+   * @param enumObj - Enum object to check
+   * @returns `true` if the enum is registered, `false` otherwise
+   *
+   * @example
+   * ```typescript
+   * const Status = createBrandedEnum('status', { Active: 'active' });
+   *
+   * engine.hasEnum(Status); // false (not registered yet)
+   * engine.registerEnum(Status, { en: { active: 'Active' } });
+   * engine.hasEnum(Status); // true
+   * ```
+   *
+   * @see {@link registerEnum} - Register enums for translation
+   * @see {@link translateEnum} - Translate registered enum values
    */
   hasEnum(enumObj: object): boolean {
     return this.enumRegistry.has(enumObj);
