@@ -608,6 +608,7 @@ export class I18nEngine implements II18nEngine {
    * @param enumObj - Enum object to register (traditional or branded)
    * @param translations - Language keyed translations for enum values
    * @param enumName - Name to identify the enum (optional for branded enums)
+   * @returns The registered translations object.
    *
    * @example Traditional enum (name required)
    * ```typescript
@@ -649,8 +650,8 @@ export class I18nEngine implements II18nEngine {
       | { [key: string]: string | number },
     translations: Record<string, Record<TEnum | string, string>>,
     enumName?: string,
-  ): void {
-    this.enumRegistry.register(enumObj, translations, enumName);
+  ): Record<string, Record<string, string>> {
+    return this.enumRegistry.register(enumObj, translations, enumName);
   }
 
   /**
