@@ -650,8 +650,12 @@ export class I18nEngine implements II18nEngine {
       | { [key: string]: string | number },
     translations: Record<string, Record<TEnum | string, string>>,
     enumName?: string,
-  ): Record<string, Record<string, string>> {
-    return this.enumRegistry.register(enumObj, translations, enumName);
+  ): Record<string, Record<TEnum, string>> {
+    return this.enumRegistry.register(
+      enumObj,
+      translations,
+      enumName,
+    ) as Record<string, Record<TEnum, string>>;
   }
 
   /**
