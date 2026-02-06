@@ -45,6 +45,10 @@ export const I18nErrorCode = {
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
   /** Nested validation error with context */
   NESTED_VALIDATION_ERROR: 'NESTED_VALIDATION_ERROR',
+  /** Invalid string key enum passed to registerStringKeyEnum */
+  INVALID_STRING_KEY_ENUM: 'INVALID_STRING_KEY_ENUM',
+  /** String key value does not belong to any registered enum */
+  STRING_KEY_NOT_REGISTERED: 'STRING_KEY_NOT_REGISTERED',
 } as const;
 
 /**
@@ -491,5 +495,30 @@ export class I18nError extends Error {
       errorType,
       severity,
     });
+  }
+
+  /**
+   * Creates an error for when a non-branded enum is passed to registerStringKeyEnum.
+   * @returns An I18nError instance
+   */
+  static invalidStringKeyEnum(): I18nError {
+    return new I18nError(
+      I18nErrorCode.INVALID_STRING_KEY_ENUM,
+      'The provided object is not a branded string key enum',
+      {},
+    );
+  }
+
+  /**
+   * Creates an error for when a string key value does not belong to any registered enum.
+   * @param key - The string key that was not found in any registered enum
+   * @returns An I18nError instance
+   */
+  static stringKeyNotRegistered(key: string): I18nError {
+    return new I18nError(
+      I18nErrorCode.STRING_KEY_NOT_REGISTERED,
+      `String key '${key}' does not belong to any registered enum`,
+      { key },
+    );
   }
 }

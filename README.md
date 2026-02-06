@@ -4,6 +4,24 @@ A production-ready TypeScript internationalization library with component-based 
 
 Part of [Express Suite](https://github.com/Digital-Defiance/express-suite)
 
+## What's New in v4.3.0
+
+✨ **String Key Enum Registration** - Register branded string key enums for direct translation without specifying component IDs.
+
+**New Features:**
+- **`registerStringKeyEnum()`**: Register branded enums for automatic component routing
+- **`translateStringKey()`**: Translate keys directly - component ID resolved from branded enum
+- **`safeTranslateStringKey()`**: Safe version returning placeholder on failure
+- **`hasStringKeyEnum()` / `getStringKeyEnums()`**: Query registered enums
+
+```typescript
+// Register your branded enum
+engine.registerStringKeyEnum(MyBrandedKeys);
+
+// Translate without component ID - it's resolved automatically
+const text = engine.translateStringKey(MyBrandedKeys.Welcome, { name: 'Alice' });
+```
+
 ## Features
 
 - **Production-Grade Security**: Comprehensive protection against common attacks
@@ -464,6 +482,33 @@ const engine = I18nBuilder.create()
   .build();
 ```
 
+#### Builder with String Key Enum Registration
+
+Register branded string key enums during engine construction for direct translation via `translateStringKey()`:
+
+```typescript
+import { I18nBuilder, createI18nStringKeysFromEnum } from '@digitaldefiance/i18n-lib';
+
+// Create branded enum from your string keys
+enum MyStringKeys {
+  Welcome = 'welcome',
+  Goodbye = 'goodbye',
+}
+const BrandedKeys = createI18nStringKeysFromEnum('my-component', MyStringKeys);
+
+const engine = I18nBuilder.create()
+  .withLanguages([
+    { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+  ])
+  .withStringKeyEnum(BrandedKeys)  // Register single enum
+  // Or register multiple at once:
+  // .withStringKeyEnums([BrandedKeys, OtherKeys])
+  .build();
+
+// Now you can translate directly without component ID
+engine.translateStringKey(BrandedKeys.Welcome);
+```
+
 ### Context Integration
 
 ```typescript
@@ -674,6 +719,11 @@ LanguageCodes.UK     // 'uk'
 - `validate()` - Validate all components
 - `registerBrandedComponent(registration)` - Register component with branded string keys
 - `getCollisionReport()` - Get map of key collisions across components
+- `registerStringKeyEnum(enum)` - Register a branded string key enum for direct translation
+- `translateStringKey(key, variables?, language?)` - Translate a branded string key directly
+- `safeTranslateStringKey(key, variables?, language?)` - Safe version returning placeholder on failure
+- `hasStringKeyEnum(enum)` - Check if a branded enum is registered
+- `getStringKeyEnums()` - Get all registered branded enums
 
 ### Branded Enum Functions
 
@@ -924,6 +974,77 @@ const allValues = getStringKeyValues(AllKeys);
 
 For complete migration guide, see [BRANDED_ENUM_MIGRATION.md](docs/BRANDED_ENUM_MIGRATION.md).
 
+### String Key Enum Registration
+
+Register branded string key enums with the engine for direct translation without specifying component IDs. This simplifies translation calls and enables automatic component routing.
+
+#### Registering String Key Enums
+
+```typescript
+import { createI18nStringKeysFromEnum, PluginI18nEngine } from '@digitaldefiance/i18n-lib';
+
+// Create a branded enum from your string keys
+enum MyStringKeys {
+  Welcome = 'welcome',
+  Goodbye = 'goodbye',
+}
+
+const BrandedKeys = createI18nStringKeysFromEnum('my-component', MyStringKeys);
+
+// Create engine and register component
+const engine = PluginI18nEngine.createInstance('myapp', languages);
+engine.registerBrandedComponent({
+  component: {
+    id: 'my-component',
+    name: 'My Component',
+    brandedStringKeys: BrandedKeys,
+  },
+  strings: {
+    [LanguageCodes.EN_US]: {
+      [BrandedKeys.Welcome]: 'Welcome!',
+      [BrandedKeys.Goodbye]: 'Goodbye!',
+    },
+  },
+});
+
+// Register the enum for direct translation
+engine.registerStringKeyEnum(BrandedKeys);
+```
+
+#### Direct Translation with translateStringKey
+
+Once registered, translate keys directly without specifying the component ID:
+
+```typescript
+// Before: Required component ID
+const text = engine.translate('my-component', BrandedKeys.Welcome, { name: 'Alice' });
+
+// After: Component ID resolved automatically from branded enum
+const text = engine.translateStringKey(BrandedKeys.Welcome, { name: 'Alice' });
+
+// Safe version returns placeholder on failure instead of throwing
+const safeText = engine.safeTranslateStringKey(BrandedKeys.Welcome, { name: 'Alice' });
+```
+
+#### Checking Registration Status
+
+```typescript
+// Check if an enum is registered
+if (engine.hasStringKeyEnum(BrandedKeys)) {
+  console.log('BrandedKeys is registered');
+}
+
+// Get all registered enums
+const registeredEnums = engine.getStringKeyEnums();
+```
+
+#### Benefits
+
+- **Cleaner Code**: No need to repeat component IDs in every translation call
+- **Automatic Routing**: Component ID resolved from branded enum metadata
+- **Type Safety**: Full TypeScript support with branded enum types
+- **Idempotent**: Safe to call `registerStringKeyEnum()` multiple times
+
 ### Branded Enum Translation
 
 The enum translation system supports branded enums from `@digitaldefiance/branded-enum`, enabling automatic name inference and type-safe enum value translations.
@@ -1122,6 +1243,107 @@ Contributions welcome! Please:
 - **Examples**: See tests/ directory
 
 ## ChangeLog
+
+### Version 4.3.0
+
+**String Key Enum Registration for Direct Translation**
+
+This release adds the ability to register branded string key enums with the I18nEngine for direct translation via `translateStringKey()`. This enables automatic component ID resolution from branded enum values.
+
+**New Features:**
+
+- **`registerStringKeyEnum()`**: Register a branded string key enum for direct translation support
+  ```typescript
+  import { createI18nStringKeysFromEnum } from '@digitaldefiance/i18n-lib';
+  
+  const MyKeys = createI18nStringKeysFromEnum('my-component', MyStringKeyEnum);
+  engine.registerStringKeyEnum(MyKeys);
+  ```
+
+- **`translateStringKey()`**: Translate a branded string key value directly without specifying component ID
+  ```typescript
+  // Before: engine.translate('my-component', MyKeys.Welcome, { name: 'Alice' });
+  // After:
+  engine.translateStringKey(MyKeys.Welcome, { name: 'Alice' });
+  ```
+
+- **`safeTranslateStringKey()`**: Safe version that returns a placeholder on failure instead of throwing
+
+- **`hasStringKeyEnum()`**: Check if a branded enum is registered
+
+- **`getStringKeyEnums()`**: Get all registered branded enums
+
+**New Error Codes:**
+
+- `INVALID_STRING_KEY_ENUM` - When a non-branded enum is passed to `registerStringKeyEnum()`
+- `STRING_KEY_NOT_REGISTERED` - When translating a key from an unregistered enum
+
+**Benefits:**
+
+- Cleaner translation calls without repeating component IDs
+- Automatic component routing based on branded enum metadata
+- Type-safe translations with full TypeScript support
+- Idempotent registration (safe to call multiple times)
+
+### Version 4.2.0
+
+**Branded Enum Translation Support**
+
+This release adds comprehensive support for translating branded enums from `@digitaldefiance/branded-enum`, enabling automatic name inference and type-safe enum value translations.
+
+**New Features:**
+
+- **Automatic Name Inference**: When registering a branded enum, the name is automatically extracted from the enum's component ID
+  ```typescript
+  const Status = createBrandedEnum('status', { Active: 'active', Inactive: 'inactive' });
+  engine.registerEnum(Status, translations); // Name 'status' inferred automatically
+  ```
+
+- **New Utility Functions**:
+  - `isBrandedEnum()` - Type guard to detect branded enums
+  - `getBrandedEnumComponentId()` - Extract component ID from branded enum
+  - `getBrandedEnumId()` - Get raw brand ID for debugging
+
+- **Enhanced `registerEnum()`**: Now accepts branded enums and returns the registered translations object
+
+- **Property-Based Tests**: Comprehensive property tests for branded enum translation ensuring:
+  - Registration idempotence
+  - Translation consistency across languages
+  - Proper error handling for missing translations
+
+**Documentation:**
+
+- Added "Branded Enum Translation" section to README
+- Comprehensive JSDoc documentation for all new utilities
+
+### Version 4.1.0
+
+**Enhanced Type Documentation and BrandedMasterStringsCollection**
+
+This release focuses on improved documentation and ergonomic type aliases for working with branded enums.
+
+**New Features:**
+
+- **`BrandedMasterStringsCollection<E, TLanguage>`**: Ergonomic type alias for defining translation collections with branded enums
+  ```typescript
+  const translations: BrandedMasterStringsCollection<typeof MyKeys, CoreLanguageCode> = {
+    [LanguageCodes.EN_US]: { 'my.welcome': 'Welcome!' },
+    [LanguageCodes.FR]: { 'my.welcome': 'Bienvenue!' },
+  };
+  ```
+
+- **`BrandedPluralMasterStringsCollection<E, TLanguage>`**: Type alias for plural-aware branded translations
+
+- **Comprehensive Module Documentation**: Added extensive JSDoc documentation to `types.ts` explaining:
+  - Traditional enums vs branded enums
+  - Migration patterns from legacy enums
+  - Complete examples for defining translations
+
+**Documentation:**
+
+- Step-by-step guide for creating branded string keys
+- Examples showing `BrandedMasterStringsCollection` usage
+- Migration guide from traditional `EnumLanguageTranslation` types
 
 ### Version 4.0.4
 

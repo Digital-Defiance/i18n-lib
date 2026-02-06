@@ -3,6 +3,7 @@
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import type { AnyBrandedEnum } from '@digitaldefiance/branded-enum';
 import { I18nEngine } from '../core/i18n-engine';
 import { EngineConfig, LanguageDefinition } from '../interfaces';
 
@@ -12,6 +13,7 @@ export class I18nBuilder {
   private instanceKey = 'default';
   private registerInstance = true;
   private setAsDefault = true;
+  private stringKeyEnums: AnyBrandedEnum[] = [];
 
   private constructor() {}
 
@@ -60,6 +62,25 @@ export class I18nBuilder {
     return this;
   }
 
+  /**
+   * Register a branded string key enum for direct translation via translateStringKey().
+   * Multiple enums can be registered by calling this method multiple times.
+   * @param stringKeyEnum - Branded enum created by createI18nStringKeys or createI18nStringKeysFromEnum
+   */
+  withStringKeyEnum(stringKeyEnum: AnyBrandedEnum): this {
+    this.stringKeyEnums.push(stringKeyEnum);
+    return this;
+  }
+
+  /**
+   * Register multiple branded string key enums for direct translation.
+   * @param stringKeyEnums - Array of branded enums
+   */
+  withStringKeyEnums(stringKeyEnums: readonly AnyBrandedEnum[]): this {
+    this.stringKeyEnums.push(...stringKeyEnums);
+    return this;
+  }
+
   isolated(): this {
     this.registerInstance = false;
     return this;
@@ -75,10 +96,17 @@ export class I18nBuilder {
       throw new Error('At least one language must be provided');
     }
 
-    return new I18nEngine(this.languages, this.config, {
+    const engine = new I18nEngine(this.languages, this.config, {
       instanceKey: this.instanceKey,
       registerInstance: this.registerInstance,
       setAsDefault: this.setAsDefault,
     });
+
+    // Register all string key enums
+    for (const enumObj of this.stringKeyEnums) {
+      engine.registerStringKeyEnum(enumObj);
+    }
+
+    return engine;
   }
 }

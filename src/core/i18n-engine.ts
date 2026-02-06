@@ -33,6 +33,7 @@ import { ComponentStore } from './component-store';
 import { ContextManager } from './context-manager';
 import { EnumRegistry } from './enum-registry';
 import { LanguageRegistry } from './language-registry';
+import { StringKeyEnumRegistry } from './string-key-enum-registry';
 
 /**
  * I18nEngine implements the II18nEngine interface, providing translation,
@@ -46,6 +47,7 @@ export class I18nEngine implements II18nEngine {
 
   private readonly componentStore: ComponentStore;
   private readonly enumRegistry: EnumRegistry;
+  private readonly stringKeyEnumRegistry: StringKeyEnumRegistry;
   private readonly instanceKey: string;
   private readonly config: Required<EngineConfig>;
   private readonly aliasToComponent = new Map<string, string>();
@@ -96,6 +98,7 @@ export class I18nEngine implements II18nEngine {
     this.enumRegistry = new EnumRegistry((key, vars) =>
       this.safeTranslate(CoreI18nComponentId, key, vars),
     );
+    this.stringKeyEnumRegistry = new StringKeyEnumRegistry();
     this.instanceKey = options?.instanceKey || I18nEngine.DEFAULT_KEY;
 
     // Create context
@@ -737,6 +740,214 @@ export class I18nEngine implements II18nEngine {
   }
 
   /**
+   * Registers a branded string key enum for automatic component ID resolution.
+   *
+   * This method enables direct translation of string key values without requiring
+   * per-component wrapper functions. Once registered, the engine can automatically
+   * resolve the component ID from any string key value belonging to the enum.
+   *
+   * ## Registration Behavior
+   *
+   * - Extracts the component ID from the branded enum's metadata
+   * - Stores a reference to the enum for later lookup
+   * - Idempotent: re-registering the same enum returns the same component ID
+   * - Skips re-registration if another enum with the same component ID exists
+   *
+   * ## Validation
+   *
+   * The method validates that the provided object is a branded enum created
+   * with `createI18nStringKeys` or `createBrandedEnum`. Non-branded objects
+   * will cause an error to be thrown.
+   *
+   * @param stringKeyEnum - Branded enum created by createI18nStringKeys
+   * @returns The extracted component ID
+   * @throws {I18nError} If not a valid branded enum (INVALID_STRING_KEY_ENUM)
+   *
+   * @example Basic registration
+   * ```typescript
+   * const UserKeys = createI18nStringKeys('user', {
+   *   Welcome: 'user.welcome',
+   *   Goodbye: 'user.goodbye',
+   * } as const);
+   *
+   * const componentId = engine.registerStringKeyEnum(UserKeys);
+   * console.log(componentId); // 'user'
+   * ```
+   *
+   * @example Idempotent registration
+   * ```typescript
+   * engine.registerStringKeyEnum(UserKeys); // 'user'
+   * engine.registerStringKeyEnum(UserKeys); // 'user' (same result, no duplicate)
+   * ```
+   *
+   * @see {@link translateStringKey} - Translate registered string key values
+   * @see {@link hasStringKeyEnum} - Check if an enum is registered
+   */
+  registerStringKeyEnum(stringKeyEnum: AnyBrandedEnum): string {
+    return this.stringKeyEnumRegistry.register(stringKeyEnum);
+  }
+
+  /**
+   * Translates a branded string key value directly.
+   *
+   * This method automatically resolves the component ID from the branded string
+   * key value and calls the underlying `translate` method. It eliminates the need
+   * for per-component wrapper functions.
+   *
+   * ## Resolution Process
+   *
+   * 1. Resolves the component ID from the string key value using the registry
+   * 2. Calls `translate(componentId, stringKeyValue, variables, language)`
+   * 3. Returns the translated string
+   *
+   * ## Prerequisites
+   *
+   * The branded enum containing the string key value must be registered via
+   * {@link registerStringKeyEnum} before calling this method.
+   *
+   * @template E - The branded enum type
+   * @param stringKeyValue - Branded string key value to translate
+   * @param variables - Optional variables for template substitution
+   * @param language - Optional language code (defaults to current language)
+   * @returns Translated string
+   * @throws {I18nError} If the string key is not registered (STRING_KEY_NOT_REGISTERED)
+   * @throws {I18nError} If the translation key is not found (KEY_NOT_FOUND)
+   *
+   * @example Basic translation
+   * ```typescript
+   * const UserKeys = createI18nStringKeys('user', { Welcome: 'user.welcome' });
+   * engine.registerStringKeyEnum(UserKeys);
+   *
+   * engine.translateStringKey(UserKeys.Welcome); // 'Welcome!'
+   * ```
+   *
+   * @example With variables
+   * ```typescript
+   * engine.translateStringKey(UserKeys.Greeting, { name: 'John' }); // 'Hello, John!'
+   * ```
+   *
+   * @example With explicit language
+   * ```typescript
+   * engine.translateStringKey(UserKeys.Welcome, undefined, 'es'); // '¡Bienvenido!'
+   * ```
+   *
+   * @see {@link registerStringKeyEnum} - Register enums for translation
+   * @see {@link safeTranslateStringKey} - Safe version that returns placeholder on failure
+   */
+  translateStringKey<E extends AnyBrandedEnum>(
+    stringKeyValue: BrandedEnumValue<E>,
+    variables?: Record<string, unknown>,
+    language?: string,
+  ): string {
+    const componentId = this.stringKeyEnumRegistry.resolveComponentId(
+      stringKeyValue as string,
+    );
+    return this.translate(
+      componentId,
+      stringKeyValue as string,
+      variables,
+      language,
+    );
+  }
+
+  /**
+   * Safely translates a branded string key value.
+   *
+   * Returns a placeholder string on failure instead of throwing an exception.
+   * This is useful for UI code where a missing translation should not crash
+   * the application.
+   *
+   * ## Placeholder Format
+   *
+   * - If component ID is resolved: `[componentId.stringKeyValue]`
+   * - If component ID cannot be resolved: `[unknown.stringKeyValue]`
+   *
+   * @template E - The branded enum type
+   * @param stringKeyValue - Branded string key value to translate
+   * @param variables - Optional variables for template substitution
+   * @param language - Optional language code (defaults to current language)
+   * @returns Translated string or placeholder on failure
+   *
+   * @example Safe translation
+   * ```typescript
+   * engine.safeTranslateStringKey(UserKeys.Welcome); // 'Welcome!' or '[user.user.welcome]'
+   * ```
+   *
+   * @see {@link translateStringKey} - Throwing version
+   * @see {@link registerStringKeyEnum} - Register enums for translation
+   */
+  safeTranslateStringKey<E extends AnyBrandedEnum>(
+    stringKeyValue: BrandedEnumValue<E>,
+    variables?: Record<string, unknown>,
+    language?: string,
+  ): string {
+    const componentId = this.stringKeyEnumRegistry.safeResolveComponentId(
+      stringKeyValue as string,
+    );
+    if (!componentId) {
+      return `[unknown.${String(stringKeyValue)}]`;
+    }
+    return this.safeTranslate(
+      componentId,
+      stringKeyValue as string,
+      variables,
+      language,
+    );
+  }
+
+  /**
+   * Checks if a branded string key enum is registered.
+   *
+   * Uses object reference equality to check registration status.
+   *
+   * @param stringKeyEnum - The branded enum to check
+   * @returns `true` if the enum is registered, `false` otherwise
+   *
+   * @example
+   * ```typescript
+   * engine.hasStringKeyEnum(UserKeys); // false (not registered yet)
+   * engine.registerStringKeyEnum(UserKeys);
+   * engine.hasStringKeyEnum(UserKeys); // true
+   * ```
+   *
+   * @see {@link registerStringKeyEnum} - Register enums
+   * @see {@link getStringKeyEnums} - Get all registered enums
+   */
+  hasStringKeyEnum(stringKeyEnum: AnyBrandedEnum): boolean {
+    return this.stringKeyEnumRegistry.has(stringKeyEnum);
+  }
+
+  /**
+   * Gets all registered string key enums with their component IDs.
+   *
+   * Returns a readonly array of entries containing the enum reference
+   * and its associated component ID.
+   *
+   * @returns Readonly array of objects with enumObj and componentId
+   *
+   * @example
+   * ```typescript
+   * engine.registerStringKeyEnum(UserKeys);
+   * engine.registerStringKeyEnum(AdminKeys);
+   *
+   * const enums = engine.getStringKeyEnums();
+   * // [
+   * //   { enumObj: UserKeys, componentId: 'user' },
+   * //   { enumObj: AdminKeys, componentId: 'admin' }
+   * // ]
+   * ```
+   *
+   * @see {@link registerStringKeyEnum} - Register enums
+   * @see {@link hasStringKeyEnum} - Check if an enum is registered
+   */
+  getStringKeyEnums(): readonly {
+    enumObj: AnyBrandedEnum;
+    componentId: string;
+  }[] {
+    return this.stringKeyEnumRegistry.getAll();
+  }
+
+  /**
    * Validates all registered components for missing translations or warnings.
    * @returns ValidationResult containing errors and warnings.
    */
@@ -837,6 +1048,10 @@ export class I18nEngine implements II18nEngine {
    * Resets all engine instances and clears global registries.
    */
   static resetAll(): void {
+    // Clear string key enum registries for each instance before clearing instances
+    for (const instance of I18nEngine.instances.values()) {
+      instance.stringKeyEnumRegistry.clear();
+    }
     I18nEngine.instances.clear();
     I18nEngine.defaultKey = null;
     I18nEngine.contextManager.clear();

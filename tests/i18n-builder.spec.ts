@@ -313,4 +313,137 @@ describe('I18nBuilder', () => {
       expect(engine).toBeInstanceOf(I18nEngine);
     });
   });
+
+  describe('String Key Enum Registration', () => {
+    // Import branded enum utilities for testing
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const createI18nStringKeys = require('../src/branded-string-key').createI18nStringKeys;
+
+    it('should register single string key enum via withStringKeyEnum', () => {
+      const TestKeys = createI18nStringKeys('test-component', {
+        Hello: 'hello',
+        Goodbye: 'goodbye',
+      } as const);
+
+      const engine = I18nBuilder.create()
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
+        .withStringKeyEnum(TestKeys)
+        .build();
+
+      expect(engine.hasStringKeyEnum(TestKeys)).toBe(true);
+    });
+
+    it('should register multiple string key enums via withStringKeyEnums', () => {
+      const TestKeys1 = createI18nStringKeys('component-1', {
+        Key1: 'key1',
+      } as const);
+
+      const TestKeys2 = createI18nStringKeys('component-2', {
+        Key2: 'key2',
+      } as const);
+
+      const engine = I18nBuilder.create()
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
+        .withStringKeyEnums([TestKeys1, TestKeys2])
+        .build();
+
+      expect(engine.hasStringKeyEnum(TestKeys1)).toBe(true);
+      expect(engine.hasStringKeyEnum(TestKeys2)).toBe(true);
+    });
+
+    it('should allow chaining withStringKeyEnum multiple times', () => {
+      const TestKeys1 = createI18nStringKeys('chain-1', {
+        A: 'a',
+      } as const);
+
+      const TestKeys2 = createI18nStringKeys('chain-2', {
+        B: 'b',
+      } as const);
+
+      const engine = I18nBuilder.create()
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
+        .withStringKeyEnum(TestKeys1)
+        .withStringKeyEnum(TestKeys2)
+        .build();
+
+      expect(engine.hasStringKeyEnum(TestKeys1)).toBe(true);
+      expect(engine.hasStringKeyEnum(TestKeys2)).toBe(true);
+    });
+
+    it('should support translateStringKey after builder registration', () => {
+      const TestKeys = createI18nStringKeys('translate-test', {
+        Welcome: 'welcome',
+      } as const);
+
+      const engine = I18nBuilder.create()
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
+        .withStringKeyEnum(TestKeys)
+        .build();
+
+      // Register the component with translations
+      engine.register({
+        id: 'translate-test',
+        strings: {
+          'en-US': { welcome: 'Welcome!' },
+        },
+      });
+
+      // Should be able to translate using translateStringKey
+      const result = engine.translateStringKey(TestKeys.Welcome);
+      expect(result).toBe('Welcome!');
+    });
+
+    it('should combine withStringKeyEnum and withStringKeyEnums', () => {
+      const SingleKey = createI18nStringKeys('single', {
+        One: 'one',
+      } as const);
+
+      const MultiKey1 = createI18nStringKeys('multi-1', {
+        Two: 'two',
+      } as const);
+
+      const MultiKey2 = createI18nStringKeys('multi-2', {
+        Three: 'three',
+      } as const);
+
+      const engine = I18nBuilder.create()
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
+        .withStringKeyEnum(SingleKey)
+        .withStringKeyEnums([MultiKey1, MultiKey2])
+        .build();
+
+      expect(engine.hasStringKeyEnum(SingleKey)).toBe(true);
+      expect(engine.hasStringKeyEnum(MultiKey1)).toBe(true);
+      expect(engine.hasStringKeyEnum(MultiKey2)).toBe(true);
+      expect(engine.getStringKeyEnums()).toHaveLength(3);
+    });
+
+    it('should work with isolated instances', () => {
+      const TestKeys = createI18nStringKeys('isolated-test', {
+        Key: 'key',
+      } as const);
+
+      const engine = I18nBuilder.create()
+        .withLanguages([
+          { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+        ])
+        .withStringKeyEnum(TestKeys)
+        .isolated()
+        .build();
+
+      expect(engine.hasStringKeyEnum(TestKeys)).toBe(true);
+      // Isolated instance should not be registered globally
+      expect(I18nEngine.hasInstance('default')).toBe(false);
+    });
+  });
 });

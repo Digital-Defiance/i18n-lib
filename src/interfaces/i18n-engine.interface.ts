@@ -4,6 +4,10 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import type {
+  AnyBrandedEnum,
+  BrandedEnumValue,
+} from '@digitaldefiance/branded-enum';
 import { ComponentConfig } from './component-config.interface';
 import { LanguageDefinition } from './language-definition.interface';
 import { ValidationResult } from './validation-result.interface';
@@ -75,4 +79,45 @@ export interface II18nEngine {
   // Validation
   /** Validates all registered components */
   validate(): ValidationResult;
+
+  // String Key Enum Registration
+  /**
+   * Registers a branded string key enum for automatic component ID resolution.
+   * @param stringKeyEnum - Branded enum created by createI18nStringKeys
+   * @returns The extracted component ID
+   */
+  registerStringKeyEnum(stringKeyEnum: AnyBrandedEnum): string;
+
+  /**
+   * Translates a branded string key value directly.
+   * Automatically resolves the component ID from the branded value.
+   */
+  translateStringKey<E extends AnyBrandedEnum>(
+    stringKeyValue: BrandedEnumValue<E>,
+    variables?: Record<string, unknown>,
+    language?: string,
+  ): string;
+
+  /**
+   * Safely translates a branded string key value.
+   * Returns a placeholder on failure instead of throwing.
+   */
+  safeTranslateStringKey<E extends AnyBrandedEnum>(
+    stringKeyValue: BrandedEnumValue<E>,
+    variables?: Record<string, unknown>,
+    language?: string,
+  ): string;
+
+  /**
+   * Checks if a branded string key enum is registered.
+   */
+  hasStringKeyEnum(stringKeyEnum: AnyBrandedEnum): boolean;
+
+  /**
+   * Gets all registered string key enums with their component IDs.
+   */
+  getStringKeyEnums(): readonly {
+    enumObj: AnyBrandedEnum;
+    componentId: string;
+  }[];
 }
