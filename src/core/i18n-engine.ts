@@ -643,7 +643,10 @@ export class I18nEngine implements II18nEngine {
    * @see {@link hasEnum} - Check if an enum is registered
    */
   registerEnum<TEnum extends string | number>(
-    enumObj: Record<string, TEnum> | AnyBrandedEnum,
+    enumObj:
+      | Record<string, TEnum>
+      | AnyBrandedEnum
+      | { [key: string]: string | number },
     translations: Record<string, Record<TEnum | string, string>>,
     enumName?: string,
   ): void {

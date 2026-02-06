@@ -195,7 +195,10 @@ export class EnumRegistry {
    * ```
    */
   register<TEnum extends string | number>(
-    enumObj: Record<string, TEnum> | AnyBrandedEnum,
+    enumObj:
+      | Record<string, TEnum>
+      | AnyBrandedEnum
+      | { [key: string]: string | number },
     translations: Record<string, Record<string, string>>,
     enumName?: string,
   ): Record<string, Record<string, string>> {
@@ -263,7 +266,10 @@ export class EnumRegistry {
    * ```
    */
   translate<TEnum extends string | number>(
-    enumObj: Record<string, TEnum> | AnyBrandedEnum,
+    enumObj:
+      | Record<string, TEnum>
+      | AnyBrandedEnum
+      | { [key: string]: string | number },
     value: TEnum | BrandedEnumValue<AnyBrandedEnum>,
     language: string,
   ): string {
