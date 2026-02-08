@@ -34,6 +34,8 @@ export function resetAll(): void {
 export * from './branded-string-key';
 // Branded enum utilities for detection and extraction
 export * from './branded-enum-utils';
+// Factory function for simplified i18n setup
+export { createI18nSetup } from './create-i18n-setup';
 // Re-export key types from branded-enum for convenience
 export type {
   BrandedEnum,

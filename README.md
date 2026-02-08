@@ -1315,6 +1315,406 @@ function translateAnyValue<T extends string | number>(
 }
 ```
 
+## Monorepo i18n-setup Guide
+
+When building an application that consumes multiple Express Suite packages (e.g., `suite-core-lib`, `ecies-lib`), you need a single `i18n-setup.ts` file that initializes the engine, registers all components and their branded string key enums, sets up the global context, and exports translation helpers.
+
+### Recommended: Factory Approach (`createI18nSetup`)
+
+The `createI18nSetup()` factory replaces ~200 lines of manual boilerplate with a single function call. It handles engine creation, core component registration, library component registration, branded enum registration, and context initialization automatically.
+
+```typescript
+// i18n-setup.ts — Application-level i18n initialization (factory approach)
+
+import {
+  createI18nSetup,
+  createI18nStringKeys,
+  LanguageCodes,
+} from '@digitaldefiance/i18n-lib';
+import { createSuiteCoreComponentPackage } from '@digitaldefiance/suite-core-lib';
+import { createEciesComponentPackage } from '@digitaldefiance/ecies-lib';
+
+// 1. Define your application component
+export const AppComponentId = 'MyApp';
+
+export const AppStringKey = createI18nStringKeys(AppComponentId, {
+  SiteTitle: 'siteTitle',
+  SiteDescription: 'siteDescription',
+  WelcomeMessage: 'welcomeMessage',
+} as const);
+
+const appStrings = {
+  [LanguageCodes.EN_US]: {
+    siteTitle: 'My Application',
+    siteDescription: 'An Express Suite application',
+    welcomeMessage: 'Welcome, {name}!',
+  },
+  [LanguageCodes.FR]: {
+    siteTitle: 'Mon Application',
+    siteDescription: 'Une application Express Suite',
+    welcomeMessage: 'Bienvenue, {name} !',
+  },
+};
+
+// 2. Create the i18n setup — one call does everything
+const i18n = createI18nSetup({
+  componentId: AppComponentId,
+  stringKeyEnum: AppStringKey,
+  strings: appStrings,
+  aliases: ['AppStringKey'],
+  libraryComponents: [
+    createSuiteCoreComponentPackage(),
+    createEciesComponentPackage(),
+  ],
+});
+
+// 3. Export the public API
+export const { engine: i18nEngine, translate, safeTranslate } = i18n;
+export const i18nContext = i18n.context;
+```
+
+The factory:
+- Creates or reuses an `I18nEngine` instance (idempotent via `instanceKey`, defaults to `'default'`)
+- Registers the Core i18n component automatically
+- Registers each library component's `ComponentConfig` and branded `stringKeyEnum` from the `I18nComponentPackage`
+- Registers your application component and its branded enum
+- Initializes `GlobalActiveContext` with the specified `defaultLanguage` (defaults to `'en-US'`)
+- Returns an `I18nSetupResult` with `engine`, `translate`, `safeTranslate`, `context`, `setLanguage`, `setAdminLanguage`, `setContext`, `getLanguage`, `getAdminLanguage`, and `reset`
+
+Calling `createI18nSetup()` multiple times with the same `instanceKey` reuses the existing engine — safe for monorepos where a subset library and a superset API both call the factory.
+
+### I18nComponentPackage Interface
+
+Library authors bundle a `ComponentConfig` with its branded string key enum in a single `I18nComponentPackage` object. This lets the factory auto-register both the component and its enum in one step.
+
+```typescript
+import type { AnyBrandedEnum } from '@digitaldefiance/branded-enum';
+import type { ComponentConfig } from '@digitaldefiance/i18n-lib';
+
+interface I18nComponentPackage {
+  readonly config: ComponentConfig;
+  readonly stringKeyEnum?: AnyBrandedEnum;
+}
+```
+
+Each library exports a `createXxxComponentPackage()` function:
+
+```typescript
+// In suite-core-lib
+import { createSuiteCoreComponentPackage } from '@digitaldefiance/suite-core-lib';
+const pkg = createSuiteCoreComponentPackage();
+// pkg.config  → SuiteCore ComponentConfig
+// pkg.stringKeyEnum → SuiteCoreStringKey branded enum
+
+// In ecies-lib
+import { createEciesComponentPackage } from '@digitaldefiance/ecies-lib';
+const pkg = createEciesComponentPackage();
+
+// In node-ecies-lib
+import { createNodeEciesComponentPackage } from '@digitaldefiance/node-ecies-lib';
+const pkg = createNodeEciesComponentPackage();
+```
+
+The existing `createSuiteCoreComponentConfig()` and `createEciesComponentConfig()` functions remain available for consumers that prefer the manual approach.
+
+### Browser-Safe Fallback
+
+In browser environments, bundlers like Vite and webpack may create separate copies of `@digitaldefiance/branded-enum`, causing `isBrandedEnum()` to fail due to Symbol/WeakSet identity mismatch. This breaks `registerStringKeyEnum()` and `translateStringKey()`.
+
+The engine now includes a transparent fallback: when the `StringKeyEnumRegistry` fails to resolve a component ID for a known string key value, the engine scans all registered components' string keys to find the matching component. The result is cached in a `ValueComponentLookupCache` for subsequent lookups, and the cache is invalidated whenever a new component is registered.
+
+This means consumers do not need manual workarounds (like `safeRegisterStringKeyEnum` or `_componentLookup` maps) for bundler Symbol mismatch issues. Both `translateStringKey` and `safeTranslateStringKey` use the fallback automatically.
+
+### Advanced: Manual Setup
+
+For advanced use cases where you need full control over engine creation, validation options, or custom registration order, you can use the manual approach:
+
+<details>
+<summary>Click to expand manual i18n-setup.ts example</summary>
+
+```typescript
+// i18n-setup.ts — Manual approach (advanced)
+
+import {
+  I18nBuilder,
+  I18nEngine,
+  LanguageCodes,
+  GlobalActiveContext,
+  getCoreLanguageDefinitions,
+  createCoreComponentRegistration,
+  createI18nStringKeys,
+  type CoreLanguageCode,
+  type IActiveContext,
+  type ComponentConfig,
+  type LanguageContextSpace,
+} from '@digitaldefiance/i18n-lib';
+import type { BrandedEnumValue } from '@digitaldefiance/branded-enum';
+import {
+  createSuiteCoreComponentConfig,
+  SuiteCoreStringKey,
+} from '@digitaldefiance/suite-core-lib';
+import {
+  createEciesComponentConfig,
+  EciesStringKey,
+} from '@digitaldefiance/ecies-lib';
+
+export const AppComponentId = 'MyApp';
+
+export const AppStringKey = createI18nStringKeys(AppComponentId, {
+  SiteTitle: 'siteTitle',
+  SiteDescription: 'siteDescription',
+  WelcomeMessage: 'welcomeMessage',
+} as const);
+
+export type AppStringKeyValue = BrandedEnumValue<typeof AppStringKey>;
+
+const appStrings: Record<string, Record<string, string>> = {
+  [LanguageCodes.EN_US]: {
+    siteTitle: 'My Application',
+    siteDescription: 'An Express Suite application',
+    welcomeMessage: 'Welcome, {name}!',
+  },
+  [LanguageCodes.FR]: {
+    siteTitle: 'Mon Application',
+    siteDescription: 'Une application Express Suite',
+    welcomeMessage: 'Bienvenue, {name} !',
+  },
+};
+
+function createAppComponentConfig(): ComponentConfig {
+  return { id: AppComponentId, strings: appStrings, aliases: ['AppStringKey'] };
+}
+
+// Create or reuse engine
+let i18nEngine: I18nEngine;
+if (I18nEngine.hasInstance('default')) {
+  i18nEngine = I18nEngine.getInstance('default');
+} else {
+  i18nEngine = I18nBuilder.create()
+    .withLanguages(getCoreLanguageDefinitions())
+    .withDefaultLanguage(LanguageCodes.EN_US)
+    .withFallbackLanguage(LanguageCodes.EN_US)
+    .withInstanceKey('default')
+    .build();
+}
+
+// Register components
+const coreReg = createCoreComponentRegistration();
+i18nEngine.registerIfNotExists({
+  id: coreReg.component.id,
+  strings: coreReg.strings as Record<string, Record<string, string>>,
+});
+i18nEngine.registerIfNotExists(createSuiteCoreComponentConfig());
+i18nEngine.registerIfNotExists(createEciesComponentConfig());
+i18nEngine.registerIfNotExists(createAppComponentConfig());
+
+// Register branded enums
+if (!i18nEngine.hasStringKeyEnum(SuiteCoreStringKey)) {
+  i18nEngine.registerStringKeyEnum(SuiteCoreStringKey);
+}
+if (!i18nEngine.hasStringKeyEnum(EciesStringKey)) {
+  i18nEngine.registerStringKeyEnum(EciesStringKey);
+}
+if (!i18nEngine.hasStringKeyEnum(AppStringKey)) {
+  i18nEngine.registerStringKeyEnum(AppStringKey);
+}
+
+// Initialize context
+const globalContext = GlobalActiveContext.getInstance<
+  CoreLanguageCode,
+  IActiveContext<CoreLanguageCode>
+>();
+globalContext.createContext(LanguageCodes.EN_US, LanguageCodes.EN_US, AppComponentId);
+
+// Export helpers
+export { i18nEngine };
+
+export const translate = (
+  name: AppStringKeyValue,
+  variables?: Record<string, string | number>,
+  language?: CoreLanguageCode,
+  context?: LanguageContextSpace,
+): string => {
+  const activeContext =
+    context ?? globalContext.getContext(AppComponentId).currentContext;
+  const lang =
+    language ??
+    (activeContext === 'admin'
+      ? globalContext.getContext(AppComponentId).adminLanguage
+      : globalContext.getContext(AppComponentId).language);
+  return i18nEngine.translateStringKey(name, variables, lang);
+};
+
+export const safeTranslate = (
+  name: AppStringKeyValue,
+  variables?: Record<string, string | number>,
+  language?: CoreLanguageCode,
+  context?: LanguageContextSpace,
+): string => {
+  const activeContext =
+    context ?? globalContext.getContext(AppComponentId).currentContext;
+  const lang =
+    language ??
+    (activeContext === 'admin'
+      ? globalContext.getContext(AppComponentId).adminLanguage
+      : globalContext.getContext(AppComponentId).language);
+  return i18nEngine.safeTranslateStringKey(name, variables, lang);
+};
+```
+
+</details>
+
+Key points for the manual approach:
+
+- **Idempotent engine creation**: `I18nEngine.hasInstance('default')` checks for an existing engine before building a new one.
+- **Core component first**: Always register the Core component before other components — it provides error message translations used internally.
+- **`registerIfNotExists`**: All component registrations use the idempotent variant so multiple packages can safely register without conflicts.
+- **`hasStringKeyEnum` guard**: Prevents duplicate enum registration when multiple setup files run in the same process.
+- **Context-aware helpers**: The `translate` and `safeTranslate` functions resolve the active language from `GlobalActiveContext`, respecting user vs. admin context.
+
+### Migration Guide
+
+Converting an existing manual `i18n-setup.ts` to the factory approach is straightforward. There are no breaking changes — the factory produces the same engine state as the manual approach.
+
+#### Before (manual)
+
+```typescript
+import { I18nBuilder, I18nEngine, LanguageCodes, GlobalActiveContext, ... } from '@digitaldefiance/i18n-lib';
+import { createSuiteCoreComponentConfig, SuiteCoreStringKey } from '@digitaldefiance/suite-core-lib';
+import { createEciesComponentConfig, EciesStringKey } from '@digitaldefiance/ecies-lib';
+
+// ~200 lines: engine creation, core registration, library registration,
+// enum registration, context initialization, translate helpers...
+```
+
+#### After (factory)
+
+```typescript
+import { createI18nSetup, createI18nStringKeys, LanguageCodes } from '@digitaldefiance/i18n-lib';
+import { createSuiteCoreComponentPackage } from '@digitaldefiance/suite-core-lib';
+import { createEciesComponentPackage } from '@digitaldefiance/ecies-lib';
+
+const i18n = createI18nSetup({
+  componentId: AppComponentId,
+  stringKeyEnum: AppStringKey,
+  strings: appStrings,
+  libraryComponents: [
+    createSuiteCoreComponentPackage(),
+    createEciesComponentPackage(),
+  ],
+});
+
+export const { engine: i18nEngine, translate, safeTranslate } = i18n;
+```
+
+#### Migration steps
+
+1. Replace `createXxxComponentConfig` imports with `createXxxComponentPackage` imports
+2. Replace manual engine creation (`I18nBuilder` / `I18nEngine.registerIfNotExists`) with `createI18nSetup()`
+3. Move library component registrations into the `libraryComponents` array
+4. Remove manual `registerStringKeyEnum` calls — the factory handles them
+5. Remove manual `GlobalActiveContext` initialization — the factory handles it
+6. Destructure the returned `I18nSetupResult` to get `engine`, `translate`, `safeTranslate`, etc.
+
+#### Notes
+
+- Existing `createXxxComponentConfig()` functions remain available for consumers that prefer the manual approach
+- The factory uses the same `registerIfNotExists` pattern internally, so it is safe to mix factory and manual consumers sharing the same engine instance
+- There are no breaking changes or behavioral differences between the manual and factory approaches
+
+### createI18nStringKeys vs createI18nStringKeysFromEnum
+
+Both functions produce identical `BrandedStringKeys` output. Choose based on your starting point.
+
+#### createI18nStringKeys — preferred for new code
+
+Creates a branded enum directly from an `as const` object literal:
+
+```typescript
+import { createI18nStringKeys } from '@digitaldefiance/i18n-lib';
+
+export const AppStringKey = createI18nStringKeys('my-app', {
+  Welcome: 'welcome',
+  Goodbye: 'goodbye',
+} as const);
+```
+
+Use this when writing a new component from scratch. The `as const` assertion preserves literal types so each key is fully type-safe.
+
+#### createI18nStringKeysFromEnum — useful for migration
+
+Wraps an existing TypeScript enum into a branded enum:
+
+```typescript
+import { createI18nStringKeysFromEnum } from '@digitaldefiance/i18n-lib';
+
+// Existing traditional enum
+enum LegacyStringKeys {
+  Welcome = 'welcome',
+  Goodbye = 'goodbye',
+}
+
+export const AppStringKey = createI18nStringKeysFromEnum(
+  'my-app',
+  LegacyStringKeys,
+);
+```
+
+Use this when migrating code that already has a traditional `enum`. Internally, `createI18nStringKeysFromEnum` filters out TypeScript's reverse numeric mappings and then delegates to `createI18nStringKeys`.
+
+#### Comparison
+
+| Aspect | `createI18nStringKeys` | `createI18nStringKeysFromEnum` |
+|---|---|---|
+| Input | Object literal with `as const` | Existing TypeScript enum |
+| Use case | New code, fresh components | Migrating existing enum-based code |
+| Output | `BrandedStringKeys<T>` | `BrandedStringKeys<T>` |
+| Internal behavior | Calls `createBrandedEnum` directly | Filters reverse numeric mappings, then delegates to `createI18nStringKeys` |
+
+### Troubleshooting: Branded Enum Module Identity in Monorepos
+
+#### Symptom
+
+`registerStringKeyEnum()` throws or `hasStringKeyEnum()` returns `false` for a branded enum that was created with `createI18nStringKeys` or `createI18nStringKeysFromEnum`.
+
+#### Root Cause
+
+`isBrandedEnum()` returns `false` when the `@digitaldefiance/branded-enum` global registry holds a different module instance. This happens when multiple copies of the package are installed — each copy has its own `WeakSet` / `Symbol` registry, so enums created by one copy are not recognized by another.
+
+#### Diagnosis
+
+Check for duplicate installations:
+
+```bash
+# npm
+npm ls @digitaldefiance/branded-enum
+
+# yarn
+yarn why @digitaldefiance/branded-enum
+```
+
+If you see more than one resolved version (or multiple paths), the registry is split.
+
+#### Solutions
+
+1. **Single version via resolutions/overrides** — pin a single version in your root `package.json`:
+
+   ```jsonc
+   // npm (package.json)
+   "overrides": {
+     "@digitaldefiance/branded-enum": "<version>"
+   }
+
+   // yarn (package.json)
+   "resolutions": {
+     "@digitaldefiance/branded-enum": "<version>"
+   }
+   ```
+
+2. **Bundler deduplication** — if you use webpack, Rollup, or esbuild, ensure the `@digitaldefiance/branded-enum` module is resolved to a single path. For webpack, the `resolve.alias` or `resolve.dedupe` options can help.
+
+3. **Consistent package resolution** — in Nx or other monorepo tools, verify that all projects resolve the same physical copy. Running `nx graph` can help visualize dependency relationships.
+
 ## Browser Support
 
 - Chrome/Edge: Latest 2 versions (minimum: Chrome 90, Edge 90)
@@ -1499,6 +1899,28 @@ Contributions welcome! Please:
 - **Examples**: See tests/ directory
 
 ## ChangeLog
+
+### Version 4.4.0
+
+**Factory-Based i18n Setup & Browser-Safe Fallback**
+
+This release introduces `createI18nSetup()`, a factory function that replaces ~200 lines of boilerplate per consumer with a single function call. It also adds a browser-safe fallback for `translateStringKey` when bundler-duplicated packages break Symbol-based identity checks.
+
+**New Features:**
+
+- **`createI18nSetup()`**: Factory function that handles engine creation, core/library/app component registration, branded enum registration, and `GlobalActiveContext` initialization in one call
+- **`I18nComponentPackage`** interface: Bundles a `ComponentConfig` with its branded string key enum so the factory can auto-register both
+- **`I18nSetupConfig`** / **`I18nSetupResult`** interfaces: Typed config input and result output for the factory
+- **`createSuiteCoreComponentPackage()`**: New function in `suite-core-lib` returning an `I18nComponentPackage`
+- **`createEciesComponentPackage()`**: New function in `ecies-lib` returning an `I18nComponentPackage`
+- **`createNodeEciesComponentPackage()`**: New function in `node-ecies-lib` returning an `I18nComponentPackage`
+- **Browser-safe fallback**: `translateStringKey` and `safeTranslateStringKey` now fall back to scanning registered components when the `StringKeyEnumRegistry` fails (e.g., due to bundler Symbol mismatch), with a lazily-built `ValueComponentLookupCache` that invalidates on new component registration
+- **Updated starter template**: `express-suite-starter` scaffolding now uses `createI18nSetup()` for minimal boilerplate
+
+**Backward Compatibility:**
+
+- All existing APIs (`createSuiteCoreComponentConfig`, `createEciesComponentConfig`, `I18nBuilder`, manual registration) remain unchanged
+- The factory uses the same `registerIfNotExists` pattern internally, so factory and manual consumers can safely share the same engine instance
 
 ### Version 4.3.0
 
@@ -2623,21 +3045,6 @@ const myEngine = PluginI18nEngine.createInstance<MyLanguageCodes>('custom', lang
 
 - Wed Sep 24 2025 15:20:07 GMT-0700 (Pacific Daylight Time)
   - Initial release of the TypeScript internationalization library with enum translation, template processing, context management, and currency formatting.
-    PluginI18nEngine.resetAll();
-  });
-
-  afterEach(() => {
-    PluginI18nEngine.resetAll();
-  });
-
-  it('should translate', () => {
-    const engine = PluginI18nEngine.createInstance('test', languages);
-    engine.registerComponent(registration);
-    expect(engine.translate('app', 'hello')).toBe('Hello');
-  });
-});
-
-```
 
 ## TypeScript Support
 

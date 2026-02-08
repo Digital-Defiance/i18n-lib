@@ -52,6 +52,7 @@ export class I18nEngine implements II18nEngine {
   private readonly config: Required<EngineConfig>;
   private readonly aliasToComponent = new Map<string, string>();
   private readonly componentKeyLookup = new Map<string, Map<string, string>>();
+  private valueComponentLookupCache: Map<string, string> | null = null;
 
   /**
    * Constructs an I18nEngine instance, registering languages, setting defaults,
@@ -128,7 +129,9 @@ export class I18nEngine implements II18nEngine {
   register(config: ComponentConfig): ValidationResult {
     validateComponentId(config.id);
     this.registerComponentMetadata(config);
-    return this.componentStore.register(config);
+    const result = this.componentStore.register(config);
+    this.invalidateValueComponentLookupCache();
+    return result;
   }
 
   /**
@@ -202,6 +205,62 @@ export class I18nEngine implements II18nEngine {
         }
       });
     }
+  }
+
+  /**
+   * Invalidates the value-to-component lookup cache.
+   * Called after component registration so new keys are discoverable.
+   */
+  private invalidateValueComponentLookupCache(): void {
+    this.valueComponentLookupCache = null;
+  }
+
+  /**
+   * Builds a cache mapping string key values to component IDs
+   * by scanning all registered components.
+   */
+  private buildValueComponentLookupCache(): Map<string, string> {
+    const cache = new Map<string, string>();
+    for (const component of this.componentStore.getAll()) {
+      const firstLang = Object.keys(component.strings)[0];
+      if (firstLang) {
+        for (const key of Object.keys(component.strings[firstLang])) {
+          if (!cache.has(key)) {
+            cache.set(key, component.id);
+          }
+        }
+      }
+    }
+    return cache;
+  }
+
+  /**
+   * Resolves a string key value to its component ID, falling back to
+   * scanning registered components when the branded enum registry fails
+   * (e.g., due to bundler Symbol mismatch in browser environments).
+   * @param stringKeyValue - The string key value to resolve.
+   * @returns The component ID that owns this string key.
+   * @throws {I18nError} If the key is not found in any registered component.
+   */
+  private resolveComponentIdWithFallback(stringKeyValue: string): string {
+    // Try registry first
+    const registryResult =
+      this.stringKeyEnumRegistry.safeResolveComponentId(stringKeyValue);
+    if (registryResult !== null) {
+      return registryResult;
+    }
+
+    // Fallback: scan components via cache
+    if (!this.valueComponentLookupCache) {
+      this.valueComponentLookupCache = this.buildValueComponentLookupCache();
+    }
+
+    const fallbackResult = this.valueComponentLookupCache.get(stringKeyValue);
+    if (fallbackResult) {
+      return fallbackResult;
+    }
+
+    throw I18nError.stringKeyNotRegistered(stringKeyValue);
   }
 
   /**
@@ -839,7 +898,7 @@ export class I18nEngine implements II18nEngine {
     variables?: Record<string, unknown>,
     language?: string,
   ): string {
-    const componentId = this.stringKeyEnumRegistry.resolveComponentId(
+    const componentId = this.resolveComponentIdWithFallback(
       stringKeyValue as string,
     );
     return this.translate(
@@ -881,18 +940,19 @@ export class I18nEngine implements II18nEngine {
     variables?: Record<string, unknown>,
     language?: string,
   ): string {
-    const componentId = this.stringKeyEnumRegistry.safeResolveComponentId(
-      stringKeyValue as string,
-    );
-    if (!componentId) {
+    try {
+      const componentId = this.resolveComponentIdWithFallback(
+        stringKeyValue as string,
+      );
+      return this.safeTranslate(
+        componentId,
+        stringKeyValue as string,
+        variables,
+        language,
+      );
+    } catch {
       return `[unknown.${String(stringKeyValue)}]`;
     }
-    return this.safeTranslate(
-      componentId,
-      stringKeyValue as string,
-      variables,
-      language,
-    );
   }
 
   /**

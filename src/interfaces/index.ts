@@ -11,3 +11,6 @@ export type * from './i18n-engine.interface';
 export type * from './language-definition.interface';
 export type * from './translation-options.interface';
 export type * from './validation-result.interface';
+export type * from './i18n-component-package.interface';
+export type * from './i18n-setup-config.interface';
+export type * from './i18n-setup-result.interface';
