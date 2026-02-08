@@ -62,7 +62,7 @@ const text = engine.translateStringKey(MyBrandedKeys.Welcome, { name: 'Alice' })
 - **Type Safety**: Full TypeScript support with generic types
 - **Branded Enums**: Runtime-identifiable string keys with collision detection and component routing
 - **Error Handling**: Comprehensive error classes with translation support and ICU formatting
-- **93.22% Test Coverage**: 1,779 tests covering all features
+- **93.22% Test Coverage**: 2,007 tests covering all features
 - **Security Hardened**: Comprehensive protection against prototype pollution, ReDoS, and XSS attacks
 
 ## Installation
