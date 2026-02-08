@@ -8,6 +8,8 @@ Part of [Express Suite](https://github.com/Digital-Defiance/express-suite)
 
 ✨ **String Key Enum Registration** - Register branded string key enums for direct translation without specifying component IDs.
 
+**Prerequisites**: Requires branded enums from v4.0.4+ (see [Branded Enums](#branded-enums) section)
+
 **New Features:**
 - **`registerStringKeyEnum()`**: Register branded enums for automatic component routing
 - **`translateStringKey()`**: Translate keys directly - component ID resolved from branded enum
@@ -15,6 +17,15 @@ Part of [Express Suite](https://github.com/Digital-Defiance/express-suite)
 - **`hasStringKeyEnum()` / `getStringKeyEnums()`**: Query registered enums
 
 ```typescript
+import { createI18nStringKeysFromEnum, PluginI18nEngine, LanguageCodes } from '@digitaldefiance/i18n-lib';
+
+// First, create a branded enum from your string keys
+enum MyStringKeys {
+  Welcome = 'welcome',
+  Goodbye = 'goodbye',
+}
+const MyBrandedKeys = createI18nStringKeysFromEnum('my-component', MyStringKeys);
+
 // Register your branded enum
 engine.registerStringKeyEnum(MyBrandedKeys);
 
@@ -51,8 +62,8 @@ const text = engine.translateStringKey(MyBrandedKeys.Welcome, { name: 'Alice' })
 - **Type Safety**: Full TypeScript support with generic types
 - **Branded Enums**: Runtime-identifiable string keys with collision detection and component routing
 - **Error Handling**: Comprehensive error classes with translation support and ICU formatting
-- **93.22% Test Coverage**: 1,738 tests covering all features
-- **Security Hardened**: See [SECURITY.md](SECURITY.md) for details
+- **93.22% Test Coverage**: 1,779 tests covering all features
+- **Security Hardened**: Comprehensive protection against prototype pollution, ReDoS, and XSS attacks
 
 ## Installation
 
@@ -102,8 +113,12 @@ console.log(engine.translate('app', 'welcome', { appName: 'MyApp' }));
 // Output: "Bienvenue sur MyApp!"
 
 // Pluralization (automatic form selection)
-engine.register({
-  id: 'cart',
+engine.registerComponent({
+  component: {
+    id: 'cart',
+    name: 'Cart',
+    stringKeys: ['items']
+  },
   strings: {
     'en-US': {
       items: {
@@ -122,7 +137,18 @@ console.log(engine.translate('cart', 'items', { count: 5 }));
 
 ## ICU MessageFormat
 
-Industry-standard message formatting with powerful features. See [@docs/ICU_MESSAGEFORMAT.md](../../docs/ICU_MESSAGEFORMAT.md) for complete guide.
+Industry-standard message formatting with powerful features. See [docs/ICU_MESSAGEFORMAT.md](docs/ICU_MESSAGEFORMAT.md) for complete guide.
+
+**When to use ICU MessageFormat:**
+- Complex pluralization with multiple forms
+- Gender-specific translations
+- Number/date/time formatting with locale awareness
+- Nested conditional logic (select within plural)
+
+**When to use simple templates:**
+- Basic variable substitution
+- Component references ({{Component.key}})
+- Simple string interpolation
 
 ### Quick Example
 
@@ -164,9 +190,9 @@ formatICUMessage(
 
 ### Documentation
 
-- **[@docs/ICU_MESSAGEFORMAT.md](../../docs/ICU_MESSAGEFORMAT.md)** - Complete guide with syntax reference and examples
-- **[@docs/ICU_COMPREHENSIVE_VALIDATION.md](../../docs/ICU_COMPREHENSIVE_VALIDATION.md)** - Validation report with test coverage
-- **[@docs/ICU_PROJECT_COMPLETE.md](../../docs/ICU_PROJECT_COMPLETE.md)** - Implementation summary
+- **[docs/ICU_MESSAGEFORMAT.md](docs/ICU_MESSAGEFORMAT.md)** - Complete guide with syntax reference and examples
+- **[docs/ICU_COMPREHENSIVE_VALIDATION.md](docs/ICU_COMPREHENSIVE_VALIDATION.md)** - Validation report with test coverage
+- **[docs/ICU_PROJECT_COMPLETE.md](docs/ICU_PROJECT_COMPLETE.md)** - Implementation summary
 
 ### API
 
@@ -190,11 +216,19 @@ import {
 Automatic plural form selection based on count with CLDR-compliant rules for 37 languages:
 
 ```typescript
-import { createPluralString } from '@digitaldefiance/i18n-lib';
+import { createPluralString, PluginI18nEngine, LanguageCodes } from '@digitaldefiance/i18n-lib';
+
+const engine = PluginI18nEngine.createInstance('app', [
+  { id: LanguageCodes.EN_US, name: 'English', code: 'en-US', isDefault: true }
+]);
 
 // English (one/other)
-engine.register({
-  id: 'shop',
+engine.registerComponent({
+  component: {
+    id: 'shop',
+    name: 'Shop',
+    stringKeys: ['items']
+  },
   strings: {
     'en-US': {
       items: createPluralString({
@@ -206,8 +240,12 @@ engine.register({
 });
 
 // Russian (one/few/many)
-engine.register({
-  id: 'shop',
+engine.registerComponent({
+  component: {
+    id: 'shop',
+    name: 'Shop',
+    stringKeys: ['items']
+  },
   strings: {
     'ru': {
       items: createPluralString({
@@ -220,8 +258,12 @@ engine.register({
 });
 
 // Arabic (zero/one/two/few/many/other)
-engine.register({
-  id: 'shop',
+engine.registerComponent({
+  component: {
+    id: 'shop',
+    name: 'Shop',
+    stringKeys: ['items']
+  },
   strings: {
     'ar': {
       items: createPluralString({
@@ -258,10 +300,18 @@ See [PLURALIZATION_SUPPORT.md](docs/PLURALIZATION_SUPPORT.md) for complete langu
 Gender-aware translations with intelligent fallback:
 
 ```typescript
-import { createGenderedString } from '@digitaldefiance/i18n-lib';
+import { createGenderedString, PluginI18nEngine, LanguageCodes } from '@digitaldefiance/i18n-lib';
 
-engine.register({
-  id: 'profile',
+const engine = PluginI18nEngine.createInstance('app', [
+  { id: LanguageCodes.EN_US, name: 'English', code: 'en-US', isDefault: true }
+]);
+
+engine.registerComponent({
+  component: {
+    id: 'profile',
+    name: 'Profile',
+    stringKeys: ['greeting']
+  },
   strings: {
     'en-US': {
       greeting: createGenderedString({
@@ -364,10 +414,10 @@ The main engine class that manages translations, languages, and components.
 ```typescript
 import { PluginI18nEngine, LanguageCodes } from '@digitaldefiance/i18n-lib';
 
-// Create instance
+// Recommended: Create named instance (supports multiple engines)
 const engine = PluginI18nEngine.createInstance('myapp', languages);
 
-// Or use constructor
+// Alternative: Direct constructor (for single engine use cases)
 const engine = new PluginI18nEngine(languages, config);
 ```
 
@@ -511,8 +561,16 @@ engine.translateStringKey(BrandedKeys.Welcome);
 
 ### Context Integration
 
+Automatic injection of currency, timezone, and language from GlobalActiveContext:
+
 ```typescript
-import { GlobalActiveContext, CurrencyCode, Timezone } from '@digitaldefiance/i18n-lib';
+import { 
+  GlobalActiveContext, 
+  CurrencyCode, 
+  Timezone,
+  PluginI18nEngine,
+  LanguageCodes
+} from '@digitaldefiance/i18n-lib';
 
 // Set context variables
 const context = GlobalActiveContext.getInstance();
@@ -531,15 +589,22 @@ engine.t('Price in {currency}', { currency: 'USD' }); // "Price in USD"
 
 ### Constants Management
 
+Manage application-wide constants for use in translations:
+
 ```typescript
-// Merge constants (adds/overwrites specific keys)
+// Merge constants (adds/updates specific keys, preserves others)
 engine.mergeConstants({ Version: '2.0', NewKey: 'value' });
 // Existing constants preserved, specified ones added/updated
 
-// Update all constants (replaces everything)
+// Update all constants (replaces entire constants object)
 engine.updateConstants({ Site: 'NewSite', Version: '2.0' });
 // All previous constants removed, only these remain
 ```
+
+**When to use:**
+- **Constants**: Application-wide values that rarely change (AppName, Version)
+- **Variables**: Request-specific or dynamic values passed to translate()
+- **Context**: User-specific values (currency, timezone, language)
 
 ### Language Management
 
@@ -550,9 +615,11 @@ engine.setLanguage(LanguageCodes.FR);
 // Get current language
 const lang = engine.getCurrentLanguage();
 
-// Check if language exists
+// Check if language exists (recommended before setLanguage)
 if (engine.hasLanguage(LanguageCodes.ES)) {
   engine.setLanguage(LanguageCodes.ES);
+} else {
+  console.warn('Spanish not available, using default');
 }
 
 // Get all languages
@@ -561,22 +628,29 @@ const languages = engine.getLanguages();
 
 ### Admin Context
 
-Separate language for admin interfaces:
+Separate language for admin interfaces (useful for multi-tenant applications where admins need consistent UI language regardless of user's language):
 
 ```typescript
-// Set admin language
+// Set admin language (e.g., always English for admin panel)
 engine.setAdminLanguage(LanguageCodes.EN_US);
 
-// Switch to admin context
+// Switch to admin context (uses admin language)
 engine.switchToAdmin();
+const adminText = engine.translate('app', 'dashboard'); // Uses EN_US
 
-// Switch back to user context
+// Switch back to user context (uses user's language)
 engine.switchToUser();
+const userText = engine.translate('app', 'dashboard'); // Uses user's language
 ```
+
+**Use cases:**
+- Admin panels in multi-language applications
+- Support interfaces that need consistent language
+- Internal tools accessed by multilingual teams
 
 ## Core System Strings
 
-Pre-built translations for common UI elements:
+Pre-built translations for common UI elements in 8 languages:
 
 ```typescript
 import { getCoreI18nEngine, CoreStringKey, CoreI18nComponentId } from '@digitaldefiance/i18n-lib';
@@ -588,21 +662,23 @@ const yes = coreEngine.translate(CoreI18nComponentId, CoreStringKey.Common_Yes);
 const error = coreEngine.translate(CoreI18nComponentId, CoreStringKey.Error_NotFound);
 ```
 
-Available core string categories:
+**Available core string categories:**
 
-- **Common**: Yes, No, Cancel, OK, Save, Delete, Edit, Create, Update, Loading, etc.
-- **Errors**: InvalidInput, NetworkError, NotFound, AccessDenied, ValidationFailed, etc.
-- **System**: Welcome, Goodbye, PleaseWait, ProcessingRequest, OperationComplete, etc.
+- **Common** (30+ strings): Yes, No, Cancel, OK, Save, Delete, Edit, Create, Update, Loading, Search, Filter, Sort, Export, Import, Settings, Help, About, Contact, Terms, Privacy, Logout, Profile, Dashboard, Home, Back, Next, Previous, Submit, Reset
+- **Errors** (25+ strings): InvalidInput, NetworkError, NotFound, AccessDenied, ValidationFailed, Unauthorized, Forbidden, ServerError, Timeout, BadRequest, Conflict, Gone, TooManyRequests, ServiceUnavailable
+- **System** (20+ strings): Welcome, Goodbye, PleaseWait, ProcessingRequest, OperationComplete, OperationFailed, Success, Warning, Info, Confirm, AreYouSure, UnsavedChanges, SessionExpired, MaintenanceMode
+
+See `CoreStringKey` enum for complete list of available strings.
 
 ## Multiple Instances
 
-Create isolated engines for different parts of your application:
+Create isolated engines for different parts of your application (useful for micro-frontends, plugins, or multi-tenant systems):
 
 ```typescript
-// Admin engine
+// Admin engine with admin-specific languages
 const adminEngine = PluginI18nEngine.createInstance('admin', adminLanguages);
 
-// User engine
+// User engine with user-facing languages
 const userEngine = PluginI18nEngine.createInstance('user', userLanguages);
 
 // Get instance by key
@@ -613,12 +689,18 @@ if (PluginI18nEngine.hasInstance('admin')) {
   // ...
 }
 
-// Remove instance
+// Remove instance (cleanup)
 PluginI18nEngine.removeInstance('admin');
 
-// Reset all instances
-PluginI18nEngine.resetAll();
+// Reset all instances (useful in tests)
+PluginI18nEngine.resetAll(); // ⚠️ Removes ALL instances globally
 ```
+
+**Use cases:**
+- Micro-frontends with independent i18n
+- Plugin systems with isolated translations
+- Multi-tenant applications with tenant-specific languages
+- Testing (create/destroy engines per test)
 
 ## Error Handling
 
@@ -663,7 +745,7 @@ throw new MyError(LanguageCodes.FR); // Throws with French error message
 
 ## Translation Adapter
 
-Adapt PluginI18nEngine to simpler TranslationEngine interface:
+Adapt PluginI18nEngine to simpler TranslationEngine interface (useful when integrating with error classes or other components expecting a simplified translation interface):
 
 ```typescript
 import { createTranslationAdapter } from '@digitaldefiance/i18n-lib';
@@ -671,6 +753,7 @@ import { createTranslationAdapter } from '@digitaldefiance/i18n-lib';
 const adapter = createTranslationAdapter(engine, 'componentId');
 
 // Use adapter where TranslationEngine is expected
+// (e.g., error classes, third-party libraries)
 const message = adapter.translate('key', { var: 'value' });
 ```
 
@@ -690,6 +773,23 @@ LanguageCodes.ZH_CN  // 'zh-CN'
 LanguageCodes.JA     // 'ja'
 LanguageCodes.UK     // 'uk'
 ```
+
+**Adding custom language codes:**
+
+```typescript
+// Define your custom language type
+type MyLanguages = CoreLanguageCode | 'pt-BR' | 'it' | 'nl';
+
+// Create engine with custom languages
+const engine = PluginI18nEngine.createInstance<MyLanguages>('app', [
+  { id: LanguageCodes.EN_US, name: 'English', code: 'en-US', isDefault: true },
+  { id: 'pt-BR', name: 'Portuguese (Brazil)', code: 'pt-BR' },
+  { id: 'it', name: 'Italian', code: 'it' },
+  { id: 'nl', name: 'Dutch', code: 'nl' },
+]);
+```
+
+**Note**: The 8 built-in codes have pre-translated core strings. Custom languages require you to provide all translations.
 
 ## API Reference
 
@@ -1217,10 +1317,166 @@ function translateAnyValue<T extends string | number>(
 
 ## Browser Support
 
-- Chrome/Edge: Latest 2 versions
-- Firefox: Latest 2 versions
-- Safari: Latest 2 versions
+- Chrome/Edge: Latest 2 versions (minimum: Chrome 90, Edge 90)
+- Firefox: Latest 2 versions (minimum: Firefox 88)
+- Safari: Latest 2 versions (minimum: Safari 14)
 - Node.js: 18+
+
+**Polyfills**: Not required for supported versions. For older browsers, you may need:
+- `Intl.PluralRules` polyfill
+- `Intl.NumberFormat` polyfill
+
+## Troubleshooting
+
+### Component Not Found Error
+
+**Problem**: `RegistryError: Component 'xyz' not found`
+
+**Solutions**:
+1. Ensure component is registered before use: `engine.registerComponent({...})`
+2. Check component ID spelling matches exactly
+3. Verify registration completed successfully (no errors thrown)
+
+### Translation Returns `[componentId.key]`
+
+**Problem**: Translation returns placeholder instead of translated text
+
+**Solutions**:
+1. Check string key exists in component registration
+2. Verify current language has translation for this key
+3. Use `engine.validate()` to find missing translations
+4. Check if using `safeTranslate()` (returns placeholder on error)
+
+### Plural Forms Not Working
+
+**Problem**: Always shows same plural form regardless of count
+
+**Solutions**:
+1. Ensure passing `count` variable: `engine.translate('id', 'key', { count: 5 })`
+2. Use `createPluralString()` helper to create plural object
+3. Verify language has correct plural rules (see PLURALIZATION_SUPPORT.md)
+4. Check required plural forms for language: `getRequiredPluralForms('ru')`
+
+### ICU MessageFormat Not Parsing
+
+**Problem**: ICU syntax appears as literal text
+
+**Solutions**:
+1. Use `formatICUMessage()` function, not `translate()`
+2. Check ICU syntax is valid: `validateICUMessage(message)`
+3. Ensure variables are provided: `formatICUMessage(msg, { count: 1 })`
+4. See [docs/ICU_MESSAGEFORMAT.md](docs/ICU_MESSAGEFORMAT.md) for syntax
+
+### Memory Leak with Multiple Instances
+
+**Problem**: Memory usage grows over time
+
+**Solutions**:
+1. Call `PluginI18nEngine.removeInstance(key)` when done
+2. Use `resetAll()` in test cleanup
+3. Reuse instances instead of creating new ones
+4. Check for circular references in custom code
+
+### TypeScript Type Errors
+
+**Problem**: Type errors with language codes or string keys
+
+**Solutions**:
+1. Use generic types: `PluginI18nEngine.createInstance<MyLanguages>(...)`
+2. Ensure `as const` on string key objects
+3. Import types: `import type { ComponentRegistration } from '@digitaldefiance/i18n-lib'`
+4. Check TypeScript version (4.5+ recommended)
+
+## FAQ
+
+### When should I use ICU MessageFormat vs simple templates?
+
+**Use ICU MessageFormat when:**
+- You need complex pluralization (multiple forms)
+- You need gender-specific translations
+- You need number/date/time formatting
+- You need nested conditional logic
+
+**Use simple templates when:**
+- You only need variable substitution
+- You're referencing other components ({{Component.key}})
+- You want simpler, more readable strings
+
+### How do I handle missing translations?
+
+**Options:**
+1. Use `safeTranslate()` - returns `[componentId.key]` placeholder
+2. Set fallback language in config
+3. Use `engine.validate()` to find missing translations during development
+4. Implement custom error handling with try/catch
+
+### Can I use this library without TypeScript?
+
+**Yes**, but you lose type safety benefits:
+```javascript
+const { PluginI18nEngine, LanguageCodes } = require('@digitaldefiance/i18n-lib');
+const engine = PluginI18nEngine.createInstance('app', languages);
+```
+
+### How do I add a new language?
+
+**Steps:**
+1. Add language definition to engine creation
+2. Register components with translations for new language
+3. If using plurals, check required forms: `getRequiredPluralForms('pt-BR')`
+4. See [docs/ADDING_LANGUAGES.md](docs/ADDING_LANGUAGES.md) for details
+
+### What's the difference between branded enums and regular enums?
+
+**Branded enums** (v4.0.4+):
+- Runtime identification of component ownership
+- Collision detection between components
+- Automatic component routing
+- Created with `createI18nStringKeys()`
+
+**Regular enums**:
+- Compile-time only (erased at runtime)
+- No collision detection
+- Must specify component ID in every translate call
+
+### How do I migrate from v1.x to v4.x?
+
+**Key changes:**
+1. `CoreLanguage` enum → `LanguageCodes` constants
+2. Language IDs now use BCP 47 codes ('en-US' not 'English (US)')
+3. `register()` → `registerComponent()` (more explicit)
+4. See [docs/MIGRATION_GUIDE.md](docs/MIGRATION_GUIDE.md) for complete guide
+
+### Can I use multiple engines in the same application?
+
+**Yes**, use named instances:
+```typescript
+const adminEngine = PluginI18nEngine.createInstance('admin', adminLangs);
+const userEngine = PluginI18nEngine.createInstance('user', userLangs);
+```
+
+See [Multiple Instances](#multiple-instances) section for details.
+
+### How do I test components that use i18n?
+
+**Pattern:**
+```typescript
+import { PluginI18nEngine } from '@digitaldefiance/i18n-lib';
+
+describe('MyComponent', () => {
+  beforeEach(() => {
+    PluginI18nEngine.resetAll();
+    const engine = PluginI18nEngine.createInstance('test', languages);
+    engine.registerComponent(/* ... */);
+  });
+
+  afterEach(() => {
+    PluginI18nEngine.resetAll();
+  });
+});
+```
+
+See [Testing](#testing) section for more patterns.
 
 ## License
 
