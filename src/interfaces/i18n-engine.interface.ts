@@ -84,9 +84,13 @@ export interface II18nEngine {
   /**
    * Registers a branded string key enum for automatic component ID resolution.
    * @param stringKeyEnum - Branded enum created by createI18nStringKeys
-   * @returns The extracted component ID
+   * @param componentId - Optional explicit component ID (escape hatch for cross-module scenarios)
+   * @returns The extracted or provided component ID
    */
-  registerStringKeyEnum(stringKeyEnum: AnyBrandedEnum): string;
+  registerStringKeyEnum(
+    stringKeyEnum: AnyBrandedEnum,
+    componentId?: string,
+  ): string;
 
   /**
    * Translates a branded string key value directly.

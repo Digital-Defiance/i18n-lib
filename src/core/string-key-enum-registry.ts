@@ -149,35 +149,74 @@ export class StringKeyEnumRegistry {
    * registry.register(UserKeys); // 'user' (same result, no duplicate entry)
    * ```
    */
-  register(enumObj: AnyBrandedEnum): string {
-    // Check if already registered (idempotent)
+  /**
+   * Registers a branded string key enum.
+   *
+   * Extracts the component ID from the branded enum's metadata and stores
+   * a reference to the enum for later lookup. If the enum is already
+   * registered, returns the existing component ID without re-registering.
+   *
+   * ## Detection Strategy
+   *
+   * 1. Check if already registered by reference (idempotent fast path)
+   * 2. If explicit `componentId` is provided, use it directly (escape hatch)
+   * 3. Try branded enum detection via `isBrandedEnum()` (happy path)
+   * 4. Structural fallback: infer component ID from object values
+   * 5. If all detection fails, throw `I18nError.invalidStringKeyEnum()`
+   *
+   * ## Idempotence
+   *
+   * Registering the same enum multiple times is safe:
+   * - Same enum object: Returns existing component ID (no-op)
+   * - Different enum with same component ID: Skips re-registration
+   *
+   * @param enumObj - The branded enum created by createI18nStringKeys
+   * @param componentId - Optional explicit component ID (escape hatch for cross-module scenarios)
+   * @returns The extracted or provided component ID
+   * @throws {I18nError} If not a valid branded enum and no fallback succeeds (INVALID_STRING_KEY_ENUM)
+   *
+   * @example Basic registration
+   * ```typescript
+   * const UserKeys = createI18nStringKeys('user', { Welcome: 'user.welcome' });
+   * const componentId = registry.register(UserKeys);
+   * console.log(componentId); // 'user'
+   * ```
+   *
+   * @example Explicit componentId escape hatch
+   * ```typescript
+   * const plainObj = { Welcome: 'user.welcome' } as AnyBrandedEnum;
+   * const componentId = registry.register(plainObj, 'user');
+   * console.log(componentId); // 'user'
+   * ```
+   */
+  register(enumObj: AnyBrandedEnum, componentId?: string): string {
+    // 1. Check if already registered by reference (idempotent)
     const existingId = this.registeredEnums.get(enumObj);
     if (existingId !== undefined) {
       return existingId;
     }
 
-    // Validate that it's a branded enum
-    if (!isBrandedEnum(enumObj)) {
-      throw I18nError.invalidStringKeyEnum();
+    // 2. If explicit componentId provided, use it directly (escape hatch)
+    if (componentId !== undefined) {
+      return this.registerWithComponentId(enumObj, componentId);
     }
 
-    // Extract component ID
-    const componentId = getBrandedEnumComponentId(enumObj);
-    if (componentId === null) {
-      throw I18nError.invalidStringKeyEnum();
+    // 3. Try branded enum detection (happy path)
+    if (isBrandedEnum(enumObj)) {
+      const id = getBrandedEnumComponentId(enumObj);
+      if (id !== null) {
+        return this.registerWithComponentId(enumObj, id);
+      }
     }
 
-    // Check if another enum with the same component ID is already registered
-    // If so, skip re-registration (Requirement 1.5)
-    if (this.componentIdToEnum.has(componentId)) {
-      return componentId;
+    // 4. Structural fallback: try to infer component ID
+    const inferredId = this.inferComponentId(enumObj);
+    if (inferredId !== null) {
+      return this.registerWithComponentId(enumObj, inferredId);
     }
 
-    // Store the registration
-    this.registeredEnums.set(enumObj, componentId);
-    this.componentIdToEnum.set(componentId, enumObj);
-
-    return componentId;
+    // 5. All detection failed
+    throw I18nError.invalidStringKeyEnum();
   }
 
   /**
@@ -196,7 +235,18 @@ export class StringKeyEnumRegistry {
    * ```
    */
   has(enumObj: AnyBrandedEnum): boolean {
-    return this.registeredEnums.has(enumObj);
+    // 1. Reference equality (fast path)
+    if (this.registeredEnums.has(enumObj)) {
+      return true;
+    }
+
+    // 2. Component ID fallback for cross-module duplicates
+    const componentId = this.tryExtractComponentId(enumObj);
+    if (componentId !== null) {
+      return this.componentIdToEnum.has(componentId);
+    }
+
+    return false;
   }
 
   /**
@@ -310,5 +360,99 @@ export class StringKeyEnumRegistry {
   clear(): void {
     this.registeredEnums.clear();
     this.componentIdToEnum.clear();
+  }
+
+  /**
+   * Attempts to infer a component ID from an object's structure.
+   *
+   * Uses two strategies:
+   * 1. **Global registry lookup**: Calls `findEnumSources()` with the object's
+   *    string values. If any source starts with `i18n:`, extracts the component ID.
+   * 2. **Value prefix extraction**: If the object's values follow the
+   *    `{componentId}.{key}` convention, extracts the common prefix.
+   *
+   * @param enumObj - The object to infer a component ID from
+   * @returns The inferred component ID, or `null` if detection fails
+   */
+  private inferComponentId(enumObj: AnyBrandedEnum): string | null {
+    // Collect string values from the object
+    const values = Object.values(enumObj).filter(
+      (v): v is string => typeof v === 'string',
+    );
+    if (values.length === 0) {
+      return null;
+    }
+
+    // Strategy 1: Global registry lookup via findEnumSources
+    for (const value of values) {
+      const sources = findEnumSources(value);
+      for (const source of sources) {
+        if (source.startsWith('i18n:')) {
+          return source.slice(5); // Remove 'i18n:' prefix
+        }
+      }
+    }
+
+    // Strategy 2: Value prefix extraction — find common {componentId}. prefix
+    const firstDotIndex = values[0].indexOf('.');
+    if (firstDotIndex <= 0) {
+      return null;
+    }
+    const prefix = values[0].substring(0, firstDotIndex);
+
+    // Verify all values share the same prefix
+    for (const value of values) {
+      if (!value.startsWith(prefix + '.')) {
+        return null;
+      }
+    }
+
+    return prefix;
+  }
+  /**
+   * Attempts to extract a component ID from an enum object using all available strategies.
+   *
+   * Tries branded enum metadata first (via `getBrandedEnumComponentId()`), then
+   * falls back to structural detection (via `inferComponentId()`).
+   *
+   * @param enumObj - The enum object to extract a component ID from
+   * @returns The extracted component ID, or `null` if all strategies fail
+   */
+  private tryExtractComponentId(enumObj: AnyBrandedEnum): string | null {
+    // Strategy 1: Try branded enum metadata
+    const brandedId = getBrandedEnumComponentId(enumObj);
+    if (brandedId !== null) {
+      return brandedId;
+    }
+
+    // Strategy 2: Structural detection fallback
+    return this.inferComponentId(enumObj);
+  }
+
+  /**
+   * Registers an enum object with a known component ID.
+   *
+   * Stores the enum in both the `registeredEnums` and `componentIdToEnum` maps.
+   * If another enum with the same component ID is already registered, the
+   * registration is skipped (idempotent by component ID).
+   *
+   * @param enumObj - The enum object to register
+   * @param componentId - The component ID to associate with the enum
+   * @returns The component ID
+   */
+  private registerWithComponentId(
+    enumObj: AnyBrandedEnum,
+    componentId: string,
+  ): string {
+    // Check if another enum with the same component ID is already registered
+    if (this.componentIdToEnum.has(componentId)) {
+      return componentId;
+    }
+
+    // Store the registration
+    this.registeredEnums.set(enumObj, componentId);
+    this.componentIdToEnum.set(componentId, enumObj);
+
+    return componentId;
   }
 }

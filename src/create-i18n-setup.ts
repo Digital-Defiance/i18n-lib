@@ -47,7 +47,7 @@ export function createI18nSetup<TStringKeyEnum extends AnyBrandedEnum>(
     for (const pkg of config.libraryComponents) {
       engine.registerIfNotExists(pkg.config);
       if (pkg.stringKeyEnum && !engine.hasStringKeyEnum(pkg.stringKeyEnum)) {
-        engine.registerStringKeyEnum(pkg.stringKeyEnum);
+        engine.registerStringKeyEnum(pkg.stringKeyEnum, pkg.config.id);
       }
     }
   }

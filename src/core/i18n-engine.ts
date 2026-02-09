@@ -819,8 +819,9 @@ export class I18nEngine implements II18nEngine {
    * will cause an error to be thrown.
    *
    * @param stringKeyEnum - Branded enum created by createI18nStringKeys
-   * @returns The extracted component ID
-   * @throws {I18nError} If not a valid branded enum (INVALID_STRING_KEY_ENUM)
+   * @param componentId - Optional explicit component ID (escape hatch for cross-module scenarios)
+   * @returns The extracted or provided component ID
+   * @throws {I18nError} If not a valid branded enum and no fallback succeeds (INVALID_STRING_KEY_ENUM)
    *
    * @example Basic registration
    * ```typescript
@@ -833,6 +834,11 @@ export class I18nEngine implements II18nEngine {
    * console.log(componentId); // 'user'
    * ```
    *
+   * @example Explicit componentId escape hatch
+   * ```typescript
+   * engine.registerStringKeyEnum(plainObj, 'user'); // 'user'
+   * ```
+   *
    * @example Idempotent registration
    * ```typescript
    * engine.registerStringKeyEnum(UserKeys); // 'user'
@@ -842,8 +848,11 @@ export class I18nEngine implements II18nEngine {
    * @see {@link translateStringKey} - Translate registered string key values
    * @see {@link hasStringKeyEnum} - Check if an enum is registered
    */
-  registerStringKeyEnum(stringKeyEnum: AnyBrandedEnum): string {
-    return this.stringKeyEnumRegistry.register(stringKeyEnum);
+  registerStringKeyEnum(
+    stringKeyEnum: AnyBrandedEnum,
+    componentId?: string,
+  ): string {
+    return this.stringKeyEnumRegistry.register(stringKeyEnum, componentId);
   }
 
   /**
