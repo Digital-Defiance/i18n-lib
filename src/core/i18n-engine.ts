@@ -30,6 +30,8 @@ import {
   validateTemplateLength,
 } from '../utils/validation';
 import { ComponentStore } from './component-store';
+import { ConstantsRegistry } from './constants-registry';
+import type { ConstantsEntry } from './constants-registry';
 import { ContextManager } from './context-manager';
 import { EnumRegistry } from './enum-registry';
 import { LanguageRegistry } from './language-registry';
@@ -48,6 +50,7 @@ export class I18nEngine implements II18nEngine {
   private readonly componentStore: ComponentStore;
   private readonly enumRegistry: EnumRegistry;
   private readonly stringKeyEnumRegistry: StringKeyEnumRegistry;
+  private readonly constantsRegistry: ConstantsRegistry;
   private readonly instanceKey: string;
   private readonly config: Required<EngineConfig>;
   private readonly aliasToComponent = new Map<string, string>();
@@ -100,7 +103,16 @@ export class I18nEngine implements II18nEngine {
       this.safeTranslate(CoreI18nComponentId, key, vars),
     );
     this.stringKeyEnumRegistry = new StringKeyEnumRegistry();
+    this.constantsRegistry = new ConstantsRegistry();
     this.instanceKey = options?.instanceKey || I18nEngine.DEFAULT_KEY;
+
+    // Register initial constants from config into the registry
+    if (
+      this.config.constants &&
+      Object.keys(this.config.constants).length > 0
+    ) {
+      this.constantsRegistry.register('__engine__', this.config.constants);
+    }
 
     // Create context
     I18nEngine.contextManager.create(
@@ -597,24 +609,28 @@ export class I18nEngine implements II18nEngine {
   }
 
   /**
-   * Merges new constants into existing config constants.
+   * Merges new constants into the engine-level constants pool.
+   * These are registered under the '__engine__' component ID in the registry.
    * @param constants - Key-value constants to merge.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mergeConstants(constants: Record<string, any>): void {
+  mergeConstants(constants: Record<string, unknown>): void {
     validateObjectKeys(constants);
     safeAssign(this.config.constants, constants);
+    this.constantsRegistry.update('__engine__', constants);
+    this.syncConstantsToStore();
   }
 
   /**
-   * Updates config constants and componentStore constants to new values.
+   * Replaces engine-level constants and syncs to the component store.
+   * @deprecated Use registerConstants/updateConstants with componentId instead.
    * @param constants - New constants record.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  updateConstants(constants: Record<string, any>): void {
+  replaceConstants(constants: Record<string, unknown>): void {
     validateObjectKeys(constants);
     this.config.constants = constants;
-    this.componentStore.setConstants(constants);
+    // Full replacement — wipes old keys, sets new ones
+    this.constantsRegistry.replace('__engine__', constants);
+    this.syncConstantsToStore();
   }
 
   /**
@@ -1016,6 +1032,106 @@ export class I18nEngine implements II18nEngine {
     return this.stringKeyEnumRegistry.getAll();
   }
 
+  // =========================================================================
+  // Constants Registration
+  // =========================================================================
+
+  /**
+   * Registers constants for a component.
+   *
+   * Constants are available as template variables in all translations
+   * (e.g., `{appName}` in a translation string). Registration is idempotent
+   * per component ID. Conflicts (same key, different value, different component)
+   * throw an error.
+   *
+   * @param componentId - The component registering these constants
+   * @param constants - Key-value pairs to register
+   * @throws {I18nError} If a key conflict is detected (CONSTANT_CONFLICT)
+   *
+   * @example
+   * ```typescript
+   * engine.registerConstants('my-app', { appName: 'MyApp', supportEmail: 'help@example.com' });
+   * // Now {appName} and {supportEmail} are available in all translations
+   * ```
+   */
+  registerConstants(
+    componentId: string,
+    constants: Record<string, unknown>,
+  ): void {
+    this.constantsRegistry.register(componentId, constants);
+    this.syncConstantsToStore();
+  }
+
+  /**
+   * Updates constants for a component, merging new values into existing ones.
+   *
+   * This is the runtime override mechanism. A library registers defaults via
+   * `registerConstants`, and the app overrides specific keys (like `Site`)
+   * via `updateConstants` once the real values are known.
+   *
+   * @param componentId - The component updating these constants
+   * @param constants - Key-value pairs to merge (overrides existing keys)
+   *
+   * @example
+   * ```typescript
+   * // Library registers defaults
+   * engine.registerConstants('suite-core', { Site: 'New Site' });
+   * // App overrides at runtime
+   * engine.updateConstants('suite-core', { Site: 'My Real Site' });
+   * ```
+   */
+  updateConstants(
+    componentId: string,
+    constants: Record<string, unknown>,
+  ): void {
+    this.constantsRegistry.update(componentId, constants);
+    this.syncConstantsToStore();
+  }
+
+  /**
+   * Checks if constants are registered for a component.
+   */
+  hasConstants(componentId: string): boolean {
+    return this.constantsRegistry.has(componentId);
+  }
+
+  /**
+   * Gets the constants registered for a specific component.
+   */
+  getConstants(
+    componentId: string,
+  ): Readonly<Record<string, unknown>> | undefined {
+    return this.constantsRegistry.get(componentId);
+  }
+
+  /**
+   * Gets all registered constants entries with their component IDs.
+   */
+  getAllConstants(): readonly ConstantsEntry[] {
+    return this.constantsRegistry.getAll();
+  }
+
+  /**
+   * Resolves which component owns a given constant key.
+   * Returns null if the key is not registered.
+   */
+  resolveConstantOwner(key: string): string | null {
+    return this.constantsRegistry.resolveOwner(key);
+  }
+
+  /**
+   * Syncs the merged constants from the registry into the component store
+   * so they're available during template variable replacement.
+   */
+  private syncConstantsToStore(): void {
+    const merged = this.constantsRegistry.getMerged();
+    const combined: Record<string, unknown> = {
+      ...this.config.constants,
+      ...merged,
+    };
+    this.componentStore.setConstants(combined);
+  }
+
   /**
    * Validates all registered components for missing translations or warnings.
    * @returns ValidationResult containing errors and warnings.
@@ -1117,9 +1233,10 @@ export class I18nEngine implements II18nEngine {
    * Resets all engine instances and clears global registries.
    */
   static resetAll(): void {
-    // Clear string key enum registries for each instance before clearing instances
+    // Clear string key enum registries and constants registries for each instance before clearing instances
     for (const instance of I18nEngine.instances.values()) {
       instance.stringKeyEnumRegistry.clear();
+      instance.constantsRegistry.clear();
     }
     I18nEngine.instances.clear();
     I18nEngine.defaultKey = null;

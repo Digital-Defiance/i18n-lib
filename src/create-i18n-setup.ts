@@ -31,7 +31,9 @@ export function createI18nSetup<TStringKeyEnum extends AnyBrandedEnum>(
     createDefaultLanguages(),
     {
       defaultLanguage,
-      ...(config.constants ? { constants: config.constants } : {}),
+      // Note: constants are NOT passed to the engine config here.
+      // They are registered via the constants registry after library
+      // components, so the app's values always override library defaults.
     },
   );
 
@@ -42,12 +44,15 @@ export function createI18nSetup<TStringKeyEnum extends AnyBrandedEnum>(
     strings: coreReg.strings as Record<string, Record<string, string>>,
   });
 
-  // 3. Register library components
+  // 3. Register library components (with their default constants)
   if (config.libraryComponents) {
     for (const pkg of config.libraryComponents) {
       engine.registerIfNotExists(pkg.config);
       if (pkg.stringKeyEnum && !engine.hasStringKeyEnum(pkg.stringKeyEnum)) {
         engine.registerStringKeyEnum(pkg.stringKeyEnum, pkg.config.id);
+      }
+      if (pkg.constants && !engine.hasConstants(pkg.config.id)) {
+        engine.registerConstants(pkg.config.id, pkg.constants);
       }
     }
   }
@@ -61,6 +66,13 @@ export function createI18nSetup<TStringKeyEnum extends AnyBrandedEnum>(
 
   if (!engine.hasStringKeyEnum(config.stringKeyEnum)) {
     engine.registerStringKeyEnum(config.stringKeyEnum);
+  }
+
+  // 4b. Register app-level constants as overrides.
+  // Uses updateConstants so the app's values (e.g. real Site name) always
+  // win over library defaults, regardless of initialization order.
+  if (config.constants) {
+    engine.updateConstants(config.componentId, config.constants);
   }
 
   // 5. Initialize GlobalActiveContext
@@ -128,6 +140,14 @@ export function createI18nSetup<TStringKeyEnum extends AnyBrandedEnum>(
       globalContext.setLanguageContextSpace(ctx, config.componentId),
     getLanguage: () => getActiveContext().language,
     getAdminLanguage: () => getActiveContext().adminLanguage,
+    registerConstants: (
+      componentId: string,
+      constants: Record<string, unknown>,
+    ) => engine.registerConstants(componentId, constants),
+    updateConstants: (
+      componentId: string,
+      constants: Record<string, unknown>,
+    ) => engine.updateConstants(componentId, constants),
     reset: () => {
       I18nEngine.removeInstance(instanceKey);
     },

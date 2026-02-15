@@ -11,4 +11,6 @@ export interface I18nComponentPackage {
   readonly config: ComponentConfig;
   /** Optional branded string key enum for direct translateStringKey support */
   readonly stringKeyEnum?: AnyBrandedEnum;
+  /** Optional constants to register for this component */
+  readonly constants?: Record<string, unknown>;
 }

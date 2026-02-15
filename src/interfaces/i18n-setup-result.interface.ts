@@ -41,6 +41,16 @@ export interface I18nSetupResult<
   readonly getLanguage: () => string;
   /** Get the current admin language */
   readonly getAdminLanguage: () => string;
+  /** Register constants for a component (available as template variables) */
+  readonly registerConstants: (
+    componentId: string,
+    constants: Record<string, unknown>,
+  ) => void;
+  /** Update/override constants for a component (merges, app values win) */
+  readonly updateConstants: (
+    componentId: string,
+    constants: Record<string, unknown>,
+  ) => void;
   /** Reset the engine instance and context (useful for testing) */
   readonly reset: () => void;
 }

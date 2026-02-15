@@ -124,4 +124,57 @@ export interface II18nEngine {
     enumObj: AnyBrandedEnum;
     componentId: string;
   }[];
+
+  // Constants Registration
+
+  /**
+   * Registers constants for a component.
+   * Constants are available as template variables in all translations.
+   * Registration is idempotent per component ID.
+   * @param componentId - The component registering these constants
+   * @param constants - Key-value pairs to register
+   * @throws {I18nError} If a key conflict is detected (CONSTANT_CONFLICT)
+   */
+  registerConstants(
+    componentId: string,
+    constants: Record<string, unknown>,
+  ): void;
+
+  /**
+   * Updates/overrides constants for a component, merging new values.
+   * Use this when the app needs to override library defaults at runtime
+   * (e.g., replacing a default Site name with the real one).
+   * @param componentId - The component updating these constants
+   * @param constants - Key-value pairs to merge (overrides existing keys)
+   */
+  updateConstants(
+    componentId: string,
+    constants: Record<string, unknown>,
+  ): void;
+
+  /**
+   * Checks if constants are registered for a component.
+   */
+  hasConstants(componentId: string): boolean;
+
+  /**
+   * Gets the constants registered for a specific component.
+   */
+  getConstants(
+    componentId: string,
+  ): Readonly<Record<string, unknown>> | undefined;
+
+  /**
+   * Gets all registered constants entries with their component IDs.
+   */
+  getAllConstants(): readonly {
+    componentId: string;
+    constants: Readonly<Record<string, unknown>>;
+  }[];
+
+  /**
+   * Resolves which component owns a given constant key.
+   * Returns null if the key is not registered.
+   */
+  resolveConstantOwner(key: string): string | null;
 }

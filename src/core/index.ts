@@ -12,7 +12,9 @@ export { EnumRegistry } from './enum-registry';
 export { I18nEngine } from './i18n-engine';
 export { LanguageRegistry } from './language-registry';
 export { StringKeyEnumRegistry } from './string-key-enum-registry';
+export { ConstantsRegistry } from './constants-registry';
 
 // Export types only (no runtime dependency)
 export type { Context } from './context-manager';
 export type { StringKeyEnumEntry } from './string-key-enum-registry';
+export type { ConstantsEntry } from './constants-registry';

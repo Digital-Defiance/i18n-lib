@@ -300,7 +300,7 @@ describe('I18nEngine v2', () => {
     });
 
     it('should update all constants', () => {
-      engine.updateConstants({ NewSite: 'UpdatedSite' });
+      engine.replaceConstants({ NewSite: 'UpdatedSite' });
       expect(engine.translate('app', 'site')).toBe('{Site}'); // Original constant gone
     });
   });

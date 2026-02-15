@@ -589,22 +589,108 @@ engine.t('Price in {currency}', { currency: 'USD' }); // "Price in USD"
 
 ### Constants Management
 
-Manage application-wide constants for use in translations:
+Constants are application-wide values available as template variables in all translations (e.g., `{Site}` in a translation string resolves to the registered value). The `ConstantsRegistry` provides structured, per-component registration with conflict detection and ownership tracking.
+
+#### Registration Flow (via `createI18nSetup`)
+
+Library packages declare default constants in their `I18nComponentPackage`. The app overrides them at runtime. The factory handles the ordering automatically:
 
 ```typescript
-// Merge constants (adds/updates specific keys, preserves others)
-engine.mergeConstants({ Version: '2.0', NewKey: 'value' });
-// Existing constants preserved, specified ones added/updated
+import { createI18nSetup } from '@digitaldefiance/i18n-lib';
+import { createSuiteCoreComponentPackage } from '@digitaldefiance/suite-core-lib';
+import { AppStringKey } from './enumerations/app-string-key';
+import { Strings } from './strings-collection';
 
-// Update all constants (replaces entire constants object)
-engine.updateConstants({ Site: 'NewSite', Version: '2.0' });
-// All previous constants removed, only these remain
+const setup = createI18nSetup({
+  componentId: 'my-app',
+  stringKeyEnum: AppStringKey,
+  strings: Strings,
+  // App constants override library defaults — app always wins
+  constants: { Site: 'My Real Site', SiteTagline: 'We do things' },
+  // Library components register their own defaults
+  libraryComponents: [createSuiteCoreComponentPackage()],
+});
+
+// The factory does this internally:
+// 1. Library components register defaults via registerConstants()
+// 2. App constants override via updateConstants() — app values win
 ```
 
+#### Direct Engine API
+
+```typescript
+// Register constants for a component (idempotent, conflict-detecting)
+engine.registerConstants('suite-core', { Site: 'New Site', Version: '1.0' });
+
+// Update/override constants (merges, updater wins ownership)
+engine.updateConstants('my-app', { Site: 'My Real Site' });
+
+// Replace all constants for a component (wipes old keys)
+engine.replaceConstants({ Site: 'Completely New', Version: '2.0' });
+
+// Merge into engine-level constants (legacy, preserved for compat)
+engine.mergeConstants({ ExtraKey: 'value' });
+
+// Query
+engine.hasConstants('suite-core');           // true
+engine.getConstants('suite-core');           // { Site: 'New Site', Version: '1.0' }
+engine.getAllConstants();                     // [{ componentId, constants }, ...]
+engine.resolveConstantOwner('Site');         // 'my-app' (last updater wins)
+```
+
+#### I18nComponentPackage Constants
+
+Library authors can bundle default constants with their component package:
+
+```typescript
+import type { I18nComponentPackage } from '@digitaldefiance/i18n-lib';
+
+export function createMyLibComponentPackage(): I18nComponentPackage {
+  return {
+    config: createMyLibComponentConfig(),
+    stringKeyEnum: MyLibStringKey,
+    constants: {
+      LibName: 'My Library',
+      LibVersion: '1.0.0',
+    },
+  };
+}
+```
+
+These are registered automatically when passed via `libraryComponents` in `createI18nSetup`.
+
+#### I18nSetupResult Helpers
+
+The result from `createI18nSetup` exposes constants helpers:
+
+```typescript
+const setup = createI18nSetup({ /* ... */ });
+
+// Register constants for a new component after setup
+setup.registerConstants('analytics', { TrackingId: 'UA-12345' });
+
+// Override constants at runtime
+setup.updateConstants('my-app', { Site: 'Updated Site Name' });
+```
+
+#### Conflict Detection
+
+If two different components try to `register` the same key with different values, an error is thrown:
+
+```typescript
+engine.registerConstants('lib-a', { Site: 'Alpha' });
+engine.registerConstants('lib-b', { Site: 'Beta' });
+// Throws: I18nError CONSTANT_CONFLICT — "Site" already registered by "lib-a" with a different value
+```
+
+Use `updateConstants` instead of `registerConstants` when you intentionally want to override.
+
 **When to use:**
-- **Constants**: Application-wide values that rarely change (AppName, Version)
+- **Constants**: Application-wide values that rarely change (Site, Version, SiteTagline)
 - **Variables**: Request-specific or dynamic values passed to translate()
 - **Context**: User-specific values (currency, timezone, language)
+
+**Variable priority**: provided variables > context > constants
 
 ### Language Management
 
@@ -824,6 +910,14 @@ const engine = PluginI18nEngine.createInstance<MyLanguages>('app', [
 - `safeTranslateStringKey(key, variables?, language?)` - Safe version returning placeholder on failure
 - `hasStringKeyEnum(enum)` - Check if a branded enum is registered
 - `getStringKeyEnums()` - Get all registered branded enums
+- `registerConstants(componentId, constants)` - Register constants for a component (idempotent, conflict-detecting)
+- `updateConstants(componentId, constants)` - Update/override constants for a component (merges, updater wins)
+- `replaceConstants(constants)` - Replace all engine-level constants
+- `mergeConstants(constants)` - Merge into engine-level constants
+- `hasConstants(componentId)` - Check if constants are registered for a component
+- `getConstants(componentId)` - Get constants for a specific component
+- `getAllConstants()` - Get all registered constants entries
+- `resolveConstantOwner(key)` - Resolve which component owns a constant key
 
 ### Branded Enum Functions
 

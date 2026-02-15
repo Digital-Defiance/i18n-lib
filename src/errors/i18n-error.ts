@@ -49,6 +49,8 @@ export const I18nErrorCode = {
   INVALID_STRING_KEY_ENUM: 'INVALID_STRING_KEY_ENUM',
   /** String key value does not belong to any registered enum */
   STRING_KEY_NOT_REGISTERED: 'STRING_KEY_NOT_REGISTERED',
+  /** Constant key conflict between components */
+  CONSTANT_CONFLICT: 'CONSTANT_CONFLICT',
 } as const;
 
 /**
@@ -519,6 +521,25 @@ export class I18nError extends Error {
       I18nErrorCode.STRING_KEY_NOT_REGISTERED,
       `String key '${key}' does not belong to any registered enum`,
       { key },
+    );
+  }
+
+  /**
+   * Creates an error for constant key conflicts between components.
+   * @param key - The conflicting constant key
+   * @param newComponent - The component attempting to register the key
+   * @param existingComponent - The component that already owns the key
+   */
+  static constantConflict(
+    key: string,
+    newComponent: string,
+    existingComponent: string,
+  ): I18nError {
+    return new I18nError(
+      I18nErrorCode.CONSTANT_CONFLICT,
+      `Constant key "${key}" conflict: component "${newComponent}" ` +
+        `attempted to register a different value than component "${existingComponent}"`,
+      { key, newComponent, existingComponent },
     );
   }
 }

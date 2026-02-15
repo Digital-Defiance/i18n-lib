@@ -44,9 +44,9 @@ describe('Security: Prototype Pollution', () => {
     expect(({} as any).isAdmin).toBeUndefined();
   });
 
-  it('should not pollute Object.prototype via updateConstants', () => {
+  it('should not pollute Object.prototype via replaceConstants', () => {
     const constants = JSON.parse('{"__proto__": {"isAdmin": true}}');
-    expect(() => engine.updateConstants(constants)).toThrow();
+    expect(() => engine.replaceConstants(constants)).toThrow();
     expect(({} as any).isAdmin).toBeUndefined();
   });
 
