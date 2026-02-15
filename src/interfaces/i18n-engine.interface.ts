@@ -9,6 +9,7 @@ import type {
   BrandedEnumValue,
 } from '@digitaldefiance/branded-enum';
 import { ComponentConfig } from './component-config.interface';
+import type { II18nConstants } from './i18n-constants.interface';
 import { LanguageDefinition } from './language-definition.interface';
 import { ValidationResult } from './validation-result.interface';
 
@@ -135,9 +136,9 @@ export interface II18nEngine {
    * @param constants - Key-value pairs to register
    * @throws {I18nError} If a key conflict is detected (CONSTANT_CONFLICT)
    */
-  registerConstants(
+  registerConstants<T extends II18nConstants>(
     componentId: string,
-    constants: Record<string, unknown>,
+    constants: T,
   ): void;
 
   /**
@@ -147,9 +148,9 @@ export interface II18nEngine {
    * @param componentId - The component updating these constants
    * @param constants - Key-value pairs to merge (overrides existing keys)
    */
-  updateConstants(
+  updateConstants<T extends II18nConstants>(
     componentId: string,
-    constants: Record<string, unknown>,
+    constants: T,
   ): void;
 
   /**
@@ -160,16 +161,14 @@ export interface II18nEngine {
   /**
    * Gets the constants registered for a specific component.
    */
-  getConstants(
-    componentId: string,
-  ): Readonly<Record<string, unknown>> | undefined;
+  getConstants(componentId: string): Readonly<II18nConstants> | undefined;
 
   /**
    * Gets all registered constants entries with their component IDs.
    */
   getAllConstants(): readonly {
     componentId: string;
-    constants: Readonly<Record<string, unknown>>;
+    constants: Readonly<II18nConstants>;
   }[];
 
   /**

@@ -14,6 +14,7 @@ import { I18nError } from '../errors/i18n-error';
 import {
   ComponentConfig,
   EngineConfig,
+  II18nConstants,
   II18nEngine,
   LanguageDefinition,
   ValidationResult,
@@ -617,7 +618,7 @@ export class I18nEngine implements II18nEngine {
    * These are registered under the '__engine__' component ID in the registry.
    * @param constants - Key-value constants to merge.
    */
-  mergeConstants(constants: Record<string, unknown>): void {
+  mergeConstants<T extends II18nConstants>(constants: T): void {
     validateObjectKeys(constants);
     safeAssign(this.config.constants, constants);
     this.constantsRegistry.update('__engine__', constants);
@@ -629,7 +630,7 @@ export class I18nEngine implements II18nEngine {
    * @deprecated Use registerConstants/updateConstants with componentId instead.
    * @param constants - New constants record.
    */
-  replaceConstants(constants: Record<string, unknown>): void {
+  replaceConstants<T extends II18nConstants>(constants: T): void {
     validateObjectKeys(constants);
     this.config.constants = constants;
     // Full replacement — wipes old keys, sets new ones
@@ -1058,9 +1059,9 @@ export class I18nEngine implements II18nEngine {
    * // Now {appName} and {supportEmail} are available in all translations
    * ```
    */
-  registerConstants(
+  registerConstants<T extends II18nConstants>(
     componentId: string,
-    constants: Record<string, unknown>,
+    constants: T,
   ): void {
     this.constantsRegistry.register(componentId, constants);
     this.syncConstantsToStore();
@@ -1084,9 +1085,9 @@ export class I18nEngine implements II18nEngine {
    * engine.updateConstants('suite-core', { Site: 'My Real Site' });
    * ```
    */
-  updateConstants(
+  updateConstants<T extends II18nConstants>(
     componentId: string,
-    constants: Record<string, unknown>,
+    constants: T,
   ): void {
     this.constantsRegistry.update(componentId, constants);
     this.syncConstantsToStore();
@@ -1102,9 +1103,7 @@ export class I18nEngine implements II18nEngine {
   /**
    * Gets the constants registered for a specific component.
    */
-  getConstants(
-    componentId: string,
-  ): Readonly<Record<string, unknown>> | undefined {
+  getConstants(componentId: string): Readonly<II18nConstants> | undefined {
     return this.constantsRegistry.get(componentId);
   }
 

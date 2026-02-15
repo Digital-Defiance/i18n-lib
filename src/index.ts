@@ -36,6 +36,12 @@ export * from './branded-string-key';
 export * from './branded-enum-utils';
 // Factory function for simplified i18n setup
 export { createI18nSetup } from './create-i18n-setup';
+// Explicit re-export of constants validation utility
+// (barrel re-export via ./utils can be lost to circular dependency at runtime)
+export {
+  validateConstantsCoverage,
+  type ConstantsCoverageResult,
+} from './utils/constants-validation';
 // Re-export key types from branded-enum for convenience
 export type {
   BrandedEnum,

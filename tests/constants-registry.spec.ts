@@ -277,3 +277,82 @@ describe('createI18nSetup constants flow', () => {
     result.reset();
   });
 });
+
+describe('II18nConstants interface acceptance', () => {
+  beforeEach(() => {
+    I18nEngine.resetAll();
+  });
+
+  it('should accept an interface-typed constants object (not just plain objects)', () => {
+    // Simulates what consuming packages do: define an interface extending II18nConstants
+    interface IMyAppConstants extends II18nConstants {
+      Site: string;
+      Version: number;
+    }
+
+    const constants: IMyAppConstants = { Site: 'TestApp', Version: 42 };
+
+    const engine = I18nBuilder.create()
+      .withLanguages([
+        { id: 'en-US', name: 'English', code: 'en-US', isDefault: true },
+      ])
+      .build();
+
+    engine.register({
+      id: 'typed-app',
+      strings: { 'en-US': { greeting: 'Welcome to {Site} v{Version}' } },
+    });
+
+    // This must compile — II18nConstants has an index signature so interfaces extending it work
+    engine.registerConstants<IMyAppConstants>('typed-app', constants);
+    expect(engine.translate('typed-app', 'greeting')).toBe(
+      'Welcome to TestApp v42',
+    );
+  });
+
+  it('should accept constants via createI18nSetup with typed interface', () => {
+    interface ILibConstants extends II18nConstants {
+      LibName: string;
+      LibVersion: string;
+    }
+
+    const LibKeys = createI18nStringKeys('typed-lib', {
+      Info: 'typed-lib.info',
+    } as const);
+
+    const libConstants: ILibConstants = {
+      LibName: 'TypedLib',
+      LibVersion: '2.0',
+    };
+
+    const libPkg: I18nComponentPackage = {
+      config: {
+        id: 'typed-lib',
+        strings: {
+          'en-US': { 'typed-lib.info': '{LibName} v{LibVersion}' },
+        },
+      },
+      stringKeyEnum: LibKeys,
+      constants: libConstants,
+    };
+
+    const AppKeys = createI18nStringKeys('typed-consumer', {
+      Msg: 'typed-consumer.msg',
+    } as const);
+
+    const result = createI18nSetup({
+      componentId: 'typed-consumer',
+      stringKeyEnum: AppKeys,
+      strings: { 'en-US': { 'typed-consumer.msg': 'Using {LibName}' } },
+      instanceKey: 'typed-interface-test',
+      libraryComponents: [libPkg],
+    });
+
+    expect(result.engine.translateStringKey(LibKeys.Info)).toBe(
+      'TypedLib v2.0',
+    );
+    expect(result.translate(AppKeys.Msg)).toBe('Using TypedLib');
+
+    result.reset();
+  });
+});

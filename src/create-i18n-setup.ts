@@ -14,6 +14,7 @@ import {
 } from './core-i18n';
 import { GlobalActiveContext } from './global-active-context';
 import type { IActiveContext } from './interfaces/active-context.interface';
+import type { II18nConstants } from './interfaces/i18n-constants.interface';
 import type { I18nSetupConfig } from './interfaces/i18n-setup-config.interface';
 import type { I18nSetupResult } from './interfaces/i18n-setup-result.interface';
 import { LanguageCodes } from './language-codes';
@@ -140,13 +141,13 @@ export function createI18nSetup<TStringKeyEnum extends AnyBrandedEnum>(
       globalContext.setLanguageContextSpace(ctx, config.componentId),
     getLanguage: () => getActiveContext().language,
     getAdminLanguage: () => getActiveContext().adminLanguage,
-    registerConstants: (
+    registerConstants: <T extends II18nConstants>(
       componentId: string,
-      constants: Record<string, unknown>,
+      constants: T,
     ) => engine.registerConstants(componentId, constants),
-    updateConstants: (
+    updateConstants: <T extends II18nConstants>(
       componentId: string,
-      constants: Record<string, unknown>,
+      constants: T,
     ) => engine.updateConstants(componentId, constants),
     reset: () => {
       I18nEngine.removeInstance(instanceKey);

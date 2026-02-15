@@ -5,6 +5,7 @@
 
 import { I18nError } from '../errors/i18n-error';
 import { ComponentConfig, ValidationResult } from '../interfaces';
+import type { II18nConstants } from '../interfaces/i18n-constants.interface';
 import { getPluralCategory } from '../pluralization/language-plural-map';
 import { PluralString, resolvePluralString } from '../types/plural-types';
 import { replaceVariables } from '../utils';
@@ -15,13 +16,13 @@ import { replaceVariables } from '../utils';
 export class ComponentStore {
   private components = new Map<string, ComponentConfig>();
   private aliasMap = new Map<string, string>();
-  private constants?: Record<string, any>;
+  private constants?: II18nConstants;
 
   /**
    * Creates a new ComponentStore instance.
    * @param constants - Optional constants to be used in variable replacement.
    */
-  constructor(constants?: Record<string, any>) {
+  constructor(constants?: II18nConstants) {
     this.constants = constants;
   }
 
@@ -228,8 +229,7 @@ export class ComponentStore {
    * Sets constants for variable replacement.
    * @param constants - The constants to set.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setConstants(constants: Record<string, any>): void {
+  setConstants(constants: II18nConstants): void {
     this.constants = constants;
   }
 

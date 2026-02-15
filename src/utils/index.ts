@@ -1,3 +1,4 @@
+export * from './constants-validation';
 export * from './currency';
 export * from './html-escape';
 export * from './lru-cache';

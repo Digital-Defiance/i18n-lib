@@ -9,6 +9,7 @@
  */
 
 import { I18nError } from '../errors/i18n-error';
+import type { II18nConstants } from '../interfaces/i18n-constants.interface';
 import { validateObjectKeys } from '../utils/safe-object';
 
 /**
@@ -18,7 +19,7 @@ export interface ConstantsEntry {
   /** The component that registered these constants */
   readonly componentId: string;
   /** The constants record */
-  readonly constants: Readonly<Record<string, unknown>>;
+  readonly constants: Readonly<II18nConstants>;
 }
 
 /**
@@ -27,13 +28,13 @@ export interface ConstantsEntry {
  */
 export class ConstantsRegistry {
   /** Component ID → constants record */
-  private readonly entries = new Map<string, Record<string, unknown>>();
+  private readonly entries = new Map<string, II18nConstants>();
 
   /** Reverse lookup: constant key → owning component ID (first registrant wins) */
   private readonly keyOwnership = new Map<string, string>();
 
   /** Cached merged constants (invalidated on registration) */
-  private mergedCache: Record<string, unknown> | null = null;
+  private mergedCache: II18nConstants | null = null;
 
   /**
    * Registers constants for a component.
@@ -47,7 +48,7 @@ export class ConstantsRegistry {
    * @param constants - Key-value pairs to register
    * @throws {I18nError} If a key conflict is detected with a different value
    */
-  register(componentId: string, constants: Record<string, unknown>): void {
+  register<T extends II18nConstants>(componentId: string, constants: T): void {
     // Idempotent: skip if already registered for this component
     if (this.entries.has(componentId)) {
       return;
@@ -89,7 +90,7 @@ export class ConstantsRegistry {
    * @param componentId - The component updating these constants
    * @param constants - Key-value pairs to merge
    */
-  update(componentId: string, constants: Record<string, unknown>): void {
+  update<T extends II18nConstants>(componentId: string, constants: T): void {
     validateObjectKeys(constants);
 
     const existing = this.entries.get(componentId) ?? {};
@@ -114,7 +115,7 @@ export class ConstantsRegistry {
    * @param componentId - The component replacing its constants
    * @param constants - The new complete set of constants
    */
-  replace(componentId: string, constants: Record<string, unknown>): void {
+  replace<T extends II18nConstants>(componentId: string, constants: T): void {
     validateObjectKeys(constants);
 
     // Remove ownership of old keys belonging to this component
@@ -140,7 +141,7 @@ export class ConstantsRegistry {
    * Gets the constants registered for a specific component.
    * Returns undefined if the component has no registered constants.
    */
-  get(componentId: string): Readonly<Record<string, unknown>> | undefined {
+  get(componentId: string): Readonly<II18nConstants> | undefined {
     return this.entries.get(componentId);
   }
 
@@ -163,15 +164,12 @@ export class ConstantsRegistry {
    *
    * The result is cached and invalidated when constants change.
    */
-  getMerged(): Readonly<Record<string, unknown>> {
+  getMerged(): Readonly<II18nConstants> {
     if (this.mergedCache !== null) {
       return this.mergedCache;
     }
 
-    const merged: Record<string, unknown> = Object.create(null) as Record<
-      string,
-      unknown
-    >;
+    const merged: II18nConstants = Object.create(null) as II18nConstants;
 
     // First pass: collect all keys from all components
     for (const [componentId, constants] of this.entries) {
@@ -211,7 +209,7 @@ export class ConstantsRegistry {
    */
   private detectConflicts(
     componentId: string,
-    constants: Record<string, unknown>,
+    constants: II18nConstants,
   ): void {
     for (const [key, value] of Object.entries(constants)) {
       const owner = this.keyOwnership.get(key);

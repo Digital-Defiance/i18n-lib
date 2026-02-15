@@ -3,6 +3,7 @@
  */
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 
+import type { II18nConstants } from '../interfaces/i18n-constants.interface';
 import { safeStringify } from './html-escape';
 
 /**
@@ -43,7 +44,7 @@ export interface ReplaceVariablesOptions {
 export function replaceVariables(
   str: string,
   vars?: Record<string, any>,
-  constants?: Record<string, any>,
+  constants?: II18nConstants,
   options?: ReplaceVariablesOptions,
 ): string {
   if (typeof str !== 'string') {

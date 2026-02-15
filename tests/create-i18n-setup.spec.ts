@@ -10,6 +10,7 @@ import { I18nEngine } from '../src/core/i18n-engine';
 import { CoreI18nComponentId } from '../src/core-component-id';
 import { createI18nSetup } from '../src/create-i18n-setup';
 import { GlobalActiveContext } from '../src/global-active-context';
+import type { II18nConstants } from '../src/interfaces/i18n-constants.interface';
 import type { I18nSetupConfig } from '../src/interfaces/i18n-setup-config.interface';
 
 const AppKeys = createI18nStringKeys('test-app', {
@@ -249,5 +250,36 @@ describe('createI18nSetup', () => {
     expect(result1.engine).toBe(result2.engine);
     expect(result1.engine.hasComponent('test-lib')).toBe(true);
     expect(result2.engine.hasComponent('test-app2')).toBe(true);
+  });
+
+  it('should accept typed interface constants via II18nConstants', () => {
+    interface IAppConstants extends II18nConstants {
+      AppName: string;
+      AppVersion: number;
+    }
+
+    const typedConstants: IAppConstants = {
+      AppName: 'TypedApp',
+      AppVersion: 3,
+    };
+
+    const TypedKeys = createI18nStringKeys('typed-const-app', {
+      Title: 'typed-const-app.title',
+    } as const);
+
+    const result = createI18nSetup({
+      componentId: 'typed-const-app',
+      stringKeyEnum: TypedKeys,
+      strings: {
+        'en-US': {
+          'typed-const-app.title': '{AppName} v{AppVersion}',
+        },
+      },
+      instanceKey: 'typed-const-test',
+      constants: typedConstants,
+    });
+
+    expect(result.translate(TypedKeys.Title)).toBe('TypedApp v3');
+    result.reset();
   });
 });

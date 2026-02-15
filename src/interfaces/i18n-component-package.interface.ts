@@ -1,5 +1,6 @@
 import type { AnyBrandedEnum } from '@digitaldefiance/branded-enum';
 import type { ComponentConfig } from './component-config.interface';
+import type { II18nConstants } from './i18n-constants.interface';
 
 /**
  * Bundles a ComponentConfig with its optional branded string key enum.
@@ -12,5 +13,5 @@ export interface I18nComponentPackage {
   /** Optional branded string key enum for direct translateStringKey support */
   readonly stringKeyEnum?: AnyBrandedEnum;
   /** Optional constants to register for this component */
-  readonly constants?: Record<string, unknown>;
+  readonly constants?: II18nConstants;
 }

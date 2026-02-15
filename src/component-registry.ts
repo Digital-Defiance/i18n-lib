@@ -12,6 +12,7 @@ import {
   getComponentStringKeys,
 } from './component-definition';
 import { ComponentRegistration } from './component-registration';
+import type { II18nConstants } from './interfaces/i18n-constants.interface';
 import { RegistryError } from './registry-error';
 import { RegistryErrorType } from './registry-error-type';
 import { TranslationRequest } from './translation-request';
@@ -40,7 +41,7 @@ export class ComponentRegistry<TLanguages extends string> {
   >();
   private readonly validationConfig: ValidationConfig;
   private readonly registeredLanguages: Set<TLanguages>;
-  private readonly constants?: Record<string, any>;
+  private readonly constants?: II18nConstants;
 
   /**
    * Creates a new ComponentRegistry.
@@ -51,7 +52,7 @@ export class ComponentRegistry<TLanguages extends string> {
   constructor(
     languages: readonly TLanguages[],
     validationConfig: ValidationConfig,
-    constants?: Record<string, any>,
+    constants?: II18nConstants,
   ) {
     this.registeredLanguages = new Set(languages);
     this.validationConfig = validationConfig;

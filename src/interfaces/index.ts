@@ -14,3 +14,4 @@ export type * from './validation-result.interface';
 export type * from './i18n-component-package.interface';
 export type * from './i18n-setup-config.interface';
 export type * from './i18n-setup-result.interface';
+export type * from './i18n-constants.interface';

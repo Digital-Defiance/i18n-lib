@@ -1,3 +1,4 @@
+import type { II18nConstants } from './interfaces/i18n-constants.interface';
 import { CurrencyCode } from './utils/currency';
 import { Timezone } from './utils/timezone';
 import { ValidationConfig } from './validation-config';
@@ -5,7 +6,6 @@ import { ValidationConfig } from './validation-config';
 /**
  * Registry configuration
  */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface RegistryConfig<TLanguages extends string> {
   readonly defaultLanguage: TLanguages;
   readonly fallbackLanguage: TLanguages;
@@ -13,5 +13,5 @@ export interface RegistryConfig<TLanguages extends string> {
   readonly timezone: Timezone;
   readonly adminTimezone: Timezone;
   readonly validation: ValidationConfig;
-  readonly constants?: Record<string, any>;
+  readonly constants?: II18nConstants;
 }

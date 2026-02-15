@@ -1,6 +1,7 @@
 import type { AnyBrandedEnum } from '@digitaldefiance/branded-enum';
 import type { PluralString } from '../types/plural-types';
 import type { I18nComponentPackage } from './i18n-component-package.interface';
+import type { II18nConstants } from './i18n-constants.interface';
 
 /**
  * Configuration for the createI18nSetup factory function.
@@ -15,7 +16,7 @@ export interface I18nSetupConfig {
   /** Optional aliases for the application component */
   readonly aliases?: readonly string[];
   /** Optional constants to merge into the engine */
-  readonly constants?: Record<string, unknown>;
+  readonly constants?: II18nConstants;
   /** Library component packages to register before the app component */
   readonly libraryComponents?: readonly I18nComponentPackage[];
   /** Default language code (defaults to 'en-US') */

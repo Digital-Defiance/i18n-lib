@@ -591,6 +591,45 @@ engine.t('Price in {currency}', { currency: 'USD' }); // "Price in USD"
 
 Constants are application-wide values available as template variables in all translations (e.g., `{Site}` in a translation string resolves to the registered value). The `ConstantsRegistry` provides structured, per-component registration with conflict detection and ownership tracking.
 
+#### Type-Safe Constants with `II18nConstants`
+
+All constants passed to the i18n system must satisfy the `II18nConstants` base interface. Library authors define component-specific interfaces extending it for compile-time safety:
+
+```typescript
+import type { II18nConstants } from '@digitaldefiance/i18n-lib';
+
+// Define a typed constants interface for your component
+export interface IMyAppI18nConstants extends II18nConstants {
+  Site: string;
+  SiteTagline: string;
+  ApiVersion: number;
+}
+
+// TypeScript enforces the shape at compile time
+const constants: IMyAppI18nConstants = {
+  Site: 'Acme Corp',
+  SiteTagline: 'Building the future',
+  ApiVersion: 2,
+};
+```
+
+The library ships two helper types for working with typed constants:
+
+- `ConstantKeys<T>` — Extracts the string keys from a constants type
+- `ConstantVariables<T>` — Builds a `Partial<Record<key, string | number>>` for translation variable overrides
+
+```typescript
+import type { ConstantKeys, ConstantVariables } from '@digitaldefiance/i18n-lib';
+
+type Keys = ConstantKeys<IMyAppI18nConstants>;
+// 'Site' | 'SiteTagline' | 'ApiVersion'
+
+type Vars = ConstantVariables<IMyAppI18nConstants>;
+// { Site?: string | number; SiteTagline?: string | number; ApiVersion?: string | number }
+```
+
+Suite Core ships `ISuiteCoreI18nConstants` (from `@digitaldefiance/suite-core-lib`) with the standard template variable keys used in its translation strings.
+
 #### Registration Flow (via `createI18nSetup`)
 
 Library packages declare default constants in their `I18nComponentPackage`. The app overrides them at runtime. The factory handles the ordering automatically:
@@ -643,16 +682,22 @@ engine.resolveConstantOwner('Site');         // 'my-app' (last updater wins)
 Library authors can bundle default constants with their component package:
 
 ```typescript
-import type { I18nComponentPackage } from '@digitaldefiance/i18n-lib';
+import type { I18nComponentPackage, II18nConstants } from '@digitaldefiance/i18n-lib';
+
+export interface IMyLibI18nConstants extends II18nConstants {
+  LibName: string;
+  LibVersion: string;
+}
 
 export function createMyLibComponentPackage(): I18nComponentPackage {
+  const constants: IMyLibI18nConstants = {
+    LibName: 'My Library',
+    LibVersion: '1.0.0',
+  };
   return {
     config: createMyLibComponentConfig(),
     stringKeyEnum: MyLibStringKey,
-    constants: {
-      LibName: 'My Library',
-      LibVersion: '1.0.0',
-    },
+    constants,
   };
 }
 ```
@@ -684,6 +729,32 @@ engine.registerConstants('lib-b', { Site: 'Beta' });
 ```
 
 Use `updateConstants` instead of `registerConstants` when you intentionally want to override.
+
+#### Runtime Validation with `validateConstantsCoverage()`
+
+Use `validateConstantsCoverage()` in tests to verify that all `{variable}` references in your translation templates have corresponding constant keys. This catches drift between templates and constants at test time:
+
+```typescript
+import { validateConstantsCoverage } from '@digitaldefiance/i18n-lib';
+import { SuiteCoreComponentStrings } from '@digitaldefiance/suite-core-lib';
+
+const constants = { Site: 'Test', SiteTagline: 'Tagline', SiteDescription: 'Desc' };
+
+const result = validateConstantsCoverage(SuiteCoreComponentStrings, constants, {
+  ignoreVariables: ['count', 'name'], // runtime-only variables, not constants
+});
+
+expect(result.isValid).toBe(true);
+expect(result.missingConstants).toEqual([]);   // no template vars without constants
+expect(result.unusedConstants).toEqual([]);     // no constants without template refs
+expect(result.referencedVariables).toContain('Site');
+```
+
+The result object contains:
+- `isValid` — `true` if all template variables have matching constants
+- `missingConstants` — variable names referenced in templates but missing from constants
+- `unusedConstants` — constant keys registered but never referenced in any template
+- `referencedVariables` — all variable names found in templates
 
 **When to use:**
 - **Constants**: Application-wide values that rarely change (Site, Version, SiteTagline)

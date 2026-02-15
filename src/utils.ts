@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */
 
 import moment from 'moment-timezone';
+import type { II18nConstants } from './interfaces/i18n-constants.interface';
 
 /**
  * Replaces variables in a string with their corresponding values from vars or constants.
@@ -12,7 +13,7 @@ import moment from 'moment-timezone';
 export function replaceVariables(
   str: string,
   vars?: Record<string, string | number>,
-  constants?: Record<string, any>,
+  constants?: II18nConstants,
 ): string {
   // Ensure input is a string
   if (typeof str !== 'string') {

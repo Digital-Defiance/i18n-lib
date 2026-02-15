@@ -4,6 +4,7 @@ import type {
 } from '@digitaldefiance/branded-enum';
 import type { LanguageContextSpace } from '../types';
 import type { IActiveContext } from './active-context.interface';
+import type { II18nConstants } from './i18n-constants.interface';
 import type { II18nEngine } from './i18n-engine.interface';
 
 /**
@@ -42,14 +43,14 @@ export interface I18nSetupResult<
   /** Get the current admin language */
   readonly getAdminLanguage: () => string;
   /** Register constants for a component (available as template variables) */
-  readonly registerConstants: (
+  readonly registerConstants: <T extends II18nConstants>(
     componentId: string,
-    constants: Record<string, unknown>,
+    constants: T,
   ) => void;
   /** Update/override constants for a component (merges, app values win) */
-  readonly updateConstants: (
+  readonly updateConstants: <T extends II18nConstants>(
     componentId: string,
-    constants: Record<string, unknown>,
+    constants: T,
   ) => void;
   /** Reset the engine instance and context (useful for testing) */
   readonly reset: () => void;

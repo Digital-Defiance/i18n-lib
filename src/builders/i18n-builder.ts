@@ -5,7 +5,11 @@
 
 import type { AnyBrandedEnum } from '@digitaldefiance/branded-enum';
 import { I18nEngine } from '../core/i18n-engine';
-import { EngineConfig, LanguageDefinition } from '../interfaces';
+import {
+  EngineConfig,
+  II18nConstants,
+  LanguageDefinition,
+} from '../interfaces';
 
 export class I18nBuilder {
   private languages: LanguageDefinition[] = [];
@@ -36,8 +40,7 @@ export class I18nBuilder {
     return this;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  withConstants(constants: Record<string, any>): this {
+  withConstants<T extends II18nConstants>(constants: T): this {
     this.config.constants = constants;
     return this;
   }
