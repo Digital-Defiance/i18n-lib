@@ -469,12 +469,16 @@ export class I18nEngine implements II18nEngine {
     }
     const combined: Record<string, any> = createSafeObject();
 
-    // 1. Start with constants from config
+    // 1. Start with constants from config, then overlay registry constants
     if (this.config.constants) {
-      // Extract values from any wrapper objects in constants
       for (const [key, value] of Object.entries(this.config.constants)) {
         combined[key] = this.extractValue(value);
       }
+    }
+    // Registry constants override config constants (app overrides win)
+    const registryMerged = this.constantsRegistry.getMerged();
+    for (const [key, value] of Object.entries(registryMerged)) {
+      combined[key] = this.extractValue(value);
     }
 
     // 2. Add context variables (timezone, currency, language, etc.)
