@@ -51,6 +51,8 @@ export const I18nErrorCode = {
   STRING_KEY_NOT_REGISTERED: 'STRING_KEY_NOT_REGISTERED',
   /** Constant key conflict between components */
   CONSTANT_CONFLICT: 'CONSTANT_CONFLICT',
+  /** Constants failed branded interface schema validation */
+  CONSTANTS_SCHEMA_VALIDATION_FAILED: 'CONSTANTS_SCHEMA_VALIDATION_FAILED',
 } as const;
 
 /**
@@ -540,6 +542,32 @@ export class I18nError extends Error {
       `Constant key "${key}" conflict: component "${newComponent}" ` +
         `attempted to register a different value than component "${existingComponent}"`,
       { key, newComponent, existingComponent },
+    );
+  }
+
+  /**
+   * Creates an error for constants that fail branded interface schema validation.
+   * @param componentId - The component attempting registration
+   * @param interfaceId - The branded interface ID from the schema
+   * @param fieldErrors - Field-level validation errors from safeParseInterface
+   * @param message - The error message from the safe parse result
+   */
+  static constantsSchemaValidationFailed(
+    componentId: string,
+    interfaceId: string | undefined,
+    fieldErrors: ReadonlyArray<{ field: string; message: string }>,
+    message: string,
+  ): I18nError {
+    const fieldDetails =
+      fieldErrors.length > 0
+        ? fieldErrors.map((e) => `${e.field}: ${e.message}`).join('; ')
+        : message;
+    return new I18nError(
+      I18nErrorCode.CONSTANTS_SCHEMA_VALIDATION_FAILED,
+      `Constants schema validation failed for component "${componentId}"` +
+        (interfaceId ? ` (interface "${interfaceId}")` : '') +
+        `: ${fieldDetails}`,
+      { componentId, interfaceId, fieldErrors, originalMessage: message },
     );
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@digitaldefiance/i18n-lib",
-  "version": "4.6.2",
+  "version": "4.6.3",
   "description": "i18n library with enum translation support",
   "homepage": "https://github.com/Digital-Defiance/i18n-lib",
   "repository": {
@@ -49,7 +49,11 @@
     "moment-timezone": "^0.6.0",
     "tslib": "^2.3.0"
   },
+  "peerDependencies": {
+    "@digitaldefiance/branded-interface": "^0.0.4"
+  },
   "devDependencies": {
+    "@digitaldefiance/branded-interface": "^0.0.4",
     "@typescript-eslint/eslint-plugin": "^8.53.1",
     "@typescript-eslint/parser": "^8.53.1",
     "eslint-plugin-import": "^2.32.0",

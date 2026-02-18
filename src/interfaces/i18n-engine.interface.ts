@@ -8,6 +8,7 @@ import type {
   AnyBrandedEnum,
   BrandedEnumValue,
 } from '@digitaldefiance/branded-enum';
+import type { BrandedInterfaceDefinition } from '@digitaldefiance/branded-interface';
 import { ComponentConfig } from './component-config.interface';
 import type { II18nConstants } from './i18n-constants.interface';
 import { LanguageDefinition } from './language-definition.interface';
@@ -139,6 +140,18 @@ export interface II18nEngine {
   registerConstants<T extends II18nConstants>(
     componentId: string,
     constants: T,
+    schema?: BrandedInterfaceDefinition<T>,
+  ): void;
+
+  /**
+   * Registers a deferred schema for a component that doesn't have constants yet.
+   * The schema will be applied when constants are later registered via registerConstants().
+   * @param componentId - The component to associate the schema with
+   * @param schema - The branded interface definition for validation
+   */
+  registerDeferredSchema(
+    componentId: string,
+    schema: BrandedInterfaceDefinition,
   ): void;
 
   /**

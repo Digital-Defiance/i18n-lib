@@ -8,6 +8,8 @@
  * with different values.
  */
 
+import { safeParseInterface } from '@digitaldefiance/branded-interface';
+import type { BrandedInterfaceDefinition } from '@digitaldefiance/branded-interface';
 import { I18nError } from '../errors/i18n-error';
 import type { II18nConstants } from '../interfaces/i18n-constants.interface';
 import { validateObjectKeys } from '../utils/safe-object';
@@ -20,6 +22,8 @@ export interface ConstantsEntry {
   readonly componentId: string;
   /** The constants record */
   readonly constants: Readonly<II18nConstants>;
+  /** Optional branded interface schema for validation */
+  readonly schema?: BrandedInterfaceDefinition;
 }
 
 /**
@@ -36,6 +40,18 @@ export class ConstantsRegistry {
   /** Cached merged constants (invalidated on registration) */
   private mergedCache: II18nConstants | null = null;
 
+  /** Component ID → branded interface schema (stored alongside constants) */
+  private readonly schemas = new Map<
+    string,
+    BrandedInterfaceDefinition<Record<string, unknown>>
+  >();
+
+  /** Schemas registered without constants (for deferred validation) */
+  private readonly deferredSchemas = new Map<
+    string,
+    BrandedInterfaceDefinition<Record<string, unknown>>
+  >();
+
   /**
    * Registers constants for a component.
    *
@@ -44,14 +60,43 @@ export class ConstantsRegistry {
    * registered a constant with the same key but a different value, an
    * error is thrown to surface the conflict early.
    *
+   * When a branded interface schema is provided, the constants are validated
+   * against it before storing. On validation failure, an I18nError is thrown
+   * with field-level errors.
+   *
    * @param componentId - The component registering these constants
    * @param constants - Key-value pairs to register
+   * @param schema - Optional branded interface definition for validation
    * @throws {I18nError} If a key conflict is detected with a different value
+   * @throws {I18nError} If schema validation fails (CONSTANTS_SCHEMA_VALIDATION_FAILED)
    */
-  register<T extends II18nConstants>(componentId: string, constants: T): void {
+  register<T extends II18nConstants>(
+    componentId: string,
+    constants: T,
+    schema?: BrandedInterfaceDefinition<T>,
+  ): void {
     // Idempotent: skip if already registered for this component
     if (this.entries.has(componentId)) {
       return;
+    }
+
+    // Resolve schema: explicit parameter takes priority, then deferred schema
+    const effectiveSchema = schema ?? this.deferredSchemas.get(componentId);
+
+    // Validate against schema if one is available
+    if (effectiveSchema) {
+      this.validateAgainstSchema(
+        componentId,
+        constants,
+        effectiveSchema as BrandedInterfaceDefinition<Record<string, unknown>>,
+      );
+      // Clear deferred schema since we've now validated
+      this.deferredSchemas.delete(componentId);
+      // Store the schema for future update/replace validation
+      this.schemas.set(
+        componentId,
+        effectiveSchema as BrandedInterfaceDefinition<Record<string, unknown>>,
+      );
     }
 
     validateObjectKeys(constants);
@@ -66,6 +111,20 @@ export class ConstantsRegistry {
     }
 
     this.mergedCache = null;
+  }
+
+  /**
+   * Registers a deferred schema for a component that doesn't have constants yet.
+   * The schema will be applied when constants are later registered via register().
+   *
+   * @param componentId - The component to associate the schema with
+   * @param schema - The branded interface definition
+   */
+  registerDeferredSchema(
+    componentId: string,
+    schema: BrandedInterfaceDefinition,
+  ): void {
+    this.deferredSchemas.set(componentId, schema);
   }
 
   /**
@@ -93,6 +152,15 @@ export class ConstantsRegistry {
   update<T extends II18nConstants>(componentId: string, constants: T): void {
     validateObjectKeys(constants);
 
+    // Validate against stored schema if one exists
+    const storedSchema =
+      this.schemas.get(componentId) ?? this.deferredSchemas.get(componentId);
+    if (storedSchema) {
+      const existing = this.entries.get(componentId) ?? {};
+      const merged = { ...existing, ...constants };
+      this.validateAgainstSchema(componentId, merged, storedSchema);
+    }
+
     const existing = this.entries.get(componentId) ?? {};
     const merged = { ...existing, ...constants };
     this.entries.set(componentId, merged);
@@ -117,6 +185,13 @@ export class ConstantsRegistry {
    */
   replace<T extends II18nConstants>(componentId: string, constants: T): void {
     validateObjectKeys(constants);
+
+    // Validate against stored schema if one exists
+    const storedSchema =
+      this.schemas.get(componentId) ?? this.deferredSchemas.get(componentId);
+    if (storedSchema) {
+      this.validateAgainstSchema(componentId, constants, storedSchema);
+    }
 
     // Remove ownership of old keys belonging to this component
     const oldEntry = this.entries.get(componentId);
@@ -151,7 +226,8 @@ export class ConstantsRegistry {
   getAll(): readonly ConstantsEntry[] {
     const result: ConstantsEntry[] = [];
     for (const [componentId, constants] of this.entries) {
-      result.push({ componentId, constants });
+      const schema = this.schemas.get(componentId);
+      result.push({ componentId, constants, ...(schema ? { schema } : {}) });
     }
     return result;
   }
@@ -200,6 +276,8 @@ export class ConstantsRegistry {
   clear(): void {
     this.entries.clear();
     this.keyOwnership.clear();
+    this.schemas.clear();
+    this.deferredSchemas.clear();
     this.mergedCache = null;
   }
 
@@ -219,6 +297,26 @@ export class ConstantsRegistry {
           throw I18nError.constantConflict(key, componentId, owner);
         }
       }
+    }
+  }
+
+  /**
+   * Validates constants against a branded interface schema.
+   * Throws I18nError with field-level errors on validation failure.
+   */
+  private validateAgainstSchema<T extends Record<string, unknown>>(
+    componentId: string,
+    constants: II18nConstants,
+    schema: BrandedInterfaceDefinition<T>,
+  ): void {
+    const result = safeParseInterface(constants, schema);
+    if (!result.success) {
+      throw I18nError.constantsSchemaValidationFailed(
+        componentId,
+        result.error.interfaceId,
+        result.error.fieldErrors ?? [],
+        result.error.message,
+      );
     }
   }
 }

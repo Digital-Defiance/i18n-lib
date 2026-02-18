@@ -1,4 +1,5 @@
 import type { AnyBrandedEnum } from '@digitaldefiance/branded-enum';
+import type { BrandedInterfaceDefinition } from '@digitaldefiance/branded-interface';
 import type { ComponentConfig } from './component-config.interface';
 import type { II18nConstants } from './i18n-constants.interface';
 
@@ -14,4 +15,6 @@ export interface I18nComponentPackage {
   readonly stringKeyEnum?: AnyBrandedEnum;
   /** Optional constants to register for this component */
   readonly constants?: II18nConstants;
+  /** Optional branded interface schema for validating constants */
+  readonly constantsSchema?: BrandedInterfaceDefinition;
 }

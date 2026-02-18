@@ -32,6 +32,15 @@ export function resetAll(): void {
 // =============================================================================
 // These exports provide runtime-identifiable string keys for i18n
 export * from './branded-string-key';
+// =============================================================================
+// Branded Interface Integration
+// =============================================================================
+// Constants schema helper for branded interface validation
+export * from './branded-constants-schema';
+// Branded translation options with runtime validation
+export * from './branded-translation-options';
+// Branded validation error formatter
+export * from './branded-validation-error-formatter';
 // Branded enum utilities for detection and extraction
 export * from './branded-enum-utils';
 // Factory function for simplified i18n setup

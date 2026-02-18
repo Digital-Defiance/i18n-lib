@@ -53,7 +53,14 @@ export function createI18nSetup<TStringKeyEnum extends AnyBrandedEnum>(
         engine.registerStringKeyEnum(pkg.stringKeyEnum, pkg.config.id);
       }
       if (pkg.constants && !engine.hasConstants(pkg.config.id)) {
-        engine.registerConstants(pkg.config.id, pkg.constants);
+        engine.registerConstants(
+          pkg.config.id,
+          pkg.constants,
+          pkg.constantsSchema,
+        );
+      } else if (pkg.constantsSchema && !pkg.constants) {
+        // Schema without constants: store for deferred validation
+        engine.registerDeferredSchema(pkg.config.id, pkg.constantsSchema);
       }
     }
   }
