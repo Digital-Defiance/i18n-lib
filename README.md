@@ -2065,6 +2065,57 @@ Contributions welcome! Please:
 
 ## ChangeLog
 
+### Version 4.6.4
+
+- Dependency updates (branded-interface, noble/curves, noble/hashes)
+
+### Version 4.6.3
+
+**Branded Translation Options & Constants Schema**
+
+- **NEW**: `createConstantsSchema()` — convenience wrapper for creating branded interface definitions for i18n constants validation
+- **NEW**: `BrandedTranslationOptions` — branded interface definition with runtime validation for translation option objects
+- **NEW**: `BrandedValidationErrorFormatter` — formats validation errors from branded interface parsing into human-readable messages with fallback chain support
+- Added `@digitaldefiance/branded-interface` dependency
+- Added `registerConstantsSchema()` and `getConstantsSchema()` to `ConstantsRegistry` for schema-aware constant registration
+- Comprehensive property-based tests for all new branded modules
+
+### Version 4.6.2
+
+**II18nConstants Interface & Constants Validation**
+
+- **NEW**: `II18nConstants` interface — base interface for all i18n constants with index signature support
+- **NEW**: `ConstantKeys<T>` and `ConstantVariables<T>` utility types for type-safe constant access
+- **NEW**: `validateConstantsCoverage()` — test utility to verify all `{variable}` references in translation templates have corresponding constant keys
+- Updated `ConstantsRegistry` with improved conflict detection and error messages
+- Updated `createI18nSetup()` to accept constants registration in setup config
+- Added constants validation tests and `createI18nSetup` integration tests
+- Updated README with constants registration documentation
+
+### Version 4.6.1
+
+- Fixed constants merging in `I18nEngine`: registry constants now properly overlay config constants (app overrides win)
+
+### Version 4.6.0
+
+**Constants Registry**
+
+- **NEW**: `ConstantsRegistry` — structured, namespaced constant registration with conflict detection and merged flat lookup for template variable replacement
+- **NEW**: `registerConstants()` / `getConstants()` / `getMergedConstants()` on `II18nEngine` for per-component constant management
+- **NEW**: `I18nSetupResult` interface for typed factory output
+- **NEW**: `I18nError` class for structured i18n error handling
+- Updated `createI18nSetup()` to return `I18nSetupResult` with engine and component references
+- Updated `I18nComponentPackage` interface with optional constants field
+- Updated README with Constants Registry documentation
+
+### Version 4.5.0
+
+**Cross-Module Enum Registration & Structural Fallback**
+
+- `registerStringKeyEnum()` now accepts an optional explicit `componentId` parameter as an escape hatch for cross-module scenarios where Symbol-based branded enum detection fails
+- Enhanced `StringKeyEnumRegistry` with multi-step detection strategy: reference check → explicit componentId → branded enum detection → structural fallback
+- Added comprehensive cross-module tests: backward compatibility, fallback behavior, setup factory integration, structural fallback, and Symbol isolation
+
 ### Version 4.4.0
 
 **Factory-Based i18n Setup & Browser-Safe Fallback**
