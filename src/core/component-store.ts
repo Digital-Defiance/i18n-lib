@@ -4,11 +4,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 
 import { I18nError } from '../errors/i18n-error';
+import { formatICUMessage } from '../icu/helpers';
 import { ComponentConfig, ValidationResult } from '../interfaces';
 import type { II18nConstants } from '../interfaces/i18n-constants.interface';
 import { getPluralCategory } from '../pluralization/language-plural-map';
 import { PluralString, resolvePluralString } from '../types/plural-types';
 import { replaceVariables } from '../utils';
+
+/** Detect ICU MessageFormat patterns like {var, plural, ...} or {var, select, ...} */
+const ICU_PATTERN = /\{[^,}]+,\s*(?:plural|select|selectordinal)\s*,/;
 
 /**
  * Class representing a storage for component configurations and translations.
@@ -137,6 +141,17 @@ export class ComponentStore {
 
     // Resolve plural form if needed
     const translation = this.resolvePluralForm(value, variables?.count, lang);
+
+    // If the resolved string contains ICU MessageFormat syntax (plural/select),
+    // format it with the ICU engine instead of simple variable replacement.
+    if (typeof translation === 'string' && ICU_PATTERN.test(translation)) {
+      try {
+        return formatICUMessage(translation, variables ?? {}, lang);
+      } catch {
+        // Fall back to simple replacement if ICU parsing fails
+        return replaceVariables(translation, variables, this.constants);
+      }
+    }
 
     return replaceVariables(translation, variables, this.constants);
   }
