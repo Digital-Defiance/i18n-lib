@@ -30,6 +30,7 @@ import {
   findStringKeySources,
   resolveStringKeyComponent,
 } from './branded-string-key';
+import { getUtcDateVars } from './utc-date-vars';
 
 /**
  * Plugin-based I18n Engine with registration capabilities
@@ -158,6 +159,7 @@ export class PluginI18nEngine<TLanguages extends string> {
 
       // Step 2: Get context variables (timezone, currency, language)
       const context = this.getContext();
+      const dateVars = getUtcDateVars();
       const contextVars: Record<string, string | number> = {
         timezone:
           context.currentContext === 'admin'
@@ -172,6 +174,10 @@ export class PluginI18nEngine<TLanguages extends string> {
         adminTimezone: context.adminTimezone.value,
         userLanguage: context.language,
         adminLanguage: context.adminLanguage,
+        YEAR: dateVars.YEAR,
+        MONTH: dateVars.MONTH,
+        DAY: dateVars.DAY,
+        NOW: dateVars.NOW,
       };
 
       // Step 3: Replace remaining variable patterns like {varName} with merged variables
@@ -520,11 +526,18 @@ export class PluginI18nEngine<TLanguages extends string> {
     variables?: Record<string, string | number>,
     language?: TLanguages,
   ): string {
+    // Merge date vars as defaults, user-provided variables take precedence
+    const dateVars = getUtcDateVars();
+    const mergedVars: Record<string, string | number> = {
+      ...dateVars,
+      ...variables,
+    };
+
     const request: TranslationRequest<TStringKeys, TLanguages> = {
       componentId,
       stringKey,
       language: language || this.getCurrentLanguage(),
-      variables,
+      variables: mergedVars,
     };
 
     const response = this.componentRegistry.getTranslation(request);

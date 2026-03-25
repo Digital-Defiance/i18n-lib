@@ -2,6 +2,8 @@
  * Template processing utilities for i18n
  */
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+import { getUtcDateVars } from './utc-date-vars';
+
 export type EnumKeys<T> = keyof T;
 
 /**
@@ -61,6 +63,13 @@ export function createTemplateProcessor<
         if (!['__proto__', 'constructor', 'prototype'].includes(key)) {
           allVars[key] = value;
         }
+      }
+    }
+    // Inject UTC date variables as defaults (user-provided vars take precedence)
+    const dateVars = getUtcDateVars();
+    for (const [key, value] of Object.entries(dateVars)) {
+      if (!(key in allVars)) {
+        allVars[key] = value;
       }
     }
     // Limited pattern to prevent ReDoS

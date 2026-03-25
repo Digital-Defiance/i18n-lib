@@ -4,33 +4,19 @@ A production-ready TypeScript internationalization library with component-based 
 
 Part of [Express Suite](https://github.com/Digital-Defiance/express-suite)
 
-## What's New in v4.3.0
+## What's New in v4.7.0
 
-✨ **String Key Enum Registration** - Register branded string key enums for direct translation without specifying component IDs.
+✨ **Built-in Date/Time Template Variables** — `{YEAR}`, `{MONTH}`, `{DAY}`, and `{NOW}` are now automatically available in all translation paths without explicit variable passing.
 
-**Prerequisites**: Requires branded enums from v4.0.4+ (see [Branded Enums](#branded-enums) section)
-
-**New Features:**
-- **`registerStringKeyEnum()`**: Register branded enums for automatic component routing
-- **`translateStringKey()`**: Translate keys directly - component ID resolved from branded enum
-- **`safeTranslateStringKey()`**: Safe version returning placeholder on failure
-- **`hasStringKeyEnum()` / `getStringKeyEnums()`**: Query registered enums
+- `{YEAR}`, `{MONTH}`, `{DAY}` — current UTC date as strings (month/day zero-padded)
+- `{NOW}` — epoch milliseconds for ICU date/time formatting: `{NOW, date, long}` → locale-aware output
+- ICU `date`/`time`/`number` patterns now correctly route through the ICU formatting pipeline
 
 ```typescript
-import { createI18nStringKeysFromEnum, PluginI18nEngine, LanguageCodes } from '@digitaldefiance/i18n-lib';
-
-// First, create a branded enum from your string keys
-enum MyStringKeys {
-  Welcome = 'welcome',
-  Goodbye = 'goodbye',
-}
-const MyBrandedKeys = createI18nStringKeysFromEnum('my-component', MyStringKeys);
-
-// Register your branded enum
-engine.registerStringKeyEnum(MyBrandedKeys);
-
-// Translate without component ID - it's resolved automatically
-const text = engine.translateStringKey(MyBrandedKeys.Welcome, { name: 'Alice' });
+engine.t('Copyright {YEAR}');                    // "Copyright 2026"
+engine.t('Date: {YEAR}-{MONTH}-{DAY}');          // "Date: 2026-03-25"
+engine.translate('app', 'posted');               // "Posted on March 25, 2026"
+engine.translate('app', 'posted', {}, 'fr');     // "Publié le 25 mars 2026"
 ```
 
 ## Features
@@ -53,8 +39,8 @@ const text = engine.translateStringKey(MyBrandedKeys.Welcome, { name: 'Alice' })
   - Alias resolution: `{{Alias.key}}`
   - Enum name resolution: `{{EnumName.value}}`
   - Variable substitution: `{variable}`
-  - Context variables: `{currency}`, `{timezone}`, `{language}`
-- **Context Integration**: Automatic injection of currency, timezone, and language from GlobalActiveContext
+  - Context variables: `{currency}`, `{timezone}`, `{language}`, `{YEAR}`, `{MONTH}`, `{DAY}`, `{NOW}`
+- **Context Integration**: Automatic injection of currency, timezone, language, and UTC date/time from GlobalActiveContext
 - **Smart Object Handling**: CurrencyCode and Timezone objects automatically extract values
 - **Multiple Instances**: Create isolated i18n engines for different contexts
 - **Fluent Builder**: I18nBuilder for clean, chainable engine configuration
@@ -491,16 +477,23 @@ engine.t('Price in {currency}'); // Uses context currency
 engine.t('Time: {timezone}'); // Uses context timezone
 engine.t('Language: {language}'); // Uses current language
 
+// Date/time variables (automatic UTC injection)
+engine.t('Copyright {YEAR}');            // "Copyright 2026"
+engine.t('Date: {YEAR}-{MONTH}-{DAY}'); // "Date: 2026-03-25"
+engine.t('Timestamp: {NOW}');            // "Timestamp: 1742918400000" (epoch ms)
+
 // CurrencyCode and Timezone objects
 const currency = new CurrencyCode('EUR');
 const timezone = new Timezone('America/New_York');
 engine.t('Price: {amount} {currency}', { amount: 100, currency });
 // Output: "Price: 100 EUR"
 
-// Variable priority: provided > context > constants
+// Variable priority: provided > context > date/time > constants
 engine.t('{AppName}'); // Uses constant
 engine.t('{currency}'); // Uses context
+engine.t('{YEAR}');     // Uses built-in UTC date
 engine.t('{currency}', { currency: 'GBP' }); // Uses provided (overrides context)
+engine.t('{YEAR}', { YEAR: '1776' });         // Uses provided (overrides built-in)
 
 // Mixed patterns
 engine.t('{{auth.login}}: {username} ({currency})', { username: 'admin' });
@@ -583,9 +576,65 @@ engine.t('Price in {currency}'); // "Price in EUR"
 engine.t('Timezone: {timezone}'); // "Timezone: Europe/Paris"
 engine.t('Language: {language}'); // "Language: fr"
 
+// UTC date/time variables (always available, no context setup needed)
+engine.t('Copyright {YEAR}');            // "Copyright 2026"
+engine.t('Date: {YEAR}-{MONTH}-{DAY}'); // "Date: 2026-03-25"
+
 // Override context with provided variables
 engine.t('Price in {currency}', { currency: 'USD' }); // "Price in USD"
+engine.t('Year: {YEAR}', { YEAR: '1776' });            // "Year: 1776"
 ```
+
+#### ICU Date/Time Formatting with `{NOW}`
+
+The built-in `{NOW}` variable (epoch milliseconds) works with ICU MessageFormat `date` and `time` types for locale-aware formatting. This works in both `I18nEngine` and `PluginI18nEngine`.
+
+```typescript
+// Register translations with ICU date/time patterns
+engine.register({
+  id: 'app',
+  strings: {
+    'en-US': {
+      posted: 'Posted on {NOW, date, long}',
+      updated: 'Last updated {NOW, date, medium} at {NOW, time, short}',
+    },
+    'fr': {
+      posted: 'Publié le {NOW, date, long}',
+      updated: 'Mis à jour le {NOW, date, medium} à {NOW, time, short}',
+    },
+  },
+});
+
+// NOW is injected automatically — no need to pass it
+engine.translate('app', 'posted');
+// en-US → "Posted on March 25, 2026"
+
+engine.translate('app', 'posted', {}, 'fr');
+// fr → "Publié le 25 mars 2026"
+
+engine.translate('app', 'updated');
+// en-US → "Last updated Mar 25, 2026 at 2:30 PM"
+
+// Override with a specific timestamp
+const launchDate = new Date('2024-07-04T12:00:00Z').getTime();
+engine.translate('app', 'posted', { NOW: launchDate });
+// → "Posted on July 4, 2024"
+```
+
+**Available ICU date/time styles:**
+
+| Pattern | Style | en-US Example |
+|---|---|---|
+| `{NOW, date, short}` | Short date | 3/25/26 |
+| `{NOW, date, medium}` | Medium date | Mar 25, 2026 |
+| `{NOW, date, long}` | Long date | March 25, 2026 |
+| `{NOW, date, full}` | Full date | Wednesday, March 25, 2026 |
+| `{NOW, time, short}` | Short time | 2:30 PM |
+| `{NOW, time, medium}` | Medium time | 2:30:00 PM |
+| `{NOW, time, long}` | Long time | 2:30:00 PM UTC |
+| `{NOW, time, full}` | Full time | 2:30:00 PM Coordinated Universal Time |
+
+All styles are locale-aware — the same pattern produces different output per language via `Intl.DateTimeFormat`. Both `I18nEngine` and `PluginI18nEngine` support ICU date/time formatting.
 
 ### Constants Management
 
@@ -760,8 +809,9 @@ The result object contains:
 - **Constants**: Application-wide values that rarely change (Site, Version, SiteTagline)
 - **Variables**: Request-specific or dynamic values passed to translate()
 - **Context**: User-specific values (currency, timezone, language)
+- **Date/Time**: Built-in UTC values (YEAR, MONTH, DAY, NOW) — always available, no setup needed
 
-**Variable priority**: provided variables > context > constants
+**Variable priority**: provided variables > context > date/time built-ins > constants
 
 ### Language Management
 
@@ -1011,6 +1061,7 @@ const engine = PluginI18nEngine.createInstance<MyLanguages>('app', [
 - `safeCoreTranslation(stringKey, variables?, language?, instanceKey?)` - Safe core translation
 - `getCoreLanguageCodes()` - Get array of core language codes
 - `getCoreLanguageDefinitions()` - Get core language definitions
+- `getUtcDateVars()` - Returns `{ YEAR, MONTH, DAY, NOW }` with current UTC date values (strings for date parts, epoch ms number for NOW)
 
 ## Testing
 
@@ -2064,6 +2115,39 @@ Contributions welcome! Please:
 - **Examples**: See tests/ directory
 
 ## ChangeLog
+
+### Version 4.7.0
+
+**Built-in Date/Time Template Variables & ICU Date/Time Routing**
+
+- **NEW**: `{YEAR}`, `{MONTH}`, `{DAY}` built-in template variables — automatically injected as UTC values (zero-padded month/day) into all translation paths without requiring explicit variable passing
+- **NEW**: `{NOW}` built-in variable — epoch milliseconds (number) for use with ICU date/time formatting: `{NOW, date, long}` → "March 25, 2026", `{NOW, time, short}` → "2:30 PM"
+- **NEW**: `getUtcDateVars()` exported utility — returns `{ YEAR, MONTH, DAY, NOW }` computed at call time
+- **FIX**: ICU pattern detection in `ComponentStore` now routes `{var, date, ...}`, `{var, time, ...}`, and `{var, number, ...}` patterns through the ICU formatting pipeline (previously only `plural`/`select`/`selectordinal` were routed)
+- **FIX**: `ComponentRegistry` (used by `PluginI18nEngine`) now also routes ICU date/time/number/plural/select patterns through the ICU formatting pipeline
+- Date variables are injected at all translation layers: `replaceVariables()`, `createTemplateProcessor()`, `PluginI18nEngine.translate()`, `PluginI18nEngine.t()`, and `I18nEngine.buildCombinedVariables()`
+- User-provided variables always take precedence over built-in date variables
+- 43 new tests covering all injection paths, ICU date/time formatting in both engines, locale-aware output, and override behavior
+
+```typescript
+// Simple date interpolation (all engines)
+engine.t('Copyright {YEAR}');           // "Copyright 2026"
+engine.t('Date: {YEAR}-{MONTH}-{DAY}'); // "Date: 2026-03-25"
+
+// ICU locale-aware formatting (I18nEngine via ComponentStore)
+engine.register({
+  id: 'app',
+  strings: {
+    'en-US': { posted: 'Posted on {NOW, date, long}' },
+    'fr':    { posted: 'Publié le {NOW, date, long}' },
+  },
+});
+engine.translate('app', 'posted');         // "Posted on March 25, 2026"
+engine.translate('app', 'posted', {}, 'fr'); // "Publié le 25 mars 2026"
+
+// Override with explicit value
+engine.t('Year: {YEAR}', { YEAR: '1776' }); // "Year: 1776"
+```
 
 ### Version 4.6.4
 

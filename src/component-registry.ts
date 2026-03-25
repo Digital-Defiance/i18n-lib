@@ -12,6 +12,7 @@ import {
   getComponentStringKeys,
 } from './component-definition';
 import { ComponentRegistration } from './component-registration';
+import { formatICUMessage } from './icu/helpers';
 import type { II18nConstants } from './interfaces/i18n-constants.interface';
 import { RegistryError } from './registry-error';
 import { RegistryErrorType } from './registry-error-type';
@@ -26,6 +27,10 @@ import {
 import { isTemplate, replaceVariables } from './utils';
 import { ValidationConfig } from './validation-config';
 import { ValidationResult, CollisionWarning } from './validation-result';
+
+/** Detect ICU MessageFormat patterns like {var, date, ...}, {var, time, ...}, {var, number, ...}, {var, plural, ...}, {var, select, ...} */
+const ICU_PATTERN =
+  /\{[^,}]+,\s*(?:plural|select|selectordinal|date|time|number)\b/;
 
 /**
  * Registry for managing components and their translations
@@ -262,9 +267,26 @@ export class ComponentRegistry<TLanguages extends string> {
       );
     }
 
-    // Process variables if the string key indicates it's a template
+    // Process the translation string:
+    // 1. If it contains ICU MessageFormat syntax (date/time/number/plural/select), use the ICU engine
+    // 2. If the string key indicates it's a template, do simple variable replacement
     let processedTranslation: string = translation;
-    if (isTemplate(stringKey)) {
+    if (ICU_PATTERN.test(translation)) {
+      try {
+        processedTranslation = formatICUMessage(
+          translation,
+          variables ?? {},
+          actualLanguage,
+        );
+      } catch {
+        // Fall back to simple replacement if ICU parsing fails
+        processedTranslation = replaceVariables(
+          translation,
+          variables,
+          this.constants,
+        );
+      }
+    } else if (isTemplate(stringKey)) {
       processedTranslation = replaceVariables(
         translation,
         variables,

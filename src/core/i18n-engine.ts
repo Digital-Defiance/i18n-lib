@@ -20,6 +20,7 @@ import {
   LanguageDefinition,
   ValidationResult,
 } from '../interfaces';
+import { getUtcDateVars } from '../utc-date-vars';
 import { CurrencyCode } from '../utils/currency';
 import {
   createSafeObject,
@@ -530,6 +531,12 @@ export class I18nEngine implements II18nEngine {
       }
     } catch (_error) {
       // GlobalActiveContext not available or not initialized - continue without context vars
+    }
+
+    // 2b. Add UTC date variables (YEAR, MONTH, DAY)
+    const dateVars = getUtcDateVars();
+    for (const [key, value] of Object.entries(dateVars)) {
+      combined[key] = value;
     }
 
     // 3. Override with provided variables (highest priority)

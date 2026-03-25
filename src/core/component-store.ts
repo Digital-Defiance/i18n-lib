@@ -11,8 +11,9 @@ import { getPluralCategory } from '../pluralization/language-plural-map';
 import { PluralString, resolvePluralString } from '../types/plural-types';
 import { replaceVariables } from '../utils';
 
-/** Detect ICU MessageFormat patterns like {var, plural, ...} or {var, select, ...} */
-const ICU_PATTERN = /\{[^,}]+,\s*(?:plural|select|selectordinal)\s*,/;
+/** Detect ICU MessageFormat patterns like {var, plural, ...}, {var, select, ...}, {var, date, ...}, {var, time, ...}, or {var, number, ...} */
+const ICU_PATTERN =
+  /\{[^,}]+,\s*(?:plural|select|selectordinal|date|time|number)\b/;
 
 /**
  * Class representing a storage for component configurations and translations.

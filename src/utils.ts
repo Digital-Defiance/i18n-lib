@@ -2,6 +2,7 @@
 
 import moment from 'moment-timezone';
 import type { II18nConstants } from './interfaces/i18n-constants.interface';
+import { getUtcDateVars } from './utc-date-vars';
 
 /**
  * Replaces variables in a string with their corresponding values from vars or constants.
@@ -23,6 +24,8 @@ export function replaceVariables(
   const variables = str.match(/\{(.+?)\}/g);
   if (!variables) return str;
 
+  const dateVars = getUtcDateVars();
+
   let result = str;
   for (const variable of variables) {
     const varName = variable.slice(1, -1);
@@ -32,6 +35,8 @@ export function replaceVariables(
       replacement = String(vars[varName]);
     } else if (constants && varName in constants) {
       replacement = String(constants[varName]);
+    } else if (varName in dateVars) {
+      replacement = String(dateVars[varName]);
     }
 
     if (replacement) {

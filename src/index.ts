@@ -80,6 +80,7 @@ export * from './template';
 export * from './translation-engine';
 export * from './translation-request';
 export * from './translation-response';
+export * from './utc-date-vars';
 export * from './validation-config';
 // Legacy convenience exports
 export {
