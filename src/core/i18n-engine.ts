@@ -1172,6 +1172,29 @@ export class I18nEngine implements II18nEngine {
       warnings.push(...result.warnings);
     }
 
+    // Cross-check registered string key enums against string tables.
+    // Every enum value should have a translation in every registered language.
+    for (const entry of this.stringKeyEnumRegistry.getAll()) {
+      const enumValues = Object.values(entry.enumObj) as string[];
+      const componentId = entry.componentId;
+      if (!this.componentStore.has(componentId)) {
+        warnings.push(
+          `String key enum registered for component "${componentId}" but component is not registered`,
+        );
+        continue;
+      }
+      const component = this.componentStore.get(componentId);
+      for (const [lang, langStrings] of Object.entries(component.strings)) {
+        for (const value of enumValues) {
+          if (typeof value === 'string' && !langStrings[value]) {
+            warnings.push(
+              `Missing translation for key "${value}" in language "${lang}" (component: "${componentId}")`,
+            );
+          }
+        }
+      }
+    }
+
     return {
       isValid: errors.length === 0,
       errors,

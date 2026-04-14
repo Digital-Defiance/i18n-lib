@@ -127,6 +127,12 @@ export class ComponentStore {
     variables?: Record<string, any>,
     language?: string,
   ): string {
+    if (key === undefined || key === null) {
+      throw I18nError.invalidConfig(
+        `translate() called with ${String(key)} key for component "${componentId}". ` +
+          `This usually means a string key enum member does not exist in the installed version.`,
+      );
+    }
     const component = this.get(componentId);
     const lang = language || 'en-US';
     const langStrings = component.strings[lang];
