@@ -158,20 +158,22 @@ export class I18nError extends Error {
     language: string,
     messageLanguage = 'en-US',
   ): I18nError {
-    const hasNestedKey = stringKey.includes('.');
+    const safeKey = stringKey ?? '<undefined>';
+    const safeComponent = componentId ?? '<undefined>';
+    const hasNestedKey = safeKey.includes('.');
     const message = formatICUMessage(
       'Translation missing: {hasNested, select, true {nested path} other {key}} {componentId}.{stringKey} not found in language {language}',
       {
-        componentId,
-        stringKey,
+        componentId: safeComponent,
+        stringKey: safeKey,
         language,
         hasNested: hasNestedKey ? 'true' : 'false',
       },
       messageLanguage,
     );
     return new I18nError(I18nErrorCode.TRANSLATION_MISSING, message, {
-      componentId,
-      stringKey,
+      componentId: safeComponent,
+      stringKey: safeKey,
       language,
     });
   }
