@@ -82,6 +82,8 @@ export * from './translation-request';
 export * from './translation-response';
 export * from './utc-date-vars';
 export * from './validation-config';
+// Strict (non-partial) type aliases for compile-time translation completeness checks
+export * from './strict-types';
 // Legacy convenience exports
 export {
   createCorePluginI18nEngine as createCoreI18n,
