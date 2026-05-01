@@ -29,7 +29,7 @@ export function replaceVariables(
   let result = str;
   for (const variable of variables) {
     const varName = variable.slice(1, -1);
-    let replacement = '';
+    let replacement: string | null = null;
 
     if (vars && varName in vars) {
       replacement = String(vars[varName]);
@@ -39,7 +39,7 @@ export function replaceVariables(
       replacement = String(dateVars[varName]);
     }
 
-    if (replacement) {
+    if (replacement !== null) {
       result = result.replace(variable, replacement);
     }
   }
