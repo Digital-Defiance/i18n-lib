@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ContextErrorType } from '../context-error-type';
 import { CoreI18nComponentId } from '../core-component-id';
 import { CoreStringKeys } from '../core-string-key';
+import { I18nEngine } from '../core/i18n-engine';
 import { EnhancedErrorHelper } from './enhanced-error-base';
-
-// Lazy reference to I18nEngine to avoid circular dependencies
-let engineGetter: (() => any) | undefined;
 
 /**
  * Error class for context-related failures in the i18n system.
@@ -53,13 +51,7 @@ export class ContextError extends Error {
     // Lazy initialization: get engine instance at runtime to avoid circular dependencies
     let message: string;
     try {
-      // Lazy load I18nEngine to break circular dependency
-      if (!engineGetter) {
-        // Dynamically import at runtime
-        const coreModule = eval('require')('../core');
-        engineGetter = () => coreModule.I18nEngine.getInstance('default');
-      }
-      const engine = engineGetter();
+      const engine = I18nEngine.getInstance('default');
       const allVars = { ...variables, contextKey: contextKey || '' };
       message = contextKey
         ? engine.safeTranslate(
