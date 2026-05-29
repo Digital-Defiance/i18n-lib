@@ -2,7 +2,7 @@
  * Currency utilities (v2)
  */
 
-import { codes, data } from 'currency-codes';
+import { codes, data } from 'fresh-currency-codes';
 
 /**
  * Position of the currency symbol relative to the amount.
@@ -31,12 +31,19 @@ export interface CurrencyData {
   code: string;
   /** Numeric currency code */
   number: string;
-  /** Number of decimal digits */
-  digits: number;
+  /**
+   * Number of minor units the currency subdivides into. `null` when ISO
+   * declares the value as `N.A.` (e.g. XAU — no minor unit at all). `null`
+   * and `0` are semantically distinct: JPY has zero minor units, XAU has
+   * none.
+   */
+  digits: number | null;
   /** Currency name */
   currency: string;
   /** Countries using this currency */
   countries: string[];
+  /** Indicates if the currency is currently active */
+  active: boolean;
 }
 
 /**
