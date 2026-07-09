@@ -12,11 +12,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@digitaldefiance/branded-interface@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "@digitaldefiance/branded-interface@npm:0.0.5"
+  dependencies:
+    "@swc/helpers": "npm:~0.5.11"
+  checksum: 10c0/800915035b9d84f4237716f6f94ecc666f608a71c84ac9eb6d58615580d9dcf0881690583c9eccebb1add2455b9437bad9dda8cc36579e5a0da1deb3b44676b5
+  languageName: node
+  linkType: hard
+
 "@digitaldefiance/i18n-lib@workspace:.":
   version: 0.0.0-use.local
   resolution: "@digitaldefiance/i18n-lib@workspace:."
   dependencies:
     "@digitaldefiance/branded-enum": "npm:0.0.7"
+    "@digitaldefiance/branded-interface": "npm:^0.0.5"
     "@typescript-eslint/eslint-plugin": "npm:^8.53.1"
     "@typescript-eslint/parser": "npm:^8.53.1"
     currency-codes: "npm:^2.2.0"
@@ -27,6 +37,8 @@ __metadata:
     moment: "npm:^2.30.1"
     moment-timezone: "npm:^0.6.0"
     tslib: "npm:^2.3.0"
+  peerDependencies:
+    "@digitaldefiance/branded-interface": ^0.0.5
   languageName: unknown
   linkType: soft
 
@@ -59,6 +71,15 @@ __metadata:
   version: 1.1.0
   resolution: "@rtsao/scc@npm:1.1.0"
   checksum: 10c0/b5bcfb0d87f7d1c1c7c0f7693f53b07866ed9fec4c34a97a8c948fb9a7c0082e416ce4d3b60beb4f5e167cbe04cdeefbf6771320f3ede059b9ce91188c409a5b
+  languageName: node
+  linkType: hard
+
+"@swc/helpers@npm:~0.5.11":
+  version: 0.5.19
+  resolution: "@swc/helpers@npm:0.5.19"
+  dependencies:
+    tslib: "npm:^2.8.0"
+  checksum: 10c0/30317ee644d390c88dd975b11b5260f7c70602bfb81ec386b3807d97a763215df7f501e43b0246e0773150fcfd835349bcdcb3b220d121e485ee528a72b5fd79
   languageName: node
   linkType: hard
 
@@ -1298,9 +1319,9 @@ __metadata:
   linkType: hard
 
 "picomatch@npm:^4.0.3":
-  version: 4.0.3
-  resolution: "picomatch@npm:4.0.3"
-  checksum: 10c0/9582c951e95eebee5434f59e426cddd228a7b97a0161a375aed4be244bd3fe8e3a31b846808ea14ef2c8a2527a6eeab7b3946a67d5979e81694654f939473ae2
+  version: 4.0.4
+  resolution: "picomatch@npm:4.0.4"
+  checksum: 10c0/e2c6023372cc7b5764719a5ffb9da0f8e781212fa7ca4bd0562db929df8e117460f00dff3cb7509dacfc06b86de924b247f504d0ce1806a37fac4633081466b0
   languageName: node
   linkType: hard
 
@@ -1622,7 +1643,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.3.0":
+"tslib@npm:^2.3.0, tslib@npm:^2.8.0":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
